@@ -79,8 +79,8 @@ DATABASES = {
         'NAME': 'basic',
         'USER': 'root',
         'PASSWORD': 'Cerc@2019',
-        #'HOST': '127.0.0.1',
-        #'PORT': '3306',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 
