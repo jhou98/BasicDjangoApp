@@ -1,0 +1,3 @@
+### Basic Django App 
+> A basic application in Django and Python that will connect to a local mySQL server to output data regarding electrical consumption for EV and Buildings at UBC. 
+> To be updated...
