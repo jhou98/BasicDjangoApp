@@ -49,3 +49,12 @@
 - In the command shell, run `python manage.py makemigrations graphs` to store our changes into a migration and then call `python manage.py sqlmigrate graphs 0001` and `python manage.py migrate` to create these model tables into our mySQL database 
     > The migrate command takes all migrations that have not been applied and runs them against your database 
     > In the future, for changes in models.py, call `python manage.py makemigrations` and `python manage.py migrate` to make the changes 
+- To add or modify the database, you can either run a python shell using `python manage.py shell` and creating and saving objects __OR__ creating and logging into the admin page at <u>localhost:8000/admin</u> and adding the following to the [admin.py in graphs](/graphs/admin.py)
+<table>
+
+    from django.contrib import admin
+    from .models import EVData
+
+    admin.site.register(EVData)
+
+</table>
