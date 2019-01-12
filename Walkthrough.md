@@ -16,9 +16,9 @@
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'NAME OF DB',
-        'USER': 'root',
-        'PASSWORD': 'PASSWORD OF ROOT',
+        'NAME': 'name of database',
+        'USER': 'username',
+        'PASSWORD': 'password',
         'HOST': '127.0.0.1',
         'PORT': 'PORT CONNECTED',
         }
@@ -58,3 +58,22 @@
     admin.site.register(EVData)
 
 </table>
+
+## Setting up mySQL Queries 
+- To create a new table in our database, use the following code in python: 
+<table>
+
+    import mysql 
+    from mysql import connector 
+
+    # Establish a connection to our mySQL db at localhost:3306 (add host and port if this changes)
+    # Assumes you have already created a database
+    myconnection = connector.MySQLConnection(user='username',password='password',database='name of database')
+    mycursor = myconnection.cursor()
+
+    # Creates a new table if there isn't already a table with the same name
+    mycursor.execute("CREATE TABLE IF NOT EXISTS tablename (id INT AUTO_INCREMENT PRIMARY KEY, namevars VARTYPE, ...")
+
+</table>
+
+- 

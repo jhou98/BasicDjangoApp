@@ -22,4 +22,3 @@ class EVData(models.Model):
 class EVData2(models.Model):
     data_date = models.Date()
     data_time = models.Time()
-    '00:00' = models.DecimalField(max_digits = 8, decimal_places = 3)
