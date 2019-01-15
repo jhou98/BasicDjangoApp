@@ -76,4 +76,52 @@
 
 </table>
 
-- 
+- After creating a table, add sample data either through a csv or xlsx file, which can be achieved through queries and pandas. 
+
+
+## Creating a CSS Template page 
+- To setup a template, you need to first create a new file called __views.py__ to store your different views: 
+<table>
+
+    def nameofview(request):
+    return render(request, "corresponding html file", {python files})
+
+</table>
+
+- In your __urls.py__ file, you will need to add the following code to link the view to your webpage: 
+<table>
+
+    from . import views
+
+    urlpatterns = [
+        path('path desired for url', views.nameofview, name='name for referencing'),
+    ]
+
+</table>
+
+- Finally, in your main [urls.py](/basic/urls.py) file, you will need to modify and add the following: 
+<table>
+
+    from django.urls import path, include
+
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('path desired for url', include('foldername.urls')),
+    ]
+    
+</table>
+
+- In the future, you will only need to do parts 1 and 2 as the path in our main __urls.py__ will already be setup. 
+- For creating the CSS template, we will be using [bootstrap](https://getbootstrap.com/) as a template 
+### Adding python functions to your page 
+- To add a python function to our page, modify our __views.py__ in a similar fashion as below: 
+<table>
+
+    def index(request):
+        from folder.pythonfile import pythonfunction
+        return render(request, "html file", {"reference": pythonfunction})
+
+</table>
+
+- In our __html file__ add `{{reference}}` where you wish to put the python function 
+

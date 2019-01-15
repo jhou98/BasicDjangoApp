@@ -2,4 +2,5 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 def index(request):
-    return HttpResponse("Hello world, you are at the Graphs index.")
+    from graphs.basedata import baseData
+    return render(request, "graphs.html", {"test_fn": baseData})
