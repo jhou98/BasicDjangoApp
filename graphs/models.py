@@ -18,7 +18,3 @@ class EVData(models.Model):
     """
     def __str__(self):
         return "Date: " + self.data_date.strftime('%m/%d/%Y') + " Time: " + self.data_time.strftime('%H:%M:%S')  + " kW: " + str(self.data_kW)
-
-class EVData2(models.Model):
-    data_date = models.Date()
-    data_time = models.Time()
