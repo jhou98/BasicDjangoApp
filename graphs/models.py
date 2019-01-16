@@ -31,4 +31,4 @@ class powerData(models.Model):
     Power = models.DecimalField(max_digits = 8, decimal_places = 3)
 
     def __str__(self):
-        return "The date is: " + self.Timestamp.strftime("%m/%d/%y %H:%M:%S") + " and The power is: " + str(self.Power)
+        return "Date: " + self.Timestamp.strftime("%m/%d/%y %H:%M:%S") + "  Power: " + str(self.Power)

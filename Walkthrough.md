@@ -86,7 +86,7 @@
 
 
 ## Creating a CSS Template page 
-- To setup a template, you need to first create a new file called __views.py__ to store your different views: 
+1. To setup a template, you need to first create a new file called __views.py__ to store your different views: 
 <table>
 
     def nameofview(request):
@@ -94,7 +94,7 @@
 
 </table>
 
-- In your __urls.py__ file, you will need to add the following code to link the view to your webpage: 
+2. In your __urls.py__ file, you will need to add the following code to link the view to your webpage: 
 <table>
 
     from . import views
@@ -105,7 +105,7 @@
 
 </table>
 
-- Finally, in your main [urls.py](/basic/urls.py) file, you will need to modify and add the following: 
+3. Finally, in your main [urls.py](/basic/urls.py) file, you will need to modify and add the following: 
 <table>
 
     from django.urls import path, include
@@ -130,4 +130,88 @@
 </table>
 
 - In our __html file__ add `{{reference}}` where you wish to put the python function 
+### Creating a List View 
+- This subsection will walk through how to create a simple list of datapoints in our web app
+    >> Creating a __powerData model__
+    >> Creating and linking the view to our url 
+    >> Creating a basic unordered list in our HTML template
+#### Power Data Model
+- In our [models.py](/graphs/models.py) create a class called `powerData`: 
+<table>
 
+    class powerData(models.Model):
+        """
+        Class that holds 3 variables
+            1. index 
+            2. Timestamp: DateTime
+            3. Power: Decimal(max digits = 8, decimal places = 3)
+        """
+        index = models.AutoField(primary_key=True)
+        Timestamp = models.DateTimeField()
+        Power = models.DecimalField(max_digits = 8, decimal_places = 3)
+
+        def __str__(self):
+            return "The date is: " + self.Timestamp.strftime("%m/%d/%y %H:%M:%S") + " and The power is: " + str(self.Power)
+</table>
+
+- Run the migrations into our database 
+- Add data values into our new powerData model by running the following code: 
+<table>
+
+    def updateTable(pathtofile, tablename):
+        """
+        Updates a table in our database by appending the new data into the table \n
+        :param str pathtofile: Path to file from our projects base directory \n
+        :param str tablename: name of table to input data. \
+        IF tablename exists, we will append the data to the bottom \
+        OTHERWISE it will create a new table 
+        """
+        # Add the corresponding path, a sample that works is //static//data//2018services.csv
+        df = pd.read_csv(__base+pathtofile)
+        
+        print("Finished reading csv")
+        print(df)
+        
+        # Add the corresponding authentication and database information
+        engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+        print("Connected to mysql\n")
+
+        # Modify if_exists to replace or fail to replace existing table or fail if table exists
+        df.to_sql(con=engine, name=tablename, if_exists='append', index=False, index_label = 'index')
+
+</table>
+
+#### Updating views.py and urls.py
+- In [urls.py](/graphs/urls.py) add `path('max/<int:num_req>/',views.peakData, name='max')` as a new path 
+- In [views.py](/graphs/views.py) create a new view called `peakData` and add the following code: 
+<table>
+
+    def peakData(request, num_req):
+        """
+        Gets a list of data points ordered by power consumption \n
+        :param int num_req: Number of data points to be extracted
+        """
+        from .models import powerData 
+        # Creates an ordered list of [num_req] from Max->Min power
+        latest_data_list = powerData.objects.order_by('-Power')[:num_req]
+        return render(request, 'max_val.html', {'max_power':latest_data_list})
+
+</table>
+
+#### HTML Template
+- Create a new html template called max_val.html (or whichever name you put in peakData.render()) and add the following block: 
+<table>
+
+    <h1>Maximum Power Consumption</h1>
+    <br>
+    <!--Unordered list of the Power Consumption listed from Greatest to Least-->
+    <ul>
+    {% for x in max_power %} 
+        <li><b>Date: </b>{{x.Timestamp}} <b>Power: </b>{{x.Power}}</li>
+        {% endfor %}
+    </ul>
+
+</table>
+
+- Now you should be able go to localhost:8000/max/INSERT_NUMBER_HERE and get an unordered list similar to below:
+![Basic Power List](/static/images/basiclistview.JPG)

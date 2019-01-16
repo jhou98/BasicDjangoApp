@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title%}Recent Power Consumption Data{% endblock %}
+
+{% block content %}
+<!--Content Here-->
+<h1>Power Data</h1>
+<br>
+<!--Unordered list of the latest power consumption data points -->
+<ul>
+{% for x in recent_data %} 
+    <li><b>Date: </b>{{x.Timestamp}} <b>Power: </b>{{x.Power}}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

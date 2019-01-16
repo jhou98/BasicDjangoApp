@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title%}Maximum Power Consumption{% endblock %}
+
+{% block content %}
+<!--Content here -->
+<h1>Maximum Power Consumption</h1>
+<br>
+<!--Unordered list of the Power Consumption listed from Greatest to Least-->
+<ul>
+{% for x in max_power %} 
+    <li><b>Date: </b>{{x.Timestamp}} <b>Power: </b>{{x.Power}}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
