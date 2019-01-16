@@ -132,9 +132,9 @@
 - In our __html file__ add `{{reference}}` where you wish to put the python function 
 ### Creating a List View 
 - This subsection will walk through how to create a simple list of datapoints in our web app
-    >> Creating a __powerData model__
-    >> Creating and linking the view to our url 
-    >> Creating a basic unordered list in our HTML template
+    > [Creating a __powerData model__](#Power-Data-Model) <br>
+    > [Creating and linking the view to our url](#Updating-views.py-and-urls.py) <br>
+    > [Creating a basic unordered list in our HTML template](#HTML-Template) <br>
 #### Power Data Model
 - In our [models.py](/graphs/models.py) create a class called `powerData`: 
 <table>
