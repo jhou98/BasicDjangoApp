@@ -1,5 +1,4 @@
 import mysql 
-import csv
 from mysql import connector
 from sqlalchemy import create_engine
 import os
@@ -18,8 +17,8 @@ __port = '3306'
 
 def createNewTable(pathtofile, tablename): 
     """
-    Uses Pandas to read a csv file to a dataframe object and stores it into our database
-    :param str pathtofile: Path to file from our projects base directory
+    Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
+    :param str pathtofile: Path to file from our projects base directory \n
     :param str tablename: Name of the table we wish to input data into. \
     IF tablename exists, it will fail
     """
@@ -35,8 +34,8 @@ def createNewTable(pathtofile, tablename):
 
 def updateTable(pathtofile, tablename):
     """
-    Updates a table in our database by appending the new data into the table 
-    :param str pathtofile: Path to file from our projects base directory
+    Updates a table in our database by appending the new data into the table \n
+    :param str pathtofile: Path to file from our projects base directory \n
     :param str tablename: name of table to input data. \
     IF tablename exists, we will append the data to the bottom \
     OTHERWISE it will create a new table 
@@ -53,8 +52,8 @@ def updateTable(pathtofile, tablename):
 
 def replaceTable(pathtofile, tablename): 
     """
-    Uses Pandas to read a csv file to a dataframe object and stores it into our database
-    :param str pathtofile: Path to file from our projects base directory
+    Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
+    :param str pathtofile: Path to file from our projects base directory \n
     :param str tablename: Name of the table we wish to input data into. \
     IF tablename exists, it will be replaced with the new data
     """
@@ -67,6 +66,17 @@ def replaceTable(pathtofile, tablename):
     print("Connected to mysql\n")
 
     df.to_sql(con=engine, name=tablename, if_exists='replace')
+    
+def baseData(tablename):
+    """
+    Reads the raw data and returns it \n
+    :param str tablename: Name of table to be opened in our basic db \n
+    Returns the dataframe created by pandas of our table    
+    """
+    engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
 
+    df = pd.read_sql_table(con=engine, table_name=tablename)
+    print(df)
+    return df
     
 

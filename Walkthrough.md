@@ -60,23 +60,29 @@
 </table>
 
 ## Setting up mySQL Queries 
-- To create a new table in our database, use the following code in python: 
+- To create a new table in our database, use the following snippet of code found in [query.py](/graphs/query.py): 
 <table>
 
-    import mysql 
-    from mysql import connector 
+    def createNewTable(pathtofile, tablename): 
+        """
+        Uses Pandas to read a csv file to a dataframe object and stores it into our database
+        :param str pathtofile: Path to file from our projects base directory
+        :param str tablename: Name of the table we wish to input data into. \
+        IF tablename exists, it will fail
+        """
+        df = pd.read_csv(__base+pathtofile)
+    
+        print("Finished reading csv")
+        print(df)
+    
+        engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+        print("Connected to mysql\n")
 
-    # Establish a connection to our mySQL db at localhost:3306 (add host and port if this changes)
-    # Assumes you have already created a database
-    myconnection = connector.MySQLConnection(user='username',password='password',database='name of database')
-    mycursor = myconnection.cursor()
-
-    # Creates a new table if there isn't already a table with the same name
-    mycursor.execute("CREATE TABLE IF NOT EXISTS tablename (id INT AUTO_INCREMENT PRIMARY KEY, namevars VARTYPE, ...")
+        df.to_sql(con=engine, name=tablename, if_exists='fail')
 
 </table>
 
-- After creating a table, add sample data either through a csv or xlsx file, which can be achieved through queries and pandas. 
+- To update or replace a table, you can change the `if_exists` to either `'replace'` or `'update'`
 
 
 ## Creating a CSS Template page 
