@@ -3,4 +3,4 @@ from django.http import HttpResponse
 
 def index(request):
     from graphs.query import baseData
-    return render(request, "graphs.html", {"test_fn": baseData('newtable1')})
+    return render(request, "graphs.html", {"test_fn": baseData('graphs_powerdata')})
