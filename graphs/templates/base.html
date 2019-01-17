@@ -10,11 +10,31 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
     <title>{% block title %}Hello, world!{% endblock %}</title>
+
+    <style>
+      h1 {
+        text-align: center;
+        text-transform: uppercase;
+        color: #4F71D0;
+      }
+    </style>
+    
   </head>
   <body>
     <!-- Add things into the body as you go -->
-    {% block content %}
-    {% endblock %}
+
+    <div class="container">
+
+      <div class="page-header">
+        {% block header %}You didn't give this page a header!{% endblock %}
+      </div>
+      
+      <!--Content block for any regular content in container-->
+      {% block content %}
+      {% endblock %}
+
+    </div>
+    
     
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

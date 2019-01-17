@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
+import pandas as pd 
 
 def index(request):
     """
@@ -16,7 +17,6 @@ def recentData(request, num_req):
     """
     from .models import powerData 
     latest_data_list = powerData.objects.order_by('-Timestamp')[:num_req]
-    #output = ', '.join([d.Power for d in latest_data_list])
     return render(request, 'data.html', {'recent_data':latest_data_list})
 
 def peakData(request, num_req):
@@ -27,3 +27,21 @@ def peakData(request, num_req):
     from .models import powerData 
     latest_data_list = powerData.objects.order_by('-Power')[:num_req]
     return render(request, 'max_val.html', {'max_power':latest_data_list})
+
+def graphData(num_points):
+    """
+    """
+    from .models import powerData
+    if num_points > 100:
+        raise Http404("Too many data points requested, please keep number below 100")
+    else: 
+        latest_data_list = powerData.objects.order_by('-Timestamp')[:num_points]
+        print(latest_data_list)
+        new_data_list = list(latest_data_list)
+        print("\nNew list:")
+        print(new_data_list)
+        df = pd.DataFrame(data=new_data_list)
+        print("\nNew dataframe:")
+        print(df)
+        return df
+        
