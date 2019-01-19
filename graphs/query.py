@@ -78,5 +78,43 @@ def baseData(tablename):
 
     df = pd.read_sql_table(con=engine, table_name=tablename)
     return df
+
+def dateData(tablename, timecol, startdate, enddate):
+    """
+    Reads raw data according to the date and returns it \n
+    :param str tablename: Name of table to be opened \n
+    :param str timecol: Name of the Date column \n
+    :param DateTime startdate: Start date we want to select data from \n
+    :param DateTime enddate: End date we want to select data from \n
+    Returns a dataframe of our table 
+    """
+    engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+
+    #sql query to select specific dates 
+    my_query = "SELECT * FROM " + \
+                tablename + \
+                " WHERE " + timecol + " >= " + "'" + startdate + "'" + \
+                " AND " + timecol + " <= "+ "'" + enddate + "'"
+
+    df = pd.read_sql_query(sql = my_query, con=engine)
+    return df
+
+def singleDateData(tablename, timecol, dateval):
+    """
+    Reads and returns all the data for a single date 
+    :param str tablename: Name of table to be opened \n
+    :param str timecol: Name of Date column \n
+    :param Datetime dateval: Date to extract data from \n
+    Returns a dataframe of our data 
+    """
+    
+    start_date = dateval+' 00:00:00'
+    end_date = dateval+' 23:45:00'
+    
+    # Call the dateData method to create a dataframe for our specified date
+    df = dateData(tablename,timecol,start_date,end_date)
+    return df 
+
+
     
 

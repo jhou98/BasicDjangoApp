@@ -44,10 +44,41 @@
 </table>
 
 - Below, I have a view called index(request, **args) which returns a render
-> render(request, HTML template that we are sending the render to, {reference name: python functions we want to use})
+> render(request, HTML template that we are sending the render to, {reference name: python functions we want to use}) <br>
+> this index function will store the sum of all the arguments into __'reference'__
 <table>
 
     def index(request, **args):
        
-        return render(request, 'index.html', {'reference':**args})
+        answ = args1 + args2 + ...
+        return render(request, 'index.html', {'reference':answ})
+</table>
+
+# Adding the view to HTML template
+- Using the example above, in `index.html`, if you wish to call upon the python function use `{{reference}}`
+<table>
+
+    <!DOCTYPE HTML>
+    <html lang = "en">
+    <head>
+    <!-- index.html -->
+    <title>index.html</title>
+    <meta charset = "UTF-8" />
+    </head>
+    <body>
+    <h1>Header: This is a addition function</h1>
+    {{reference}} <!--Calls on our python variable (we can also have functions here)-->
+    </body>
+    </html>
+</table>
+
+# Creating a URL path 
+- Now that your view and template pages are linked, you will need to setup a URL path to access this new view 
+- In `graphs.urls.py` add the path to your `url patterns[]`
+> The first argument will be the path you need to enter to get to your view from localhost <br>
+> The second argument `views.index` tells you which view you are accessing <br>
+> The last argument is a reference that you can call upon as a shortcut to the path 
+<table>
+
+     path('index/<args1>/<args2>/....',views.index, name='index')
 </table>

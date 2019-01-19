@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title%}Single Day Power Consumtpion{% endblock %}
+
+{% block header %}
+<h1>Power Consumption: {{date}}</h1>
+{% endblock %}
+
+{% block content %}
+<!--Content Here-->
+<!--Unordered list of the latest power consumption data points -->
+<ul>
+    {% for id, rows in date_data.iterrows %}
+        <li><b>Date: </b>{{rows.Timestamp}} <b>Power: </b>{{rows.Power}}</li>        
+    {% endfor %}
+</ul>
+{% endblock %}

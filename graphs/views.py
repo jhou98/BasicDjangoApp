@@ -28,20 +28,14 @@ def peakData(request, num_req):
     latest_data_list = powerData.objects.order_by('-Power')[:num_req]
     return render(request, 'max_val.html', {'max_power':latest_data_list})
 
-def graphData(num_points):
+def dateData(request, date_val):
     """
+    Gets a list of data points corresponding to the specific date \n
+    :param Datetime date_val: Date in YYYY-MM-DD format
     """
-    from .models import powerData
-    if num_points > 100:
-        raise Http404("Too many data points requested, please keep number below 100")
-    else: 
-        latest_data_list = powerData.objects.order_by('-Timestamp')[:num_points]
-        print(latest_data_list)
-        new_data_list = list(latest_data_list)
-        print("\nNew list:")
-        print(new_data_list)
-        df = pd.DataFrame(data=new_data_list)
-        print("\nNew dataframe:")
-        print(df)
-        return df
+    from .query import singleDateData as getData
+    my_df = getData('graphs_powerdata','Timestamp',date_val)
+    if my_df.empty: 
+        raise Http404("Timestamp does not exist!")
+    return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
         

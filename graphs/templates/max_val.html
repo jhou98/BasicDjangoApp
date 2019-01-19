@@ -8,9 +8,9 @@
 {% block content %}
 <!--Content here -->
 <!--Unordered list of the Power Consumption listed from Greatest to Least-->
-<ul>
+<ol>
 {% for x in max_power %} 
     <li><b>Date: </b>{{x.Timestamp}} <b>Power: </b>{{x.Power}}</li>
     {% endfor %}
-</ul>
+</ol>
 {% endblock %}
