@@ -1,14 +1,7 @@
-# Basic table testing out a test tablecalled januarytest found in basic DB 
-FROM `basic`.`graphs_evdata` SHOW TABLES;
+# FROM `basic`.`graphs_evdata` SHOW TABLES;
 SHOW TABLES;	
 DESC graphs_evdata;
 SELECT * FROM graphs_evdata;
-CREATE TABLE `test0.0`(id INT auto_increment primary key, `date` DATE);
-insert into januarytest (`date`,`00:00`) 
-VALUES ('2018-01-01',0.000);
-SELECT * FROM januarytest;
-insert into januarytest (`date`)
-VALUES ('2018-01-02');
-update januarytest set 
-januarytest.`00:00`=0.012
-where januarytest.date='2018-01-02';
+SELECT * FROM graphs_evdata;
+SELECT * FROM newtable1;
+SELECT * FROM graphs_powerdata;
