@@ -7,5 +7,23 @@
 <!--Content Here-->
 <br>
 {{test_fn}}
-
 {% endblock %}
+
+<script>
+{% block jquery %}
+    var endpoint = '/api/chart/data'
+    
+    $.ajax({
+        method:"GET",
+        url: endpoint,
+        success: function(data){
+            console.log(data)
+            console.log(data['columns\\'])
+        },
+        error: function(err_data){
+            console.log("error")
+            console.log(err_data)
+        }
+    });
+{% endblock %}
+</script>

@@ -215,3 +215,7 @@
 
 - Now you should be able go to localhost:8000/max/INSERT_NUMBER_HERE and get an unordered list similar to below:
 ![Basic Power List](/static/images/basiclistview.JPG)
+
+
+## Adding a graph using Chart.js 
+- For this project, we will be using bootstrap and Chart.js 
