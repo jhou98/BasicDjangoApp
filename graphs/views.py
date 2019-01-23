@@ -48,9 +48,41 @@ def dateData(request, date_val):
         raise Http404("Timestamp does not exist!")
     return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
 
-#matplotlib graph
+# matplotlib graph
 def GraphData(request):
-    return render(request, 'date.html',{})
+    from .models import powerData
+    from chartit import DataPool, Chart
+
+    #Create the datapool with data we wish to retrieve 
+    powerdata = DataPool(
+                    series= [{ 'options': {
+                            'source': powerData.objects.order_by('-Timestamp')[:100]},
+                            'terms':[
+                                'Timestamp',
+                                'Power'
+                            ]}
+                        ])
+
+    #Create the chart object 
+    powerchart = Chart(
+                    datasource = powerdata,
+                    series_options = 
+                        [{'options':{
+                            'type':'line',
+                            'stacking': False},
+                        'terms':{
+                            'Timestamp':[
+                            'Power']
+                        }}],
+                    chart_options = 
+                        {'title': {
+                            'text': 'EV Power Data' },
+                        'xAxis': {'title': {
+                            'text': 'Date' }},
+                        'yAxis': {'title': {
+                            'text': 'Power Generated' }}})
+
+    return render(request, 'graphs.html',{'powerchart':powerchart})
 
 # Rest Framework 
 class ChartData(APIView):
@@ -63,7 +95,9 @@ class ChartData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        from .controller import getSingleDateData as getDateData
-        my_df = getDateData('graphs_powerdata','Timestamp','2018-01-01')
-        data = my_df.to_json(date_format='epoch', orient='split')
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_powerdata',100,'Timestamp')
+        data = pandasToJSON(my_df)
         return Response(data)

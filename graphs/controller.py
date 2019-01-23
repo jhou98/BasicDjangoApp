@@ -133,6 +133,14 @@ def getRecentData(tablename, num_req, col):
     df = pd.read_sql_query(sql = my_query, con=engine)
     return df
 
+def pandasToJSON(df):
+    """
+    Converts a dataframe into a JSON string 
+    """
+    return df.to_json(date_format='iso', orient='split')
+    
+
+#Will change this method as matplotlib does not seem to work 
 def graphData(x,y):
     """
     Graphs and shows data 

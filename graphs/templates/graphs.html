@@ -3,10 +3,19 @@
 
 {% block header %} <h1>Home Page</h1> {% endblock %}
 
+<head>
+{% load chartit %}
+{{ powerchart|load_charts:"container"}}
+</head>
+
 {% block content %}
 <!--Content Here-->
 <br>
 {{test_fn}}
+<br>
+<div id='container'>Chart will be rendered here</div>
+{{powerchart}}
+<canvas id="myChart" width="400" height="400"></canvas>
 {% endblock %}
 
 <script>
@@ -18,10 +27,38 @@
         url: endpoint,
         success: function(data){
             console.log(data)
+            var result = JSON.parse(data)
+            console.log(result.columns)
+            console.log(result.data[1])
+            console.log(result.data[1][1])
         },
         error: function(err_data){
             console.log("error")
             console.log(err_data)
+        }
+    });
+
+    //Script for chart 
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            datasets: [{
+                label: 'Sample Chart',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: 'rgba(255, 99, 132, 0)',
+                borderColor: 'rgba(255,99,132)',
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
         }
     });
 {% endblock %}

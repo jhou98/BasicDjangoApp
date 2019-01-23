@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'graphs.apps.GraphsConfig',
     'rest_framework',
+    'chartit',
+    'pandas',
+
 ]
 
 MIDDLEWARE = [
