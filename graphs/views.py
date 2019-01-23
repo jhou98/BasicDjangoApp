@@ -9,8 +9,8 @@ def index(request):
     Home Page \n 
     This will be modified accordingly in the future
     """
-    from graphs.query import baseData
-    return render(request, 'graphs.html', {'test_fn': baseData('graphs_powerdata')})
+    from graphs.controller import getBaseData
+    return render(request, 'graphs.html', {'test_fn': getBaseData('graphs_powerdata')})
 
 def recentData(request, num_req):
     """
@@ -42,18 +42,15 @@ def dateData(request, date_val):
     :param Datetime date_val: Date in YYYY-MM-DD format
     Returns an unorder list of datapoints, error if date does not exist
     """
-    from .query import singleDateData as getDateData
+    from .controller import getSingleDateData as getDateData
     my_df = getDateData('graphs_powerdata','Timestamp',date_val)
     if my_df.empty: 
         raise Http404("Timestamp does not exist!")
     return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
 
-#Json Framework 
-def getData(request, *args, **kwargs):
-    from .query import singleDateData as getDateData
-    my_df = getDateData('graphs_powerdata','Timestamp','2018-01-01')
-    data = my_df.to_json(date_format='epoch', orient='split')
-    return JsonResponse(data, safe=False) #http response with datatype = JSON  
+#matplotlib graph
+def GraphData(request):
+    return render(request, 'date.html',{})
 
 # Rest Framework 
 class ChartData(APIView):
@@ -66,7 +63,7 @@ class ChartData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        from .query import singleDateData as getDateData
+        from .controller import getSingleDateData as getDateData
         my_df = getDateData('graphs_powerdata','Timestamp','2018-01-01')
         data = my_df.to_json(date_format='epoch', orient='split')
         return Response(data)

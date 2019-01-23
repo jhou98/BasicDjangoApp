@@ -60,7 +60,7 @@
 </table>
 
 ## Setting up mySQL Queries 
-- To create a new table in our database, use the following snippet of code found in [query.py](/graphs/query.py): 
+- To create a new table in our database, use the following snippet of code found in [controller.py](/graphs/controller.py): 
 <table>
 
     def createNewTable(pathtofile, tablename): 
@@ -217,5 +217,64 @@
 ![Basic Power List](/static/images/basiclistview.JPG)
 
 
-## Adding a graph using Chart.js 
-- For this project, we will be using bootstrap and Chart.js 
+## Adding a graph using MatPlotLib
+- Now that our database is setup and connected to the django application, and we have practice working with queries, we will try creating a basic graph using the MatPlotLib library 
+- The goal of this part is to create something similar to the example shown below: 
+![Basic Graph](/static/images/matplotlib_fig2.png)
+- We will adding and playing with this first in our [controller.py](/graphs/controller.py) to access our database
+- Add a method that will allow us to extract the most recent data into a pandas dataframe like so: 
+<table>
+
+    def getRecentData(tablename, num_req, col):
+    """
+    Reads and returns the recent data \n
+    :param str tablename: Name of table to be opened \n
+    :param int num_req: Number of datapoints to be limited to \n
+    :param str col: Name of column in database to be ordered by \n
+    Returns a dataframe of our data
+    """ 
+    engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+
+     #sql query to select specific dates 
+    my_query = "SELECT * FROM " + \
+                tablename + \
+                " ORDER BY " + col + " DESC" + \
+                " LIMIT " + str(num_req)
+    df = pd.read_sql_query(sql = my_query, con=engine)
+    return df
+</table>
+
+- Next, we will add the method that creates a pyplot like seen above by adding another method to our controller.py file 
+<table>
+
+    def graphData(x,y):
+    """
+    Graphs and shows data 
+    :param dataframe column x: values in x column (date)  
+    :param dataframe column y: values in y column (power)
+    Returns pyplot plt 
+    """
+    from matplotlib import pyplot as plt
+    from matplotlib import dates as mdates
+
+    yearsFmt = mdates.DateFormatter('%Y-%m-%d %H:%M')
+    fig, ax = plt.subplots()
+    line, = ax.plot(x,y,'b-') #solid line  
+    
+    line.set_antialiased(False)
+    
+    # format the ticks
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.grid(True)
+
+    fig.autofmt_xdate()
+
+    plt.xlabel("Date")
+    plt.ylabel("Power")
+    plt.title("EV Power Data")
+    return plt
+</table>
+
+- To view your graph, you can use `plt.show()` method 
+
+

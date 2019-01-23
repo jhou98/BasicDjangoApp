@@ -68,7 +68,7 @@ def replaceTable(pathtofile, tablename):
 
     df.to_sql(con=engine, name=tablename, if_exists='replace', index=False, index_label = 'index')
     
-def baseData(tablename):
+def getBaseData(tablename):
     """
     Reads the raw data and returns it \n
     :param str tablename: Name of table to be opened in our basic db \n
@@ -79,7 +79,7 @@ def baseData(tablename):
     df = pd.read_sql_table(con=engine, table_name=tablename)
     return df
 
-def dateData(tablename, timecol, startdate, enddate):
+def getDateData(tablename, timecol, startdate, enddate):
     """
     Reads raw data according to the date and returns it \n
     :param str tablename: Name of table to be opened \n
@@ -99,7 +99,7 @@ def dateData(tablename, timecol, startdate, enddate):
     df = pd.read_sql_query(sql = my_query, con=engine)
     return df
 
-def singleDateData(tablename, timecol, dateval):
+def getSingleDateData(tablename, timecol, dateval):
     """
     Reads and returns all the data for a single date 
     :param str tablename: Name of table to be opened \n
@@ -112,9 +112,53 @@ def singleDateData(tablename, timecol, dateval):
     end_date = dateval+' 23:45:00'
     
     # Call the dateData method to create a dataframe for our specified date
-    df = dateData(tablename,timecol,start_date,end_date)
+    df = getDateData(tablename,timecol,start_date,end_date)
     return df 
 
+def getRecentData(tablename, num_req, col):
+    """
+    Reads and returns the recent data \n
+    :param str tablename: Name of table to be opened \n
+    :param int num_req: Number of datapoints to be limited to \n
+    :param str col: Name of column in database to be ordered by \n
+    Returns a dataframe of our data
+    """ 
+    engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
 
+     #sql query to select specific dates 
+    my_query = "SELECT * FROM " + \
+                tablename + \
+                " ORDER BY " + col + " DESC" + \
+                " LIMIT " + str(num_req)
+    df = pd.read_sql_query(sql = my_query, con=engine)
+    return df
+
+def graphData(x,y):
+    """
+    Graphs and shows data 
+    :param dataframe column x: values in x column (date)  
+    :param dataframe column y: values in y column (power)
+    Returns pyplot plt 
+    """
+    from matplotlib import pyplot as plt
+    from matplotlib import dates as mdates
+
+    yearsFmt = mdates.DateFormatter('%Y-%m-%d %H:%M')
+    fig, ax = plt.subplots()
+    line, = ax.plot(x,y,'b-') #solid line  
     
+    #line, = ax.plot(x,y,'bo') #points 
+    line.set_antialiased(False)
+    
+    # format the ticks
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.grid(True)
+
+    fig.autofmt_xdate()
+
+    plt.xlabel("Date")
+    plt.ylabel("Power")
+    plt.title("EV Power Data")
+    #plt.show()
+    return plt
 
