@@ -138,35 +138,4 @@ def pandasToJSON(df):
     Converts a dataframe into a JSON string 
     """
     return df.to_json(date_format='iso', orient='split')
-    
-
-#Will change this method as matplotlib does not seem to work 
-def graphData(x,y):
-    """
-    Graphs and shows data 
-    :param dataframe column x: values in x column (date)  
-    :param dataframe column y: values in y column (power)
-    Returns pyplot plt 
-    """
-    from matplotlib import pyplot as plt
-    from matplotlib import dates as mdates
-
-    yearsFmt = mdates.DateFormatter('%Y-%m-%d %H:%M')
-    fig, ax = plt.subplots()
-    line, = ax.plot(x,y,'b-') #solid line  
-    
-    #line, = ax.plot(x,y,'bo') #points 
-    line.set_antialiased(False)
-    
-    # format the ticks
-    ax.xaxis.set_major_formatter(yearsFmt)
-    ax.grid(True)
-
-    fig.autofmt_xdate()
-
-    plt.xlabel("Date")
-    plt.ylabel("Power")
-    plt.title("EV Power Data")
-    #plt.show()
-    return plt
 

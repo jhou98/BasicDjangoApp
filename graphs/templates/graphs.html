@@ -1,32 +1,22 @@
 {% extends 'base.html' %}
 {% block title%}EV and Building Power Consumption{% endblock %}
 
-{% block header %} <h1>Home Page</h1> {% endblock %}
-
-<head>
-<!--This is not working!!-->
-{% load chartit %}
-{{ powerchart|load_charts:"container"}}
-</head>
+{% block header %} <h1>Home</h1> {% endblock %}
 
 {% block content %}
 <!--Content Here-->
-<br>
-{{test_fn}}
-<br>
-<div id='container'>Chart will be rendered here</div>
-{{powerchart}}
 <div class='row'>
     <div class='col-sm-6'>
-        <canvas id="myChart" width="400" height="400"></canvas>
+        <canvas id="myChartEV" width="400" height="400"></canvas>
     </div>
     <div class='col-sm-6'>
-        <canvas id="myChart2" width="400" height="400"></canvas>
+        <canvas id="myChartBuilding" width="400" height="400"></canvas>
     </div>
 </div>
 
 {% endblock %}
 
+<!--Script for our Charts-->
 <script>
 {% block jquery %}
     var endpoint = '/api/data'
@@ -36,11 +26,24 @@
         url: endpoint,
         success: function(data){
             console.log(data)
-            var result = JSON.parse(data)
-            console.log(result.columns)
-            console.log(result.data[1])
-            console.log(result.data[1][1])
-            createChart() //calls our function on success 
+            //convert our values from JSON string to JSON object
+            var result = JSON.parse(data) 
+            //Empty arrays to store our values 
+            var date = []
+            var power = []
+            //length (as our objects are in Most recent->least recent)
+            var length = result.data.length-1
+            for (var x in result.data){
+                //slice the ISO-Format String 
+                //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
+                date.push(result.data[length-x][1].slice(0,16))
+                power.push(result.data[length-x][2])
+            }
+            console.log(date)
+            console.log(power)
+            //calls our function on success 
+            createEVChart(date,power) 
+            createBuildingChart(date,power)       
         },
         error: function(err_data){
             console.log("error")
@@ -48,35 +51,45 @@
         }
     });
 
-    function createChart(){
-        //Script for chart 
-        var ctx = document.getElementById("myChart").getContext('2d');
-        var ctx2 = document.getElementById("myChart2").getContext('2d');
-        var myChart = new Chart(ctx, {
+    /**
+     * @param Array x_axis: Array of dates for our chart  
+     * @param Array y_axis: Array of power for our chart
+     * Returns a chart corresponding to our EV data
+     */
+    function createEVChart(x_axis,y_axis){
+        
+        var ctx_ev = document.getElementById("myChartEV").getContext('2d');
+
+        var myChartEV = new Chart(ctx_ev, {
             type: 'line',
             data: {
-                labels: ["2018-01-01","2018-01-02",
-                        "2018-01-03","2018-01-04",
-                        "2018-01-05","2018-01-06",
-                        "2018-01-07","2018-01-08",
-                        "2018-01-09","2018-01-10",
-                        "2018-01-11","2018-01-12",
-                        "2018-01-01","2018-01-02",
-                        "2018-01-03","2018-01-04",
-                        "2018-01-05","2018-01-06",
-                        "2018-01-07","2018-01-08",
-                        "2018-01-09","2018-01-10",
-                        "2018-01-11","2018-01-12"],
+                labels: x_axis,
                 datasets: [{
-                    label: 'Sample Chart',
-                    data: [12, 19, 3, 5, 2, 3, 1, 2, 3, 5, 7, 9, 12, 19, 3, 5, 2, 3, 1, 10, 11, 5, 7, 9],
+                    label: 'Power Consumption',
+                    data: y_axis,
                     backgroundColor: 'rgba(255, 99, 132, 0)',
                     borderColor: 'rgba(255,99,132,1)',
                 }]
             },
             options: {
+                title:{
+                    display: true,
+                    text: 'EV Charging Stations'
+                },
                 scales: {
+                    xAxes:[{
+                        display: true,
+                        scaleLabel:{
+                            display:true,
+                            labelString:'Time'
+                        }
+                    }],
                     yAxes: [{
+                        display: true,
+                        scaleLabel:{
+                            display: true,
+                            labelString: 'Power'
+                        },
                         ticks: {
                             beginAtZero:true
                         }
@@ -84,32 +97,47 @@
                 }
             }
         });
+    }
 
-        var myChart2 = new Chart(ctx2, {
+     /**
+     * @param Array x_axis: Array of dates for our chart  
+     * @param Array y_axis: Array of power for our chart
+     * Returns a chart corresponding to our Building data
+     */
+    function createBuildingChart(x_axis,y_axis){
+        
+        var ctx_building = document.getElementById("myChartBuilding").getContext('2d');
+
+        var myChartBuilding = new Chart(ctx_building, {
             type: 'line',
             data: {
-                labels: ["2018-01-01","2018-01-02",
-                        "2018-01-03","2018-01-04",
-                        "2018-01-05","2018-01-06",
-                        "2018-01-07","2018-01-08",
-                        "2018-01-09","2018-01-10",
-                        "2018-01-11","2018-01-12",
-                        "2018-01-01","2018-01-02",
-                        "2018-01-03","2018-01-04",
-                        "2018-01-05","2018-01-06",
-                        "2018-01-07","2018-01-08",
-                        "2018-01-09","2018-01-10",
-                        "2018-01-11","2018-01-12"],
+                labels: x_axis, 
                 datasets: [{
-                    label: 'Sample Chart2',
-                    data: [12, 19, 3, 5, 2, 3, 1, 2, 3, 5, 7, 9, 12, 19, 3, 5, 2, 3, 1, 10, 11, 5, 7, 9],
+                    label: 'Power Consumption',
+                    data: y_axis,
                     backgroundColor: 'rgba(255, 99, 132, 0)',
                     borderColor: 'rgba(255,99,132,1)',
                 }]
             },
             options: {
+                title:{
+                    display: true,
+                    text: 'Building Data'
+                },
                 scales: {
+                    xAxes:[{
+                        display: true,
+                        scaleLabel:{
+                            display:true,
+                            labelString:'Time'
+                        }
+                    }],
                     yAxes: [{
+                        display: true,
+                        scaleLabel:{
+                            display: true,
+                            labelString: 'Power'
+                        },
                         ticks: {
                             beginAtZero:true
                         }

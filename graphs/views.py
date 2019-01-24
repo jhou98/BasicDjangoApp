@@ -48,46 +48,10 @@ def dateData(request, date_val):
         raise Http404("Timestamp does not exist!")
     return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
 
-# matplotlib graph
-def GraphData(request):
-    from .models import powerData
-    from chartit import DataPool, Chart
-
-    #Create the datapool with data we wish to retrieve 
-    powerdata = DataPool(
-                    series= [{ 'options': {
-                            'source': powerData.objects.order_by('-Timestamp')[:100]},
-                            'terms':[
-                                'Timestamp',
-                                'Power'
-                            ]}
-                        ])
-
-    #Create the chart object 
-    powerchart = Chart(
-                    datasource = powerdata,
-                    series_options = 
-                        [{'options':{
-                            'type':'line',
-                            'stacking': False},
-                        'terms':{
-                            'Timestamp':[
-                            'Power']
-                        }}],
-                    chart_options = 
-                        {'title': {
-                            'text': 'EV Power Data' },
-                        'xAxis': {'title': {
-                            'text': 'Date' }},
-                        'yAxis': {'title': {
-                            'text': 'Power Generated' }}})
-
-    return render(request, 'graphs.html',{'powerchart':powerchart})
-
 # Rest Framework 
 class ChartData(APIView):
     """
-    This method is similar to our getData method \n
+    This method is used to send 100 most recent data points as a JSON string\n
     However it has built in support for authentication and permissions \n 
     See https://www.django-rest-framework.org/api-guide/views/ for more details 
     """ 
