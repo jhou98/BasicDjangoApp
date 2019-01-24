@@ -60,7 +60,7 @@
 </table>
 
 ## Setting up mySQL Queries 
-- To create a new table in our database, use the following snippet of code found in [query.py](/graphs/query.py): 
+- To create a new table in our database, use the following snippet of code found in [controller.py](/graphs/controller.py): 
 <table>
 
     def createNewTable(pathtofile, tablename): 
@@ -215,3 +215,227 @@
 
 - Now you should be able go to localhost:8000/max/INSERT_NUMBER_HERE and get an unordered list similar to below:
 ![Basic Power List](/static/images/basiclistview.JPG)
+
+
+## Adding a graph using MatPlotLib
+- Now that our database is setup and connected to the django application, and we have practice working with queries, we will try creating a basic graph using the MatPlotLib library 
+- The goal of this part is to create something similar to the example shown below: 
+![Basic Graph](/static/images/matplotlib_fig2.png)
+- We will adding and playing with this first in our [controller.py](/graphs/controller.py) to access our database
+- Add a method that will allow us to extract the most recent data into a pandas dataframe like so: 
+<table>
+
+    def getRecentData(tablename, num_req, col):
+    """
+    Reads and returns the recent data \n
+    :param str tablename: Name of table to be opened \n
+    :param int num_req: Number of datapoints to be limited to \n
+    :param str col: Name of column in database to be ordered by \n
+    Returns a dataframe of our data
+    """ 
+    engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+
+     #sql query to select specific dates 
+    my_query = "SELECT * FROM " + \
+                tablename + \
+                " ORDER BY " + col + " DESC" + \
+                " LIMIT " + str(num_req)
+    df = pd.read_sql_query(sql = my_query, con=engine)
+    return df
+</table>
+
+- Next, we will add the method that creates a pyplot like seen above by adding another method to our controller.py file 
+<table>
+
+    def graphData(x,y):
+    """
+    Graphs and shows data 
+    :param dataframe column x: values in x column (date)  
+    :param dataframe column y: values in y column (power)
+    Returns pyplot plt 
+    """
+    from matplotlib import pyplot as plt
+    from matplotlib import dates as mdates
+
+    yearsFmt = mdates.DateFormatter('%Y-%m-%d %H:%M')
+    fig, ax = plt.subplots()
+    line, = ax.plot(x,y,'b-') #solid line  
+    
+    line.set_antialiased(False)
+    
+    # format the ticks
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.grid(True)
+
+    fig.autofmt_xdate()
+
+    plt.xlabel("Date")
+    plt.ylabel("Power")
+    plt.title("EV Power Data")
+    return plt
+</table>
+
+- To view your graph, you can use `plt.show()` method 
+
+## Adding a graph to the Web App using Chart.js 
+- Now that we have some experience working with graphs, we will be using [chart.js](https://www.chartjs.org/) to display charts onto our web application 
+- You will need to add [the latest script](https://cdnjs.com/libraries/Chart.js) into your __base.html__ file before beginning, and add [django rest framework](https://www.django-rest-framework.org/) to your project 
+- In your __base.html__ file, also add the following block: 
+<table>
+
+    <script> 
+      $(document).ready(function(){
+        {% block jquery %}{% endblock %}
+      })
+    </script>
+</table>
+
+- Follow the [tutorial video](https://www.youtube.com/watch?v=B4Vmm3yZPgc) so that you will have a better understanding of Chart.js and how to set everything up 
+- We will be using the __getRecentData__ function in our [controller.py](/graphs/controller.py) file, as well as a new function: 
+<table>
+
+    def pandasToJSON(df):
+    """
+    Converts a dataframe into a JSON string 
+    """
+    return df.to_json(date_format='iso', orient='split')
+</table>
+
+- In our views.py, we will create a class similar to the tutorial in our __views.py__ file 
+> It will be using our __getRecentData__ and __pandasToJSON__ controller functions to obtain and format the data 
+<table>
+
+    from django.http import HttpResponse, Http404, JsonResponse
+    import pandas as pd 
+    from rest_framework.views import APIView
+    from rest_framework.response import Response
+
+    class ChartData(APIView):
+    """
+    This method is used to send 100 most recent data points as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_powerdata',100,'Timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+</table>
+
+- And in our [urls.py](/graphs/urls.py) add a new path for this class `path(r'api/data',views.ChartData.as_view(), name='chart' ),`
+> Now if we go to our http://localhost:8000/api/data we should be able to see our latest data values in a JSON string 
+- In a html file called __graphs.html__, add the following code and make sure the template is linked to your http://localhost:8000 
+<table>
+
+    {% extends 'base.html' %}
+    {% block title%}Title{% endblock %}
+
+    {% block header %} <h1>Home</h1> {% endblock %}
+
+    {% block content %}
+    <!--Content Here-->
+    <div class='row'>
+        <canvas id="myChartEV" width="400" height="400"></canvas>
+    </div>
+
+    {% endblock %}
+    <!--Script for our Charts-->
+    <script>
+    {% block jquery %}
+        var endpoint = '/api/data'
+        
+        $.ajax({
+            method:"GET",
+            url: endpoint,
+            success: function(data){
+                console.log(data)
+                //convert our values from JSON string to JSON object
+                var result = JSON.parse(data) 
+                //Empty arrays to store our values 
+                var date = []
+                var power = []
+                //length (as our objects are in Most recent->least recent)
+                var length = result.data.length-1
+                for (var x in result.data){
+                    //slice the ISO-Format String 
+                    //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
+                    date.push(result.data[length-x][1].slice(0,16))
+                    power.push(result.data[length-x][2])
+                }
+                console.log(date)
+                console.log(power)
+                //calls our function on success 
+                createEVChart(date,power)  
+            },
+            error: function(err_data){
+                console.log("error")
+                console.log(err_data)
+            }
+        });
+
+        /**
+        * @param Array x_axis: Array of dates for our chart  
+        * @param Array y_axis: Array of power for our chart
+        * Returns a chart corresponding to our EV data
+        */
+        function createEVChart(x_axis,y_axis){
+            
+            var ctx_ev = document.getElementById("myChartEV").getContext('2d');
+
+            var myChartEV = new Chart(ctx_ev, {
+                type: 'line',
+                data: {
+                    labels: x_axis,
+                    datasets: [{
+                        label: 'Power Consumption',
+                        data: y_axis,
+                        backgroundColor: 'rgba(255, 99, 132, 0)',
+                        borderColor: 'rgba(255,99,132,1)',
+                    }]
+                },
+                options: {
+                    title:{
+                        display: true,
+                        text: 'EV Charging Stations'
+                    },
+                    scales: {
+                        xAxes:[{
+                            display: true,
+                            scaleLabel:{
+                                display:true,
+                                labelString:'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel:{
+                                display: true,
+                                labelString: 'Power'
+                            },
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+    {% endblock %}
+    </script>
+
+</table>
+
+- in v0.4, we have a similar example with 2 graphs instead of 1 as shown
+![chart.js_ex1](/static/images/chartjs_fig1.png)
+
+
+
+
+
+

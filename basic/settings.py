@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphs.apps.GraphsConfig',
+    'rest_framework',
+    'pandas',
 ]
 
 MIDDLEWARE = [

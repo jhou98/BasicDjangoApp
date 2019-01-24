@@ -32,3 +32,5 @@ class powerData(models.Model):
 
     def __str__(self):
         return "Date: " + self.Timestamp.strftime("%m/%d/%y %H:%M:%S") + "  Power: " + str(self.Power)
+
+##Create two seperate classes: EV and Building so we have two separate databases to hold our data 

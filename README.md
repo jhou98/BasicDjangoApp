@@ -1,12 +1,12 @@
-### Basic Django App 
+# Basic Django App 
 > A basic application in Django and Python that will connect to a local mySQL server to output data regarding electrical consumption for EV and Buildings at UBC. 
 
 ## Models 
 - Assume you have your main project called __basic__ and you want to add a model to your app called __graphs__
-# Creating a Model
+### Creating a Model
 - In the `graphs.models.py`, make sure to add `from django.db import models` so that models can be used 
 - Create a model using `class %modelname%(models.Model):` and adding methods and variables to the model 
-# Linking a Model to the Database
+### Linking a Model to the Database
 - In the `graphs.admin.py` file, add your newly created model with the following lines of code: <br>
 <table>
 
@@ -35,7 +35,7 @@
 - Check your database to make sure a new table has been created named __graphs.%modelname%__
 
 ## Views 
-# Creating a view 
+### Creating a view 
 - In `graphs.views.py` you can create a new view just like creating a new method in python. Have the following imports at the top of your file: 
 <table>
 
@@ -54,7 +54,7 @@
         return render(request, 'index.html', {'reference':answ})
 </table>
 
-# Adding the view to HTML template
+### Adding the view to HTML template
 - Using the example above, in `index.html`, if you wish to call upon the python function use `{{reference}}`
 <table>
 
@@ -72,7 +72,7 @@
     </html>
 </table>
 
-# Creating a URL path 
+### Creating a URL path 
 - Now that your view and template pages are linked, you will need to setup a URL path to access this new view 
 - In `graphs.urls.py` add the path to your `url patterns[]`
 > The first argument will be the path you need to enter to get to your view from localhost <br>
