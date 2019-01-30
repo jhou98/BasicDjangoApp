@@ -1,5 +1,9 @@
 # Basic Django App 
-> A basic application in Django and Python that will connect to a local mySQL server to output data regarding electrical consumption for EV and Buildings at UBC. 
+- A basic application in Django and Python that will connect to a local mySQL server to output data regarding electrical consumption for EV and Buildings at UBC. 
+- [Part 1 - Models](#Models)
+- [Part 2 - Views](#Views)
+- [Part 3 - Database](#Database)
+- [Part 4 - Graphs](#Graphs)
 
 ## Models 
 - Assume you have your main project called __basic__ and you want to add a model to your app called __graphs__
@@ -33,7 +37,7 @@
 </table>
 
 - Check your database to make sure a new table has been created named __graphs.%modelname%__
-
+<br> [Back to Top](#Basic-Django-App)
 ## Views 
 ### Creating a view 
 - In `graphs.views.py` you can create a new view just like creating a new method in python. Have the following imports at the top of your file: 
@@ -44,8 +48,8 @@
 </table>
 
 - Below, I have a view called index(request, **args) which returns a render
-> render(request, HTML template that we are sending the render to, {reference name: python functions we want to use}) <br>
-> this index function will store the sum of all the arguments into __'reference'__
+    > render(request, HTML template that we are sending the render to, {reference name: python functions we want to use}) <br>
+    > this index function will store the sum of all the arguments into __'reference'__
 <table>
 
     def index(request, **args):
@@ -75,10 +79,299 @@
 ### Creating a URL path 
 - Now that your view and template pages are linked, you will need to setup a URL path to access this new view 
 - In `graphs.urls.py` add the path to your `url patterns[]`
-> The first argument will be the path you need to enter to get to your view from localhost <br>
-> The second argument `views.index` tells you which view you are accessing <br>
-> The last argument is a reference that you can call upon as a shortcut to the path 
+    > The first argument will be the path you need to enter to get to your view from localhost <br>
+    > The second argument `views.index` tells you which view you are accessing <br>
+    > The last argument is a reference that you can call upon as a shortcut to the path 
 <table>
 
      path('index/<args1>/<args2>/....',views.index, name='index')
 </table>
+
+<br>[Back to Top](#Basic-Django-App)
+
+## Database 
+### Creating a new table 
+- Walkthrough of setting up a MySQL database and adding data to the table 
+- To start off, create a new MySQL server and save the settings into the DATABASES in __settings.py__ 
+- To create a table, we simply need to create a new model class and migrate the class to our database. Create the following model and follow the steps in Part 1 to link it to our database. 
+<table>
+
+    class powerData(models.Model):
+    """
+    Class that holds 3 variables
+        1. index 
+        2. Timestamp: DateTime
+        3. Power: Decimal(max digits = 8, decimal places = 3)
+    """
+    index = models.AutoField(primary_key=True)
+    Timestamp = models.DateTimeField()
+    Power = models.DecimalField(max_digits = 8, decimal_places = 3)
+
+    def __str__(self):
+        return "Date: " + self.Timestamp.strftime("%m/%d/%y %H:%M:%S") + "  Power: " + str(self.Power)
+</table>
+
+- In your database, you should now be able to see a new empty table along the names of __graphs_powerdata__ with 3 fields: 
+    1. index 
+    2. Timestamp
+    3. Power
+
+### Using Pandas to add data to your table 
+- There are multiple different ways to update the new table in your MySQL database. However, the way we will be doing it will be using the pandas package to read a CSV file and inserting the values into our table. The advantage of this is pandas makes it easy and fast to update and insert large amounts of data into our database. 
+- Therefore, in our `controller.py` file, add the following function for pandas 
+<table>
+
+    import mysql 
+    from mysql import connector
+    from sqlalchemy import create_engine
+    import os
+    import pandas as pd
+    from pandas import ExcelWriter
+    from pandas import ExcelFile
+
+    # Base directory of our project, used to get files 
+    __base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Database variables
+    __user = ##username 
+    __passw = ##password
+    __schema= ##server
+    __host = ##host
+    __port = ##port
+
+    def updateTable(pathtofile, tablename):
+        """
+        Updates a table in our database by appending the new data into the table \n
+        :param str pathtofile: Path to file from our projects base directory \n
+        :param str tablename: name of table to input data. \n
+        IF tablename exists, we will append the data to the bottom \
+        OTHERWISE it will create a new table 
+        """
+        df = pd.read_csv(__base+pathtofile)
+        
+        print("Finished reading csv")
+        print(df)
+        
+        engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+        print("Connected to mysql\n")
+
+        df.to_sql(con=engine, name=tablename, if_exists='append', index=False, index_label = 'index')
+</table>
+
+- The `updateTable` function will add new points to the table corresponding to the _tablename_ and will not modify any previous values already in the table 
+    > We can also change the functionality by modifying the `if_exists` parameter to either _'fail'_ or _'replace'_ if we wish to have our function fail if the table already exists (creating a new table) or replace the old table data with our new data 
+- Now we can run a python shell and call this command to insert data into our table. Make sure to store the csv file somewhere within project folder so you can navigate to it, and that the column names correspond to the fields we created in our models class. 
+<table>
+
+    python manage.py shell 
+    >>>from graphs import controller as c 
+    >>>c.updateTable(//pathtofile, 'graphs_powerdata')
+</table>
+
+- Afterwards, if you connected everything correctly, you should be able to see the new data in both your MySQL connector and your Django admin page on localhost:8000/admin
+<br>[Back to Top](#Basic-Django-App)
+
+## Graphs 
+- This section will go over how to create a graph using Chart.js 
+- This section assumes you have a base template called `base.html` which your other HTML templates extend using `{% extends 'base.html' %}` and `controller.py` file for working with the data 
+- For this section, we will be using the the __powerData__ model that we went over in part 3 under the __graphs app__
+### Getting Data in JSON format 
+- In order for Chart.js to work, we need to have our data formatted into a JSON object 
+    > Have [django rest framework](https://www.django-rest-framework.org/) installed and added to the INSTALLED_APPS in __settings.py__ <br>
+    > Add [the script for chart.js](https://cdnjs.com/libraries/Chart.js) to your template 
+- In __controller.py__, create a python function that gets a number of the latest data from the powerData model in the database 
+<table>
+
+    import pandas as pd
+
+    def getRecentData(tablename, num_req, col):
+    """
+    Reads and returns the recent data \n
+    :param str tablename: Name of table to be opened \n
+    :param int num_req: Number of datapoints to be limited to \n
+    :param str col: Name of column in database to be ordered by \n
+    Returns a dataframe of our data
+    """ 
+    engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+
+     #sql query to select specific dates 
+    my_query = "SELECT * FROM " + \
+                tablename + \
+                " ORDER BY " + col + " DESC" + \
+                " LIMIT " + str(num_req)
+    df = pd.read_sql_query(sql = my_query, con=engine)
+    return df
+</table>
+
+- Since the function above only returns a dataframe and not a JSON, we need to add another functon in __controller.py__ 
+<table>
+
+    def pandasToJSON(df):
+    """
+    Converts a dataframe into a JSON string 
+    """
+    return df.to_json(date_format='iso', orient='split')
+
+</table>
+
+- Now that you have created 2 functions that will help query data from our MySQL database and convert it into a JSON string, we can create a class in __views.py__ that will use the JSON framework and send 100 data points to our HTML template page 
+<table>
+
+    from django.http import HttpResponse, Http404, JsonResponse
+    import pandas as pd 
+    from rest_framework.views import APIView
+    from rest_framework.response import Response
+
+    # Rest Framework 
+    class ChartData(APIView):
+    """
+    This method is used to send 100 most recent data points as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_powerdata',100,'Timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+</table>
+
+- Create a new page that uses the django-rest-framework in __urls.py__ 
+<table>
+
+    urlpatterns = [
+        path(r'api/data',views.ChartData.as_view(), name='chart' ),
+    ]
+</table>
+
+- Once saved, run your server and go to http://localhost:8000/api/data and you will be able to view the JSON string that we will work with in our javascript 
+### Converting JSON data into a Graph
+- At this point, you should be able to view data in a JSON string format at http://localhost:8000/api/data 
+- In this section, you will convert that JSON string into a JSON object and graph the object using chart.js into the HTML template 
+- In __base.html__ add the following script, which tells us when the page is "ready" to be manipulated safely
+<table>
+
+     <!--Custom Scripts-->
+    <script> 
+      $(document).ready(function(){
+        {% block jquery %}{% endblock %}
+      })
+    </script>
+</table>
+
+- In a new file called __graphs.html__, we will extend our __base.html__ template and run some javascript functions in our jquery block to generate our charts. Make sure to also link the template to a view and url
+<table>
+
+    {% extends 'base.html' %}
+
+    <!--Script for our Charts-->
+    <script>
+    {% block jquery %}
+        var endpoint = '/api/data'
+        
+        $.ajax({
+            method:"GET",
+            url: endpoint,
+            success: function(data){
+                console.log(data)
+                //convert our values from JSON string to JSON object
+                var result = JSON.parse(data) 
+                //Empty arrays to store our values 
+                var date = []
+                var power = []
+                //length (as our objects are in Most recent->least recent)
+                var length = result.data.length-1
+                for (var x in result.data){
+                    //slice the ISO-Format String 
+                    //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
+                    date.push(result.data[length-x][1].slice(0,16))
+                    power.push(result.data[length-x][2])
+                }
+                console.log(date)
+                console.log(power)
+            },
+            error: function(err_data){
+                console.log("error")
+                console.log(err_data)
+            }
+        });
+    {% endblock %}
+    </script>
+</table>
+
+- Run the code on localhost and navigate to the url corresponding to this view. In the console, you should be able to see the data being printed out in 3 formats: 
+    1. A JSON string of all the data 
+    2. JSON object of dates 
+    3. JSON object of power 
+- We will be using the two JSON objects - date and power, for our graph, and passing it through a function that uses chart.js. Add the following function right below our `$.ajax` call within the jquery block. 
+<table>
+
+    /**
+     * @param Array x_axis: Array of dates for our chart  
+     * @param Array y_axis: Array of power for our chart
+     * Returns a chart corresponding to our EV data
+     */
+    function createEVChart(x_axis,y_axis){
+        
+        var ctx_ev = document.getElementById("myChartEV").getContext('2d');
+
+        var myChartEV = new Chart(ctx_ev, {
+            type: 'line',
+            data: {
+                labels: x_axis,
+                datasets: [{
+                    label: 'Power Consumption',
+                    data: y_axis,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255,99,132,1)',
+                }]
+            },
+            options: {
+                title:{
+                    display: true,
+                    text: 'EV Charging Stations'
+                },
+                scales: {
+                    xAxes:[{
+                        display: true,
+                        scaleLabel:{
+                            display:true,
+                            labelString:'Time'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel:{
+                            display: true,
+                            labelString: 'Power'
+                        },
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+</table>
+
+- Add the following line of code to the success function(data) in our `$.ajax` call so that we use our newly created function `createEVChart`
+<table>
+
+    //calls our function on success 
+    createEVChart(date,power) 
+</table>
+
+- In addition, in our HTML body, we need to create the element and format it so that it will display onto the web page. 
+<table>
+
+    <div class='container'>
+            <canvas id="myChartEV" width="400" height="400"></canvas>
+    </div>
+</table>
+
+<br> [Back to Top](#Basic-Django-App)

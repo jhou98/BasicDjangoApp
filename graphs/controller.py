@@ -15,6 +15,7 @@ __schema= 'basic'
 __host = 'localhost'
 __port = '3306'
 
+
 def createNewTable(pathtofile, tablename): 
     """
     Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
@@ -37,7 +38,7 @@ def updateTable(pathtofile, tablename):
     """
     Updates a table in our database by appending the new data into the table \n
     :param str pathtofile: Path to file from our projects base directory \n
-    :param str tablename: name of table to input data. \
+    :param str tablename: name of table to input data. \n
     IF tablename exists, we will append the data to the bottom \
     OTHERWISE it will create a new table 
     """
@@ -55,7 +56,7 @@ def replaceTable(pathtofile, tablename):
     """
     Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
     :param str pathtofile: Path to file from our projects base directory \n
-    :param str tablename: Name of the table we wish to input data into. \
+    :param str tablename: Name of the table we wish to input data into. \n
     IF tablename exists, it will be replaced with the new data
     """
     df = pd.read_csv(__base+pathtofile)
@@ -138,4 +139,22 @@ def pandasToJSON(df):
     Converts a dataframe into a JSON string 
     """
     return df.to_json(date_format='iso', orient='split')
+
+def getRecentDataList(num_req):
+    """
+    Reads and returns a Query list of data from powerdata \n 
+    :param int num_req: Number of datapoints to retrieve
+    """
+    from .models import powerData 
+    latest_data_list = powerData.objects.order_by('-Timestamp')[:num_req]
+    return latest_data_list
+
+def getMaxData(num_req):
+    """
+    Gets a list of data points ordered by power consumption \n
+    :param int num_req: Number of data points to be extracted \n
+    """
+    from .models import powerData 
+    latest_data_list = powerData.objects.order_by('-Power')[:num_req]
+    return latest_data_list
 

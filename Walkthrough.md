@@ -1,4 +1,5 @@
 # Walkthrough of Project 
+- A rough walkthrough of the project. Important parts are revised and shown in [README file](README.md)
 
 ## Setup a Django Project with mySQL  
 - Make sure Python is installed, you can check through the `python -V` command

@@ -9,7 +9,7 @@ def index(request):
     Home Page \n 
     This will be modified accordingly in the future
     """
-    from graphs.controller import getBaseData
+    from .controller import getBaseData
     return render(request, 'graphs.html', {'test_fn': getBaseData('graphs_powerdata')})
 
 def recentData(request, num_req):
@@ -18,10 +18,8 @@ def recentData(request, num_req):
     :param int num_req: Number of data points to extracted \n
     Returns an unordered list of datapoints (max of 1000)
     """
-    from .models import powerData 
-    if num_req > 1000:
-        raise Http404("Error, too many datapoints requested. MAX = 1000")
-    latest_data_list = powerData.objects.order_by('-Timestamp')[:num_req]
+    from .controller import getRecentDataList as getRecent
+    latest_data_list = getRecent(num_req)
     return render(request, 'data.html', {'recent_data':latest_data_list})
 
 def peakData(request, num_req):
@@ -30,10 +28,8 @@ def peakData(request, num_req):
     :param int num_req: Number of data points to be extracted \n
     Returns an unordered list of datapoints (max of 1000)
     """
-    from .models import powerData 
-    if num_req > 1000:
-        raise Http404("Error, too many datapoints requested. MAX = 1000")
-    latest_data_list = powerData.objects.order_by('-Power')[:num_req]
+    from .controller import getMaxData 
+    latest_data_list = getMaxData(num_req)
     return render(request, 'max_val.html', {'max_power':latest_data_list})
 
 def dateData(request, date_val):
@@ -52,7 +48,7 @@ def dateData(request, date_val):
 class ChartData(APIView):
     """
     This method is used to send 100 most recent data points as a JSON string\n
-    However it has built in support for authentication and permissions \n 
+    Has built in support for authentication and permissions \n 
     See https://www.django-rest-framework.org/api-guide/views/ for more details 
     """ 
     authentication_classes = []
