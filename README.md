@@ -1,9 +1,20 @@
 # Basic Django App 
 - A basic application in Django and Python that will connect to a local mySQL server to output data regarding electrical consumption for EV and Buildings at UBC. 
-- [Part 1 - Models](#Models)
-- [Part 2 - Views](#Views)
-- [Part 3 - Database](#Database)
-- [Part 4 - Graphs](#Graphs)
+- This file will go over the essentials of application. For more details and django setup, check out [Walkthrough](Walkthrough.md) and [Django Documentation](https://docs.djangoproject.com/en/2.1/)
+- Our project follows the Model View Controller Structure(MVC), where there are three main components: Model, View, and Controller. 
+    > __Model__: The Model component defines the data objects and its fields and behaviour <br>
+    > __View__: View component is used for UI logic and whatever the user interacts with <br>
+    > __Controller__: The Controller component acts as an interface between the Model and View to process all logic and requests, manipulate the data from the Model and interact with our View to render the final results. <br>
+
+[Part 1 - Models](#Models) 
+------
+[Part 2 - Views](#Views) 
+------
+[Part 3 - Database](#Database) 
+------
+[Part 4 - Graphs](#Graphs) 
+------
+
 
 ## Models 
 - Assume you have your main project called __basic__ and you want to add a model to your app called __graphs__
@@ -12,56 +23,50 @@
 - Create a model using `class %modelname%(models.Model):` and adding methods and variables to the model 
 ### Linking a Model to the Database
 - In the `graphs.admin.py` file, add your newly created model with the following lines of code: <br>
-<table>
-
+    ```python
     from .models import %modelname%`
     admin.site.register(%modelname%)`
-</table>
-
+    ```
 - Make sure in your `graphs.apps.py` file you have everything configured like so: <br>
-<table>
-
+    ```python
     from django.apps import AppConfig
 
     class GraphsConfig(AppConfig):
         name = 'graphs'
-</table>
+    ```
 
 - In your `main.settings.py` file, check the `INSTALLED_APPS` to see if you have the graphs application path on the project.
 > If not, add `'graphs.apps.GraphsConfig'` to the list 
 - In the command shell, navigate to the top level project folder where __manage.py__ is and run the following commands to migrate the model changes into the server.
-<table>
+    <table>
 
-    python manage.py makemigrations
-    python manage.py migrate
-</table>
+        python manage.py makemigrations
+        python manage.py migrate
+    </table>
 
 - Check your database to make sure a new table has been created named __graphs.%modelname%__
 <br> [Back to Top](#Basic-Django-App)
 ## Views 
 ### Creating a view 
 - In `graphs.views.py` you can create a new view just like creating a new method in python. Have the following imports at the top of your file: 
-<table>
-
+    ```python
     from django.shortcuts import render
     from django.http import HttpResponse, Http404
-</table>
+    ```
 
 - Below, I have a view called index(request, **args) which returns a render
     > render(request, HTML template that we are sending the render to, {reference name: python functions we want to use}) <br>
     > this index function will store the sum of all the arguments into __'reference'__
-<table>
-
+    ```python
     def index(request, **args):
        
         answ = args1 + args2 + ...
         return render(request, 'index.html', {'reference':answ})
-</table>
+    ```
 
 ### Adding the view to HTML template
 - Using the example above, in `index.html`, if you wish to call upon the python function use `{{reference}}`
-<table>
-
+    ```HTML
     <!DOCTYPE HTML>
     <html lang = "en">
     <head>
@@ -74,7 +79,7 @@
     {{reference}} <!--Calls on our python variable (we can also have functions here)-->
     </body>
     </html>
-</table>
+    ```
 
 ### Creating a URL path 
 - Now that your view and template pages are linked, you will need to setup a URL path to access this new view 
@@ -82,10 +87,9 @@
     > The first argument will be the path you need to enter to get to your view from localhost <br>
     > The second argument `views.index` tells you which view you are accessing <br>
     > The last argument is a reference that you can call upon as a shortcut to the path 
-<table>
-
+    ```python
      path('index/<args1>/<args2>/....',views.index, name='index')
-</table>
+    ```
 
 <br>[Back to Top](#Basic-Django-App)
 
@@ -94,8 +98,7 @@
 - Walkthrough of setting up a MySQL database and adding data to the table 
 - To start off, create a new MySQL server and save the settings into the DATABASES in __settings.py__ 
 - To create a table, we simply need to create a new model class and migrate the class to our database. Create the following model and follow the steps in Part 1 to link it to our database. 
-<table>
-
+    ```python
     class powerData(models.Model):
     """
     Class that holds 3 variables
@@ -109,7 +112,7 @@
 
     def __str__(self):
         return "Date: " + self.Timestamp.strftime("%m/%d/%y %H:%M:%S") + "  Power: " + str(self.Power)
-</table>
+    ```
 
 - In your database, you should now be able to see a new empty table along the names of __graphs_powerdata__ with 3 fields: 
     1. index 
@@ -119,8 +122,7 @@
 ### Using Pandas to add data to your table 
 - There are multiple different ways to update the new table in your MySQL database. However, the way we will be doing it will be using the pandas package to read a CSV file and inserting the values into our table. The advantage of this is pandas makes it easy and fast to update and insert large amounts of data into our database. 
 - Therefore, in our `controller.py` file, add the following function for pandas 
-<table>
-
+    ```python
     import mysql 
     from mysql import connector
     from sqlalchemy import create_engine
@@ -155,17 +157,17 @@
         print("Connected to mysql\n")
 
         df.to_sql(con=engine, name=tablename, if_exists='append', index=False, index_label = 'index')
-</table>
+    ```
 
 - The `updateTable` function will add new points to the table corresponding to the _tablename_ and will not modify any previous values already in the table 
     > We can also change the functionality by modifying the `if_exists` parameter to either _'fail'_ or _'replace'_ if we wish to have our function fail if the table already exists (creating a new table) or replace the old table data with our new data 
 - Now we can run a python shell and call this command to insert data into our table. Make sure to store the csv file somewhere within project folder so you can navigate to it, and that the column names correspond to the fields we created in our models class. 
-<table>
+    <table>
 
-    python manage.py shell 
-    >>>from graphs import controller as c 
-    >>>c.updateTable(//pathtofile, 'graphs_powerdata')
-</table>
+        python manage.py shell 
+        >>>from graphs import controller as c 
+        >>>c.updateTable(//pathtofile, 'graphs_powerdata')
+    </table>
 
 - Afterwards, if you connected everything correctly, you should be able to see the new data in both your MySQL connector and your Django admin page on localhost:8000/admin
 <br>[Back to Top](#Basic-Django-App)
@@ -179,8 +181,7 @@
     > Have [django rest framework](https://www.django-rest-framework.org/) installed and added to the INSTALLED_APPS in __settings.py__ <br>
     > Add [the script for chart.js](https://cdnjs.com/libraries/Chart.js) to your template 
 - In __controller.py__, create a python function that gets a number of the latest data from the powerData model in the database 
-<table>
-
+    ```python
     import pandas as pd
 
     def getRecentData(tablename, num_req, col):
@@ -200,22 +201,19 @@
                 " LIMIT " + str(num_req)
     df = pd.read_sql_query(sql = my_query, con=engine)
     return df
-</table>
+    ```
 
 - Since the function above only returns a dataframe and not a JSON, we need to add another functon in __controller.py__ 
-<table>
-
+    ```python
     def pandasToJSON(df):
     """
     Converts a dataframe into a JSON string 
     """
     return df.to_json(date_format='iso', orient='split')
-
-</table>
+    ```
 
 - Now that you have created 2 functions that will help query data from our MySQL database and convert it into a JSON string, we can create a class in __views.py__ that will use the JSON framework and send 100 data points to our HTML template page 
-<table>
-
+    ```python
     from django.http import HttpResponse, Http404, JsonResponse
     import pandas as pd 
     from rest_framework.views import APIView
@@ -238,34 +236,30 @@
         my_df = getRecentData('graphs_powerdata',100,'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
-</table>
+    ```
 
 - Create a new page that uses the django-rest-framework in __urls.py__ 
-<table>
-
+    ```python
     urlpatterns = [
         path(r'api/data',views.ChartData.as_view(), name='chart' ),
     ]
-</table>
+    ```
 
 - Once saved, run your server and go to http://localhost:8000/api/data and you will be able to view the JSON string that we will work with in our javascript 
 ### Converting JSON data into a Graph
 - At this point, you should be able to view data in a JSON string format at http://localhost:8000/api/data 
 - In this section, you will convert that JSON string into a JSON object and graph the object using chart.js into the HTML template 
 - In __base.html__ add the following script, which tells us when the page is "ready" to be manipulated safely
-<table>
-
+    ```HTML
      <!--Custom Scripts-->
     <script> 
       $(document).ready(function(){
         {% block jquery %}{% endblock %}
       })
-    </script>
-</table>
+    ```
 
 - In a new file called __graphs.html__, we will extend our __base.html__ template and run some javascript functions in our jquery block to generate our charts. Make sure to also link the template to a view and url
-<table>
-
+    ```HTML
     {% extends 'base.html' %}
 
     <!--Script for our Charts-->
@@ -301,15 +295,14 @@
         });
     {% endblock %}
     </script>
-</table>
+    ```
 
 - Run the code on localhost and navigate to the url corresponding to this view. In the console, you should be able to see the data being printed out in 3 formats: 
     1. A JSON string of all the data 
     2. JSON object of dates 
     3. JSON object of power 
 - We will be using the two JSON objects - date and power, for our graph, and passing it through a function that uses chart.js. Add the following function right below our `$.ajax` call within the jquery block. 
-<table>
-
+    ```javascript
     /**
      * @param Array x_axis: Array of dates for our chart  
      * @param Array y_axis: Array of power for our chart
@@ -357,21 +350,17 @@
             }
         });
     }
-</table>
+    ```
 
 - Add the following line of code to the success function(data) in our `$.ajax` call so that we use our newly created function `createEVChart`
-<table>
-
+    ```javascript
     //calls our function on success 
     createEVChart(date,power) 
-</table>
-
+    ```
 - In addition, in our HTML body, we need to create the element and format it so that it will display onto the web page. 
-<table>
-
+    ```HTML
     <div class='container'>
             <canvas id="myChartEV" width="400" height="400"></canvas>
     </div>
-</table>
-
+    ```
 <br> [Back to Top](#Basic-Django-App)
