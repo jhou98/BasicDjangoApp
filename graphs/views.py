@@ -44,7 +44,7 @@ def dateData(request, date_val):
         raise Http404("Timestamp does not exist!")
     return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
 
-# Rest Framework 
+# Rest Framework v1
 class ChartData(APIView):
     """
     This method is used to send 100 most recent data points as a JSON string\n
@@ -59,5 +59,22 @@ class ChartData(APIView):
         from .controller import pandasToJSON 
         
         my_df = getRecentData('graphs_powerdata',100,'Timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest framework v2
+class ErrData(APIView):
+    """
+    This method takes our trial data points with error as a JSON string \n
+    Similar to ChartData class 
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('powererr',98,'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
