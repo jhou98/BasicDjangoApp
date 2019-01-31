@@ -18,9 +18,42 @@
 <div class='container'>
     <canvas id="myChartTest" width="400" height="400"></canvas>
 </div>
-
+<div id="gauge4" class="gauge-container four">
+    <span class="label">Test</span>
+    <span class="value-text">kW/hr</span>
+</div>
 {% endblock %}
 
+<!--CSS styling for our gauge-->
+<style>
+    .gauge-container.four>.gauge>.dial {
+        stroke: #334455;
+        stroke-width: 10;
+    }
+
+    .gauge-container.four>.gauge>.value {
+        stroke: #F32450;
+        stroke-dasharray: none;
+        stroke-width: 10;
+    }
+
+    .gauge-container.four>.gauge>.value-text {
+        fill: #F32450;
+        transform: translate3d(24%, 23%, 0);
+        display: inline-block;
+    }
+
+    .gauge-container.four>.value-text {
+        color: #F32450;
+        font-weight: 100;
+        position: absolute;
+        bottom: 18%;
+        right: 10%;
+        display: inline-block;
+    }
+</style>
+
+<script src="../../node_modules/svg-gauge/src/gauge.js"></script>
 <!--Script for our Charts-->
 <script>
     {% block jquery %}
@@ -67,7 +100,7 @@
             errpower.push(err_result.data[err_length - x][1])
             maxerr.push(err_result.data[err_length - x][2])
             minerr.push(err_result.data[err_length - x][3])
-        }   
+        }
         // console.log(errdate)
         // console.log(errpower)
         // console.log(maxerr)
@@ -76,6 +109,7 @@
         createEVChart(date, power)
         createBuildingChart(date, power)
         createTestChart(errdate, errpower, maxerr, minerr)
+        createGauge(100, 500)
     });
     // $.ajax({
     //     method:"GET",
@@ -108,6 +142,24 @@
     //     }
     // });
 
+    function createGauge(val, max_val) {
+
+        
+
+
+        //Gauge Code 
+        var gauge4 = new Gauge(
+            document.getElementById("gauge4"), {
+                max: max_val,
+                dialStartAngle: 90,
+                dialEndAngle: 0,
+                value: 50
+            }
+        );
+
+        // Set value and animate (value, animation duration in seconds)
+        gauge4.setValueAnimated(val, 1);
+    }
     /**
     * @param Array x_axis: Array of dates for our chart  
     * @param Array y_axis: Array of power for our chart
