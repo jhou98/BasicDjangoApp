@@ -38,8 +38,8 @@
             url: errpoint
         })
     ).then(function (data1, data2) {
-        console.log(data1[0])
-        console.log(data2[0])
+        // console.log(data1[0])
+        // console.log(data2[0])
 
         var result = JSON.parse(data1[0])
         var date = []
@@ -52,8 +52,8 @@
             date.push(result.data[length - x][1].slice(0, 16))
             power.push(result.data[length - x][2])
         }
-        console.log(date)
-        console.log(power)
+        // console.log(date)
+        // console.log(power)
 
         var err_result = JSON.parse(data2[0])
         console.log(err_result.data)
@@ -67,11 +67,11 @@
             errpower.push(err_result.data[err_length - x][1])
             maxerr.push(err_result.data[err_length - x][2])
             minerr.push(err_result.data[err_length - x][3])
-        }
-        console.log(errdate)
-        console.log(errpower)
-        console.log(maxerr)
-        console.log(minerr)
+        }   
+        // console.log(errdate)
+        // console.log(errpower)
+        // console.log(maxerr)
+        // console.log(minerr)
 
         createEVChart(date, power)
         createBuildingChart(date, power)
@@ -226,7 +226,7 @@
                     data: main,
                     backgroundColor: utils.transparentize(presets.red),
                     borderColor: presets.red,
-                    fill: '+2',
+                    fill: 'false',
                 }, {
                     label: 'Max Power Error',
                     data: max_err,
@@ -236,9 +236,9 @@
                 }, {
                     label: 'Min Power Error',
                     data: min_err,
-                    backgroundColor: utils.transparentize(presets.green),
-                    borderColor: presets.green,
-                    fill: 'false',
+                    backgroundColor: utils.transparentize(presets.blue),
+                    borderColor: presets.blue,
+                    fill: '-2',
                 }]
             },
             options: {
