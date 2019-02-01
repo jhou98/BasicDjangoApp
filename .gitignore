@@ -21,4 +21,8 @@ venv.bak/
 # json files 
 package-lock.json
 package.json
+<<<<<<< HEAD
+=======
+node_modules/
+>>>>>>> master
 
