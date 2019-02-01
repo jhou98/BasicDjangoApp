@@ -15,51 +15,158 @@
         </div>
     </div>
 </div>
-
+<div class='container'>
+    <canvas id="myChartTest" width="400" height="400"></canvas>
+</div>
+<div id="gauge4" class="gauge-container four">
+    <span class="label">Test</span>
+    <span class="value-text">kW/hr</span>
+</div>
 {% endblock %}
 
+<!--CSS styling for our gauge-->
+<style>
+    .gauge-container.four>.gauge>.dial {
+        stroke: #334455;
+        stroke-width: 10;
+    }
+
+    .gauge-container.four>.gauge>.value {
+        stroke: #F32450;
+        stroke-dasharray: none;
+        stroke-width: 10;
+    }
+
+    .gauge-container.four>.gauge>.value-text {
+        fill: #F32450;
+        transform: translate3d(24%, 23%, 0);
+        display: inline-block;
+    }
+
+    .gauge-container.four>.value-text {
+        color: #F32450;
+        font-weight: 100;
+        position: absolute;
+        bottom: 18%;
+        right: 10%;
+        display: inline-block;
+    }
+</style>
+
+<script src="../../node_modules/svg-gauge/src/gauge.js"></script>
 <!--Script for our Charts-->
 <script>
-{% block jquery %}
+    {% block jquery %}
     var endpoint = '/api/data'
-    
-    $.ajax({
-        method:"GET",
-        url: endpoint,
-        success: function(data){
-            console.log(data)
-            //convert our values from JSON string to JSON object
-            var result = JSON.parse(data) 
-            //Empty arrays to store our values 
-            var date = []
-            var power = []
-            //length (as our objects are in Most recent->least recent)
-            var length = result.data.length-1
-            for (var x in result.data){
-                //slice the ISO-Format String 
-                //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
-                date.push(result.data[length-x][1].slice(0,16))
-                power.push(result.data[length-x][2])
-            }
-            console.log(date)
-            console.log(power)
-            //calls our function on success 
-            createEVChart(date,power) 
-            createBuildingChart(date,power)       
-        },
-        error: function(err_data){
-            console.log("error")
-            console.log(err_data)
-        }
-    });
+    var errpoint = '/api/data2'
 
-    /**
-     * @param Array x_axis: Array of dates for our chart  
-     * @param Array y_axis: Array of power for our chart
-     * Returns a chart corresponding to our EV data
-     */
-    function createEVChart(x_axis,y_axis){
+    //Running the ajax methods in parallel
+    $.when(
+        $.ajax({
+            method: "GET",
+            url: endpoint
+        }),
+        $.ajax({
+            method: "GET",
+            url: errpoint
+        })
+    ).then(function (data1, data2) {
+        // console.log(data1[0])
+        // console.log(data2[0])
+
+        var result = JSON.parse(data1[0])
+        var date = []
+        var power = []
+        //length (as our objects are in Most recent->least recent)
+        var length = result.data.length - 1
+        for (var x in result.data) {
+            //slice the ISO-Format String 
+            //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
+            date.push(result.data[length - x][1].slice(0, 16))
+            power.push(result.data[length - x][2])
+        }
+        // console.log(date)
+        // console.log(power)
+
+        var err_result = JSON.parse(data2[0])
+        console.log(err_result.data)
+        var errdate = []
+        var errpower = []
+        var maxerr = []
+        var minerr = []
+        var err_length = err_result.data.length - 1
+        for (var x in err_result.data) {
+            errdate.push(err_result.data[err_length - x][0])
+            errpower.push(err_result.data[err_length - x][1])
+            maxerr.push(err_result.data[err_length - x][2])
+            minerr.push(err_result.data[err_length - x][3])
+        }
+        // console.log(errdate)
+        // console.log(errpower)
+        // console.log(maxerr)
+        // console.log(minerr)
+
+        createEVChart(date, power)
+        createBuildingChart(date, power)
+        createTestChart(errdate, errpower, maxerr, minerr)
+        createGauge(100, 500)
+    });
+    // $.ajax({
+    //     method:"GET",
+    //     url: endpoint,
+    //     success: function(data){
+    //         console.log(data)
+    //         //convert our values from JSON string to JSON object
+    //         var result = JSON.parse(data) 
+    //         //Empty arrays to store our values 
+    //         var date = []
+    //         var power = []
+    //         //length (as our objects are in Most recent->least recent)
+    //         var length = result.data.length-1
+    //         for (var x in result.data){
+    //             //slice the ISO-Format String 
+    //             //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
+    //             date.push(result.data[length-x][1].slice(0,16))
+    //             power.push(result.data[length-x][2])
+    //         }
+    //         console.log(date)
+    //         console.log(power)
+    //         //calls our function on success 
+    //         createEVChart(date,power) 
+    //         createBuildingChart(date,power)
+
+    //     },
+    //     error: function(err_data){
+    //         console.log("error")
+    //         console.log(err_data)
+    //     }
+    // });
+
+    function createGauge(val, max_val) {
+
         
+
+
+        //Gauge Code 
+        var gauge4 = new Gauge(
+            document.getElementById("gauge4"), {
+                max: max_val,
+                dialStartAngle: 90,
+                dialEndAngle: 0,
+                value: 50
+            }
+        );
+
+        // Set value and animate (value, animation duration in seconds)
+        gauge4.setValueAnimated(val, 1);
+    }
+    /**
+    * @param Array x_axis: Array of dates for our chart  
+    * @param Array y_axis: Array of power for our chart
+    * Returns a chart corresponding to our EV data
+    */
+    function createEVChart(x_axis, y_axis) {
+
         var ctx_ev = document.getElementById("myChartEV").getContext('2d');
 
         var myChartEV = new Chart(ctx_ev, {
@@ -74,26 +181,26 @@
                 }]
             },
             options: {
-                title:{
+                title: {
                     display: true,
                     text: 'EV Charging Stations'
                 },
                 scales: {
-                    xAxes:[{
+                    xAxes: [{
                         display: true,
-                        scaleLabel:{
-                            display:true,
-                            labelString:'Time'
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
                         }
                     }],
                     yAxes: [{
                         display: true,
-                        scaleLabel:{
+                        scaleLabel: {
                             display: true,
                             labelString: 'Power'
                         },
                         ticks: {
-                            beginAtZero:true
+                            beginAtZero: true
                         }
                     }]
                 }
@@ -101,19 +208,19 @@
         });
     }
 
-     /**
-     * @param Array x_axis: Array of dates for our chart  
-     * @param Array y_axis: Array of power for our chart
-     * Returns a chart corresponding to our Building data
-     */
-    function createBuildingChart(x_axis,y_axis){
-        
+    /**
+    * @param Array x_axis: Array of dates for our chart  
+    * @param Array y_axis: Array of power for our chart
+    * Returns a chart corresponding to our Building data
+    */
+    function createBuildingChart(x_axis, y_axis) {
+
         var ctx_building = document.getElementById("myChartBuilding").getContext('2d');
 
         var myChartBuilding = new Chart(ctx_building, {
             type: 'line',
             data: {
-                labels: x_axis, 
+                labels: x_axis,
                 datasets: [{
                     label: 'Power Consumption',
                     data: y_axis,
@@ -122,31 +229,101 @@
                 }]
             },
             options: {
-                title:{
+                title: {
                     display: true,
                     text: 'Building Data'
                 },
                 scales: {
-                    xAxes:[{
+                    xAxes: [{
                         display: true,
-                        scaleLabel:{
-                            display:true,
-                            labelString:'Time'
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
                         }
                     }],
                     yAxes: [{
                         display: true,
-                        scaleLabel:{
+                        scaleLabel: {
                             display: true,
                             labelString: 'Power'
                         },
                         ticks: {
-                            beginAtZero:true
+                            beginAtZero: true
                         }
                     }]
                 }
             }
         });
     }
-{% endblock %}
+
+    /**
+    * @param Array x_axis: Array of dates for our chart  
+    * @param Array main: Array of power for our chart
+    * @param Array max_err: Array of max error for chart
+    * @param Array min_err: Array of min error for chart 
+    * Returns a chart corresponding to our Building data
+    */
+    function createTestChart(x_axis, main, max_err, min_err) {
+
+        var ctx_Test = document.getElementById("myChartTest").getContext('2d');
+        var presets = window.chartColors;
+        var utils = Samples.utils;
+
+        var myChartBuilding = new Chart(ctx_Test, {
+            type: 'line',
+            data: {
+                labels: x_axis,
+                datasets: [{
+                    label: 'Power Consumption',
+                    data: main,
+                    backgroundColor: utils.transparentize(presets.red),
+                    borderColor: presets.red,
+                    fill: 'false',
+                }, {
+                    label: 'Max Power Error',
+                    data: max_err,
+                    backgroundColor: utils.transparentize(presets.blue),
+                    borderColor: presets.blue,
+                    fill: '-1',
+                }, {
+                    label: 'Min Power Error',
+                    data: min_err,
+                    backgroundColor: utils.transparentize(presets.blue),
+                    borderColor: presets.blue,
+                    fill: '-2',
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Sample Data'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Power'
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                plugins: {
+                    filler: {
+                        propagate: true
+                    }
+                }
+            }
+        });
+    }
+    {% endblock %}
 </script>
