@@ -94,6 +94,61 @@
 {% endblock %}
 
 <!--Script for our Charts-->
-{% block jquery %}
 <script src="https://jhou98.github.io/BasicDjangoApp/scripts/graphs-gauges.js"></script>
+<script>
+{% block jquery %}
+    var endpoint = '/api/data'
+    var errpoint = '/api/data2'
+
+    //Running the ajax methods in parallel
+    $.when(
+        $.ajax({
+            method: "GET",
+            url: endpoint
+        }),
+        $.ajax({
+            method: "GET",
+            url: errpoint
+        })
+    ).then(function (data1, data2) {
+        //data1 currently corresponds to our powerData model class
+        var result = JSON.parse(data1[0])
+        var date = []
+        var power = []
+        //length (as our objects are in Most recent->least recent)
+        var length = result.data.length - 1
+        for (var x in result.data) {
+            //slice the ISO-Format String 
+            //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
+            date.push(result.data[length - x][1].slice(0, 16))
+            power.push(result.data[length - x][2])
+        }
+
+        //data2 is the data with error bars 
+        var err_result = JSON.parse(data2[0])
+        var errdate = []
+        var errpower = []
+        var maxerr = []
+        var minerr = []
+        var err_length = err_result.data.length - 1
+        for (var x in err_result.data) {
+            errdate.push(err_result.data[err_length - x][0])
+            errpower.push(err_result.data[err_length - x][1])
+            maxerr.push(err_result.data[err_length - x][2])
+            minerr.push(err_result.data[err_length - x][3])
+        }
+
+        //call our chart functions
+        createEVChart(date, power)
+        createBuildingChart(date, power)
+        createTestChart(errdate, errpower, maxerr, minerr)
+        //call our gauge function 
+        createGauge("evdailyval", "evdailymax", "evdailygauge")
+        createGauge("evweeklyval", "evweeklymax", "evweeklygauge")
+        createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
+        createGauge("bddailyval", "bddailymax", "bddailygauge")
+        createGauge("bdweeklyval", "bdweeklymax", "bdweeklygauge")
+        createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
+    });
 {% endblock %}
+</script>
