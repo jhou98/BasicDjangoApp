@@ -7,10 +7,13 @@ from rest_framework.response import Response
 def index(request):
     """
     Home Page \n 
-    This will be modified accordingly in the future
+    This will be modified to send the following data \n
+    peakDaily power \n
+    peakWeekly power \n
+    peakMonthly power \n 
     """
     from .controller import getBaseData
-    return render(request, 'graphs.html', {'test_fn': getBaseData('graphs_powerdata')})
+    return render(request, 'graphs.html', {'max_daily': 201, 'max_weekly': 250, 'max_monthly': 350})
 
 def recentData(request, num_req):
     """

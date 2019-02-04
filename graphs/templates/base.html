@@ -1,58 +1,114 @@
 <!--Layout using Bootstrap-->
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>{% block title %}Hello, world!{% endblock %}</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+    crossorigin="anonymous">
 
-    <style>
-      h1 {
-        text-align: center;
-        text-transform: uppercase;
-        color: #4F71D0;
-      }
-    </style>
-  </head>
-  <body>   
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-    <!--Chart.js-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.js"></script>
-    <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
-    <script src="https://www.chartjs.org/samples/latest/charts/area/analyser.js"></script>
-    <!--Gauge-->
-    <script src="https://jhou98.github.io/BasicDjangoApp/svg-gauge/dist/gauge.js"></script>
-    <!--Custom Scripts-->
-    <script> 
-      $(document).ready(function(){
-        {% block jquery %}{% endblock %}
-      })
-    </script>
+  <title>{% block title %}Hello, world!{% endblock %}</title>
 
-    <!-- Add things into the body as you go -->
+  <style>
+    h1 {
+      text-align: center;
+      text-transform: uppercase;
+      color: #4F71D0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-    <div class="container">
+    h2{
+      text-align: center;
+      text-transform: uppercase;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #4F71D0;
+    }
 
-      <div class="page-header">
-        {% block header %}You didn't give this page a header!{% endblock %}
-      </div>
-      <!--Content block for anything need to add to our top container-->
-      {% block topcontainer %}
-      {% endblock %}
+    /** Gauge Styling
+      * Check out https://codepen.io/anon/pen/WPEbGe and https://github.com/naikus/svg-gauge for more info
+      */
+    .gauge-container>.gauge>.dial {
+      stroke: #334455;
+      stroke-width: 10;
+    }
+
+    .gauge-container>.gauge>.value {
+      stroke: #F32450;
+      stroke-dasharray: none;
+      stroke-width: 10;
+    }
+
+    .gauge-container>.gauge>.value-text {
+      fill: #F32450;
+      transform: translate3d(24%, 23%, 0);
+      display: inline-block;
+    }
+
+    .gauge-container>.value-text {
+      color: #F32450;
+      font-weight: 100;
+      position: absolute;
+      bottom: 10%;
+      right: 10%;
+      display: inline-block;
+    }
+
+    .gauge-container>.label {
+      position: absolute;
+      right: 0;
+      top: 0;
+      display: inline-block;
+      background: rgba(255, 255, 255, 0);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.7em;
+      color: #666; 
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+    crossorigin="anonymous"></script>
+  <!--Chart.js-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.js"></script>
+  <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+  <script src="https://www.chartjs.org/samples/latest/charts/area/analyser.js"></script>
+  <!--Gauge-->
+  <script src="https://jhou98.github.io/BasicDjangoApp/svg-gauge/dist/gauge.js"></script>
+  <!--Custom Scripts-->
+  <script>
+    $(document).ready(function () {
+      {% block jquery %} {% endblock %}
+    })
+  </script>
+
+  <!-- Add things into the body as you go -->
+
+  <div class="container">
+
+    <div class="page-header">
+      {% block header %}You didn't give this page a header!{% endblock %}
     </div>
-
-    <!--Content block for anything that we want to be seperate from our container-->
-    {% block content %}
+    <!--Content block for anything need to add to our top container-->
+    {% block topcontainer %}
     {% endblock %}
+  </div>
 
-  </body>
+  <!--Content block for anything that we want to be seperate from our container-->
+  {% block content %}
+  {% endblock %}
+
+</body>
+
 </html>
