@@ -41,9 +41,11 @@
     <canvas id="myChartTest" width="400" height="400"></canvas>
 </div>
 <div class='container'>
-    <div id="gauge" class="gauge-container">
-        <!-- <span class="label">Test</span>
+    <div class='col-sm-6'>
+        <div id="gauge" class="gauge-container">
+            <!-- <span class="label">Test</span>
         <span class="value-text">kW/hr</span> -->
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -80,7 +82,6 @@
 
         //data2 is the data with error bars 
         var err_result = JSON.parse(data2[0])
-        console.log(err_result.data)
         var errdate = []
         var errpower = []
         var maxerr = []
@@ -92,6 +93,7 @@
             maxerr.push(err_result.data[err_length - x][2])
             minerr.push(err_result.data[err_length - x][3])
         }
+        
         //call our chart functions
         createEVChart(date, power)
         createBuildingChart(date, power)
@@ -100,7 +102,7 @@
         createGauge(100, 500)
     });
 
-    
+
     function createGauge(val, max_val) {
         /**
          * Creates a Gauge.
@@ -123,7 +125,7 @@
         gauge4.setValueAnimated(val, 3)
     }
 
-    
+
     function createEVChart(x_axis, y_axis) {
         /**
          * Creates a chart for EV Data. 

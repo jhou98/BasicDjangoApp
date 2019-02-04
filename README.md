@@ -10,6 +10,8 @@
 ------
 [Part 2 - Views](#Views) 
 ------
+[Part 3 - Controller](#Controller)
+------
 [Part 3 - Database](#Database) 
 ------
 [Part 4 - Graphs](#Graphs) 
@@ -90,6 +92,50 @@
     ```python
      path('index/<args1>/<args2>/....',views.index, name='index')
     ```
+
+<br>[Back to Top](#Basic-Django-App)
+## Controller
+- In your __graphs__ folder, you will create a new python file called __controller.py__, where it will store the communication and queries for the database and model to our views 
+### Accessing Models
+- Django models provides a easy way to access our database without queries
+> Assume we have a created and migrated a model named __powerdata__ for our project
+> Our model has a datetime field called _Timestamp_ and we wish to generate a list ordered by this field 
+    ```python
+        def getDateList():
+            from .models import powerdata
+            data_list = powerData.objects.order_by('-Timestamp')
+            return data_list
+    ```
+
+- By importing our powerdata model, we are able to access our data directly 
+- However, there are limitations for this method including how you can structure the data being returned and how you can query the data, hence you may need to access the database directly instead
+
+### Accessing Database 
+- To access the database, we will be using the __pandas__ package for dataframes and __sqlalchemy__ package for creating an connection engine, which you will need to `pip install` 
+- Let us use the same example as before, ordering the powerdata model by date
+    ```python
+        from sqlalchemy import create_engine
+        import pandas as pd
+        def getDateData(tablename, col):
+            """
+            Reads and returns the recent data \n
+            :param str tablename: Name of table to be opened \n
+            :param str col: Name of column in database to be ordered by \n
+            Returns a dataframe of our data
+            """ 
+            engine = create_engine('mysql+mysqlconnector://'+ __user + ':' + __passw + '@' + __host + ':' + __port + '/' + __schema, echo=False)
+
+            #sql query to select specific dates 
+            my_query = "SELECT * FROM " + \
+                        tablename + \
+                        " ORDER BY " + col + " DESC"
+            df = pd.read_sql_query(sql = my_query, con=engine)
+            return df
+    ```
+
+- In the code block above, when we call the function in our __views.py__ file we would have `'graphs_powerdata'` in our _tablename_ and `'Timestamp'` in our _col_
+> __user, __passw, __host, __port, __schema are all database variables that you will need to define in your controller
+- As you can see in the above example, there is more code required for accessing the database, as well as more dependencies. However, it does allow for more flexibility with your queries, since you can basically do any SQL query as long as you input it into the my_query variable  
 
 <br>[Back to Top](#Basic-Django-App)
 
