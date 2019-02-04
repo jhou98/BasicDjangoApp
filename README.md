@@ -12,9 +12,9 @@
 ------
 [Part 3 - Controller](#Controller)
 ------
-[Part 3 - Database](#Database) 
+[Part 4 - Database](#Database) 
 ------
-[Part 4 - Graphs](#Graphs) 
+[Part 5 - Graphs](#Graphs) 
 ------
 
 
@@ -98,8 +98,8 @@
 - In your __graphs__ folder, you will create a new python file called __controller.py__, where it will store the communication and queries for the database and model to our views 
 ### Accessing Models
 - Django models provides a easy way to access our database without queries
-> Assume we have a created and migrated a model named __powerdata__ for our project
-> Our model has a datetime field called _Timestamp_ and we wish to generate a list ordered by this field 
+- Assume we have a created and migrated a model named __powerdata__ for our project
+- Our model has a datetime field called _Timestamp_ and we wish to generate a list ordered by this field 
     ```python
         def getDateList():
             from .models import powerdata

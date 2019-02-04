@@ -3,50 +3,82 @@
 
 {% block header %} <h1>Home</h1> {% endblock %}
 
-{% block head %}
-<!--CSS styling for our gauge-->
-<style>
-    .gauge-container>.gauge>.dial {
-        stroke: #334455;
-        stroke-width: 10;
-    }
-
-    .gauge-container>.gauge>.value {
-        stroke: #F32450;
-        stroke-dasharray: none;
-        stroke-width: 10;
-    }
-
-    .gauge-container>.gauge>.value-text {
-        fill: #F32450;
-        transform: translate3d(24%, 23%, 0);
-        display: inline-block;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <!--Content Here-->
 <div class='container'>
     <div class='row'>
         <div class='col-sm-6'>
             <canvas id="myChartEV" width="400" height="400"></canvas>
+            <div class='row'>
+                <div class='col-sm-4'>
+                    <div id="evdailygauge" class="gauge-container">
+                        <span class="value-text">kW/hr</span>
+                        <span class="label">Daily Peak</span>
+                        <input type="hidden" id="evdailyval" value={{max_daily}}>
+                        <input type="hidden" id="evdailymax" value=250>
+                    </div>
+                </div>
+                <div class='col-sm-4'>
+                    <div id="evweeklygauge" class="gauge-container">
+                        <span class="value-text">kW/hr</span>
+                        <span class="label">Weekly Peak</span>
+                        <input type="hidden" id="evweeklyval" value={{max_weekly}}>
+                        <input type="hidden" id="evweeklymax" value=300>
+                    </div>
+                </div>
+                <div class='col-sm-4'>
+                    <div id="evmonthlygauge" class="gauge-container">
+                        <span class="value-text">kW/hr</span>
+                        <span class="label">Monthly Peak</span>
+                        <input type="hidden" id="evmonthlyval" value={{max_monthly}}>
+                        <input type="hidden" id="evmonthlymax" value=500>
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-sm-12'>
+                    <h2>EV Power Data</h2>
+                </div>
+            </div>
         </div>
         <div class='col-sm-6'>
             <canvas id="myChartBuilding" width="400" height="400"></canvas>
+            <div class='row'>
+                <div class='col-sm-4'>
+                    <div id="bddailygauge" class="gauge-container">
+                        <span class="value-text">kW/hr</span>
+                        <span class="label">Daily Peak</span>
+                        <input type="hidden" id="bddailyval" value={{max_daily}}>
+                        <input type="hidden" id="bddailymax" value=250>
+                    </div>
+                </div>
+                <div class='col-sm-4'>
+                    <div id="bdweeklygauge" class="gauge-container">
+                        <span class="value-text">kW/hr</span>
+                        <span class="label">Weekly Peak</span>
+                        <input type="hidden" id="bdweeklyval" value={{max_weekly}}>
+                        <input type="hidden" id="bdweeklymax" value=300>
+                    </div>
+                </div>
+                <div class='col-sm-4'>
+                    <div id="bdmonthlygauge" class="gauge-container">
+                        <span class="value-text">kW/hr</span>
+                        <span class="label">Monthly Peak</span>
+                        <input type="hidden" id="bdmonthlyval" value={{max_monthly}}>
+                        <input type="hidden" id="bdmonthlymax" value=500>
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                    <div class='col-sm-12'>
+                        <h2>Building Power Data</h2>
+                    </div>
+            </div>
         </div>
     </div>
 </div>
 <div class='container'>
     <canvas id="myChartTest" width="400" height="400"></canvas>
-</div>
-<div class='container'>
-    <div class='col-sm-6'>
-        <div id="gauge" class="gauge-container">
-            <!-- <span class="label">Test</span>
-        <span class="value-text">kW/hr</span> -->
-        </div>
-    </div>
 </div>
 {% endblock %}
 
@@ -93,28 +125,37 @@
             maxerr.push(err_result.data[err_length - x][2])
             minerr.push(err_result.data[err_length - x][3])
         }
-        
+
         //call our chart functions
         createEVChart(date, power)
         createBuildingChart(date, power)
         createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
-        createGauge(100, 500)
+        createGauge("evdailyval", "evdailymax", "evdailygauge")
+        createGauge("evweeklyval", "evweeklymax", "evweeklygauge")
+        createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
+        createGauge("bddailyval", "bddailymax", "bddailygauge")
+        createGauge("bdweeklyval", "bdweeklymax", "bdweeklygauge")
+        createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
     });
 
 
-    function createGauge(val, max_val) {
+    function createGauge(val_id, maxval_id, id) {
         /**
          * Creates a Gauge.
          * 
-         * @param {double} val Value gauge is set to. 
-         * @param {double} max_val Maximum value of gauge.
+         * @param {double} val_id HTML id where our value gauge is set to. 
+         * @param {double} maxval_id HTML id for our Maximum value of gauge.
+         * @param {string} id HTML ID for our gauge element.
          * 
          */
 
+        // Get values 
+        var val = document.getElementById(val_id).value
+        var max_val = document.getElementById(maxval_id).value
         //Gauge Code 
-        var gauge4 = Gauge(
-            document.getElementById("gauge"), {
+        var gauge = Gauge(
+            document.getElementById(id), {
                 max: max_val,
                 dialStartAngle: 90,
                 dialEndAngle: 0,
@@ -122,7 +163,7 @@
             }
         );
         // Set value and animate (value, animation duration in seconds)
-        gauge4.setValueAnimated(val, 3)
+        gauge.setValueAnimated(val, 3)
     }
 
 
@@ -134,6 +175,7 @@
          * @param {Array} y_axis Array of power for our chart.
          */
         var ctx_ev = document.getElementById("myChartEV").getContext('2d');
+        document.get
 
         var myChartEV = new Chart(ctx_ev, {
             type: 'line',
