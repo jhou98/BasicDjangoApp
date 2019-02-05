@@ -12,8 +12,28 @@ def index(request):
     peakWeekly power \n
     peakMonthly power \n 
     """
-    from .controller import getBaseData
-    return render(request, 'graphs.html', {'max_hourly': 100, 'max_daily': 250, 'max_monthly': 350})
+    from .controller import getCurrentPower, getDailyPeak
+    ev_pwr = getCurrentPower('graphs_powerdata')
+    ev_peak = getDailyPeak('graphs_powerdata')
+    bd_pwr = getCurrentPower('graphs_powerdata')
+    bd_peak = getDailyPeak('graphs_powerdata')
+
+    if ev_pwr > ev_peak: 
+        max_evpwr = ev_pwr
+    else: 
+        max_evpwr = ev_peak 
+    
+    if bd_pwr > bd_peak: 
+        max_bdpwr = bd_pwr
+    else:
+        max_bdpwr = bd_peak
+
+    print("max ev power is : ", max_evpwr)
+    print("max building power is : ",max_bdpwr)
+    print("current ev power is : ",ev_pwr)
+    print("current building power is : ",bd_pwr)
+
+    return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': max_evpwr, 'max_evmonthly': max_evpwr, 'max_bddaily': max_bdpwr, 'max_bdmonthly': max_bdpwr})
 
 def recentData(request, num_req):
     """
@@ -22,6 +42,8 @@ def recentData(request, num_req):
     Returns an unordered list of datapoints (max of 1000)
     """
     from .controller import getRecentDataList as getRecent
+    if num_req > 1000:
+        raise Http404("Too many points requested. MAX=1000")
     latest_data_list = getRecent(num_req)
     return render(request, 'data.html', {'recent_data':latest_data_list})
 
@@ -32,6 +54,8 @@ def peakData(request, num_req):
     Returns an unordered list of datapoints (max of 1000)
     """
     from .controller import getMaxData 
+    if num_req > 1000:
+        raise Http404("Too many points requested. MAX=1000")
     latest_data_list = getMaxData(num_req)
     return render(request, 'max_val.html', {'max_power':latest_data_list})
 
@@ -78,6 +102,6 @@ class ErrData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('powererr',98,'Timestamp')
+        my_df = getRecentData('powererr',96,'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)

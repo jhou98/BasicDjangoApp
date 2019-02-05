@@ -15,7 +15,6 @@ __schema= 'basic'
 __host = 'localhost'
 __port = '3306'
 
-
 def createNewTable(pathtofile, tablename): 
     """
     Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
@@ -116,13 +115,69 @@ def getSingleDateData(tablename, timecol, dateval):
     df = getDateData(tablename,timecol,start_date,end_date)
     return df
 
-def getDailyPeak():
+def getCurrentPower(tablename):
     """
+    Reads and returns the most recent power reading
+    :param str tablename: Name of table to be opened \n
+    Assumes Timestamp is the name of our date column \n
+    Assume Power is the name of our power column \n
+    Returns a decimal power value 
     """
-    import datetime
-    from django.utils import timezone 
+    df = getRecentData(tablename, 1, 'Timestamp')
+    return df.at[0, 'Power']
 
+def getDailyPeak(tablename):
+    """
+    Reads and returns the peak power for yesterday
+    :param str tablename: Name of table to be opened \n
+    Assumes Timestamp is the name of our date column \n
+    Returns a decimal power value 
+    """
+    # Only need 192 points of data maximum assuming sampling every 15 minutes 
+    df = getRecentData(tablename, 192, 'Timestamp')
+    #Calculating the current day 
+    curr_year = df.iloc[0].Timestamp.year 
+    curr_month = df.iloc[0].Timestamp.month 
+    curr_day = df.iloc[0].Timestamp.day 
+    prev_day = curr_day - 1
+    #Calculate the previous day is the end of the previous month
+    if curr_day == 1: 
+        if (curr_month == 4 or curr_month == 6 or curr_month == 9 or curr_month == 11): 
+            #31st is the previous day 
+            prev_day = 31
+        else: 
+            if curr_month == 3: 
+                #28th or 29th is the previous day
+                if curr_year % 4 == 0: 
+                    #Leap Year
+                    prev_day = 29
+                else: 
+                    prev_day = 28
+            else: 
+                #30th is the previous day
+                prev_day = 30
     
+    my_df = getSingleDateData(tablename, 'Timestamp', str(curr_year)+"-"+str(curr_month)+"-"+str(prev_day))
+    return my_df.max().Power
+
+## ---------------- Don't need this method as we can just use getSingleDateData, but may be useful for the future so saved for reference --------------- ## 
+# def getDailyVals(df, date):
+#     """
+#     Helper function for getDailyPeak
+#     :param DataFrame df: Dataframe that we will iterated through for values \n
+#     :param int date: Date value that we will be searching for \n
+#     Returns a dataframe with values from the previous date
+#     """
+#     #Create a new empty dataframe 
+#     print("The date we are using is : ")
+#     print(date)
+#     new_df = pd.DataFrame()
+#     for i in range(len(df)):
+#         if df.iloc[i].Timestamp.day == date: 
+#             new_df = new_df.append(df.iloc[[i]])
+#         print(df.iloc[i].Timestamp.day)
+
+#     return new_df
 
 def getRecentData(tablename, num_req, col):
     """

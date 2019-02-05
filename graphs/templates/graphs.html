@@ -9,34 +9,35 @@
     <div class='row'>
         <div class='col-md-12 col-lg-6'>
             <canvas id="myChartEV" width="400" height="400"></canvas>
+            <br>
             <div class='row'>
-                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+                <!-- <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
                     <div id="evhourlygauge" class="gauge-container">
-                        <span class="value-text">kW/hr</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Hourly Peak</span>
                         <input type="hidden" id="evhourlyval" value={{max_hourly}}>
                         <input type="hidden" id="evhourlymax" value=250>
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
-                <div class="clearfix visible-sm"></div>
-                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+                <div class="clearfix visible-sm"></div> -->
+                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="evdailygauge" class="gauge-container">
-                        <span class="value-text">kW/hr</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Daily Peak</span>
-                        <input type="hidden" id="evdailyval" value={{max_daily}}>
-                        <input type="hidden" id="evdailymax" value=300>
+                        <input type="hidden" id="evdailyval" value={{curr_ev}}>
+                        <input type="hidden" id="evdailymax" value={{max_evdaily}}>
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
                 <div class="clearfix visible-sm"></div>
-                <div class="clearfix visible-md"></div>
-                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+                <!-- <div class="clearfix visible-md"></div> -->
+                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="evmonthlygauge" class="gauge-container">
-                        <span class="value-text">kW/hr</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Monthly Peak</span>
-                        <input type="hidden" id="evmonthlyval" value={{max_monthly}}>
-                        <input type="hidden" id="evmonthlymax" value=500>
+                        <input type="hidden" id="evmonthlyval" value={{curr_ev}}>
+                        <input type="hidden" id="evmonthlymax" value={{max_evmonthly}}>
                     </div>
                 </div>
             </div>
@@ -49,8 +50,9 @@
         <div class="clearfix visible-md"></div>
         <div class='col-md-12 col-lg-6'>
             <canvas id="myChartBuilding" width="400" height="400"></canvas>
+            <br>
             <div class='row'>
-                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+                <!-- <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
                     <div id="bdhourlygauge" class="gauge-container">
                         <span class="value-text">kW/hr</span>
                         <span class="label">Hourly Peak</span>
@@ -59,24 +61,24 @@
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
-                <div class="clearfix visible-sm"></div>
-                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+                <div class="clearfix visible-sm"></div> -->
+                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="bddailygauge" class="gauge-container">
-                        <span class="value-text">kW/hr</span>
-                        <span class="label">Weekly Peak</span>
-                        <input type="hidden" id="bddailyval" value={{max_daily}}>
-                        <input type="hidden" id="bddailymax" value=300>
+                        <span class="value-text">kW</span>
+                        <span class="label">Daily Peak</span>
+                        <input type="hidden" id="bddailyval" value={{curr_bd}}>
+                        <input type="hidden" id="bddailymax" value={{max_bddaily}}>
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
                 <div class="clearfix visible-sm"></div>
-                <div class="clearfix visible-md"></div>
-                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
+                <!-- <div class="clearfix visible-md"></div> -->
+                <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="bdmonthlygauge" class="gauge-container">
-                        <span class="value-text">kW/hr</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Monthly Peak</span>
-                        <input type="hidden" id="bdmonthlyval" value={{max_monthly}}>
-                        <input type="hidden" id="bdmonthlymax" value=500>
+                        <input type="hidden" id="bdmonthlyval" value={{curr_bd}}>
+                        <input type="hidden" id="bdmonthlymax" value={{max_bdmonthly}}>
                     </div>
                 </div>
             </div>
@@ -142,10 +144,8 @@
         createBuildingChart(date, power)
         createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
-        createGauge("evhourlyval", "evhourlymax", "evhourlygauge")
         createGauge("evdailyval", "evdailymax", "evdailygauge")
         createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
-        createGauge("bdhourlyval", "bdhourlymax", "bdhourlygauge")
         createGauge("bddailyval", "bddailymax", "bddailygauge")
         createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
     });
@@ -201,7 +201,8 @@
                 title: {
                     display: true,
                     text: 'EV Charging Stations',
-                    fontColor: 'rgba(105, 140, 176, 1)'
+                    fontColor: 'rgba(105, 140, 176, 1)',
+                    fontSize: 22, 
                 },
                 scales: {
                     xAxes: [{
@@ -209,7 +210,8 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Time',
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontSize: 20
                         },
                         ticks: {
                             fontColor: 'rgba(105, 140, 176, 1)'
@@ -224,7 +226,8 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Power',
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontSize: 20,
                         },
                         ticks: {
                             beginAtZero: true,
@@ -269,7 +272,8 @@
                 title: {
                     display: true,
                     text: 'Building Data',
-                    fontColor: 'rgba(105, 140, 176, 1)'
+                    fontColor: 'rgba(105, 140, 176, 1)',
+                    fontSize: 22,
                 },
                 scales: {
                     xAxes: [{
@@ -277,7 +281,8 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Time',
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontSize: 20, 
                         },
                         ticks: {
                             fontColor: 'rgba(105, 140, 176, 1)'
@@ -292,7 +297,8 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Power',
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontSize: 20, 
                         },
                         ticks: {
                             beginAtZero: true,
@@ -354,7 +360,8 @@
                 title: {
                     display: true,
                     text: 'Sample Data',
-                    fontColor: 'rgba(105, 140, 176, 1)'
+                    fontColor: 'rgba(105, 140, 176, 1)',
+                    fontSize: 22, 
                 },
                 scales: {
                     xAxes: [{
@@ -362,7 +369,8 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Time',
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontSize: 20, 
                         },
                         ticks: {
                             fontColor: 'rgba(105, 140, 176, 1)'
@@ -377,7 +385,8 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Power',
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontSize: 20, 
                         },
                         ticks: {
                             beginAtZero: true,
@@ -393,7 +402,12 @@
                     filler: {
                         propagate: true
                     }
-                }
+                },
+                legend: {
+                    labels: {
+                        fontColor: 'rgba(105, 140, 176, 1)'
+                    }
+                },
             }
         });
     }
