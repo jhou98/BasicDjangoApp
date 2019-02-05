@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title%}EV and Building Power Consumption{% endblock %}
 
-{% block header %} <h1>Home</h1> {% endblock %}
+{% block header %} <h1><b>Home</b></h1> {% endblock %}
 
 {% block content %}
 <!--Content Here-->
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class='row'>
-                <div class='col-md-12 col-lg-6'>
+                <div class='col-sm-12'>
                     <h2>EV Power Data</h2>
                 </div>
             </div>
@@ -185,7 +185,6 @@
          * @param {Array} y_axis Array of power for our chart.
          */
         var ctx_ev = document.getElementById("myChartEV").getContext('2d');
-        document.get
 
         var myChartEV = new Chart(ctx_ev, {
             type: 'line',
@@ -194,34 +193,54 @@
                 datasets: [{
                     label: 'Power Consumption',
                     data: y_axis,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255,99,132,1)',
+                    backgroundColor: 'rgba(255, 204, 0, 0.4)',
+                    borderColor: 'rgba(255, 204, 0, 1)',
                 }]
             },
             options: {
                 title: {
                     display: true,
-                    text: 'EV Charging Stations'
+                    text: 'EV Charging Stations',
+                    fontColor: 'rgba(105, 140, 176, 1)'
                 },
                 scales: {
                     xAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Time'
+                            labelString: 'Time',
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        ticks: {
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        gridLines: {
+                            color: 'rgba(51, 74, 97, 1)',
+                            display: true
                         }
                     }],
                     yAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Power'
+                            labelString: 'Power',
+                            fontColor: 'rgba(105, 140, 176, 1)'
                         },
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        gridLines: {
+                            color: 'rgba(51, 74, 97, 1)',
+                            display: true
                         }
-                    }]
-                }
+                    }],
+                },
+                legend: {
+                    labels: {
+                        fontColor: 'rgba(105, 140, 176, 1)'
+                    }
+                },
             }
         });
     }
@@ -242,34 +261,54 @@
                 datasets: [{
                     label: 'Power Consumption',
                     data: y_axis,
-                    backgroundColor: 'rgba(255, 99, 132, 0)',
-                    borderColor: 'rgba(255,99,132,1)',
+                    backgroundColor: 'rgba(255, 204, 0, 0.4)',
+                    borderColor: 'rgba(255, 204, 0, 1)',
                 }]
             },
             options: {
                 title: {
                     display: true,
-                    text: 'Building Data'
+                    text: 'Building Data',
+                    fontColor: 'rgba(105, 140, 176, 1)'
                 },
                 scales: {
                     xAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Time'
+                            labelString: 'Time',
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        ticks: {
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        gridLines: {
+                            color: 'rgba(51, 74, 97, 1)',
+                            display: true
                         }
                     }],
                     yAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Power'
+                            labelString: 'Power',
+                            fontColor: 'rgba(105, 140, 176, 1)'
                         },
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        gridLines: {
+                            color: 'rgba(51, 74, 97, 1)',
+                            display: true
                         }
                     }]
-                }
+                },
+                legend: {
+                    labels: {
+                        fontColor: 'rgba(105, 140, 176, 1)'
+                    }
+                },
             }
         });
     }
@@ -294,8 +333,8 @@
                 datasets: [{
                     label: 'Power Consumption',
                     data: main,
-                    backgroundColor: utils.transparentize(presets.red),
-                    borderColor: presets.red,
+                    backgroundColor: 'rgba(255, 204, 0, 0.4)',
+                    borderColor: 'rgba(255, 204, 0, 1)',
                     fill: 'false',
                 }, {
                     label: 'Max Power Error',
@@ -314,26 +353,41 @@
             options: {
                 title: {
                     display: true,
-                    text: 'Sample Data'
+                    text: 'Sample Data',
+                    fontColor: 'rgba(105, 140, 176, 1)'
                 },
                 scales: {
                     xAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Time'
+                            labelString: 'Time',
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        ticks: {
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        gridLines: {
+                            color: 'rgba(51, 74, 97, 1)',
+                            display: true
                         }
                     }],
                     yAxes: [{
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Power'
+                            labelString: 'Power',
+                            fontColor: 'rgba(105, 140, 176, 1)'
                         },
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            fontColor: 'rgba(105, 140, 176, 1)'
+                        },
+                        gridLines: {
+                            color: 'rgba(51, 74, 97, 1)',
+                            display: true
                         }
-                    }]
+                    }],
                 },
                 plugins: {
                     filler: {
