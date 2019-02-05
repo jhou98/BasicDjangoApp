@@ -11,21 +11,21 @@
             <canvas id="myChartEV" width="400" height="400"></canvas>
             <div class='row'>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="evdailygauge" class="gauge-container">
+                    <div id="evhourlygauge" class="gauge-container">
                         <span class="value-text">kW/hr</span>
-                        <span class="label">Daily Peak</span>
-                        <input type="hidden" id="evdailyval" value={{max_daily}}>
-                        <input type="hidden" id="evdailymax" value=250>
+                        <span class="label">Hourly Peak</span>
+                        <input type="hidden" id="evhourlyval" value={{max_hourly}}>
+                        <input type="hidden" id="evhourlymax" value=250>
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
                 <div class="clearfix visible-sm"></div>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="evweeklygauge" class="gauge-container">
+                    <div id="evdailygauge" class="gauge-container">
                         <span class="value-text">kW/hr</span>
-                        <span class="label">Weekly Peak</span>
-                        <input type="hidden" id="evweeklyval" value={{max_weekly}}>
-                        <input type="hidden" id="evweeklymax" value=300>
+                        <span class="label">Daily Peak</span>
+                        <input type="hidden" id="evdailyval" value={{max_daily}}>
+                        <input type="hidden" id="evdailymax" value=300>
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
@@ -51,21 +51,21 @@
             <canvas id="myChartBuilding" width="400" height="400"></canvas>
             <div class='row'>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="bddailygauge" class="gauge-container">
+                    <div id="bdhourlygauge" class="gauge-container">
                         <span class="value-text">kW/hr</span>
-                        <span class="label">Daily Peak</span>
-                        <input type="hidden" id="bddailyval" value={{max_daily}}>
-                        <input type="hidden" id="bddailymax" value=250>
+                        <span class="label">Hourly Peak</span>
+                        <input type="hidden" id="bdhourlyval" value={{max_hourly}}>
+                        <input type="hidden" id="bdhourlymax" value=250>
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
                 <div class="clearfix visible-sm"></div>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="bdweeklygauge" class="gauge-container">
+                    <div id="bddailygauge" class="gauge-container">
                         <span class="value-text">kW/hr</span>
                         <span class="label">Weekly Peak</span>
-                        <input type="hidden" id="bdweeklyval" value={{max_weekly}}>
-                        <input type="hidden" id="bdweeklymax" value=300>
+                        <input type="hidden" id="bddailyval" value={{max_daily}}>
+                        <input type="hidden" id="bddailymax" value=300>
                     </div>
                 </div>
                 <div class="clearfix visible-xs"></div>
@@ -142,11 +142,11 @@
         createBuildingChart(date, power)
         createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
+        createGauge("evhourlyval", "evhourlymax", "evhourlygauge")
         createGauge("evdailyval", "evdailymax", "evdailygauge")
-        createGauge("evweeklyval", "evweeklymax", "evweeklygauge")
         createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
+        createGauge("bdhourlyval", "bdhourlymax", "bdhourlygauge")
         createGauge("bddailyval", "bddailymax", "bddailygauge")
-        createGauge("bdweeklyval", "bdweeklymax", "bdweeklygauge")
         createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
     });
 

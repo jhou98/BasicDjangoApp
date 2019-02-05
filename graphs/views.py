@@ -13,7 +13,7 @@ def index(request):
     peakMonthly power \n 
     """
     from .controller import getBaseData
-    return render(request, 'graphs.html', {'max_daily': 201, 'max_weekly': 250, 'max_monthly': 350})
+    return render(request, 'graphs.html', {'max_hourly': 100, 'max_daily': 250, 'max_monthly': 350})
 
 def recentData(request, num_req):
     """

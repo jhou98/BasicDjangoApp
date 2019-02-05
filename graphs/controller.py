@@ -114,7 +114,15 @@ def getSingleDateData(tablename, timecol, dateval):
     
     # Call the dateData method to create a dataframe for our specified date
     df = getDateData(tablename,timecol,start_date,end_date)
-    return df 
+    return df
+
+def getDailyPeak():
+    """
+    """
+    import datetime
+    from django.utils import timezone 
+
+    
 
 def getRecentData(tablename, num_req, col):
     """

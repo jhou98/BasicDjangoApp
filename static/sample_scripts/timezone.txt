@@ -1,0 +1,36 @@
+>>> import datetime
+>>> from django.utils import timezone
+>>> aware = timezone.now()
+>>> today = aware.date()
+>>> today
+datetime.date(2019, 2, 4)
+>>> str(today)
+'2019-02-04'
+>>> timezone.get_current_timezone()
+<UTC>
+>>> aware.month()
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+TypeError: 'int' object is not callable
+>>> aware.year
+2019
+>>> aware.month
+2
+>>> aware.date
+<built-in method date of datetime.datetime object at 0x1237CBE0>
+>>> aware.day
+4
+>>> aware.time
+<built-in method time of datetime.datetime object at 0x1237CBE0>
+>>> aware.hour
+22
+>>> timezone.today
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+AttributeError: module 'django.utils.timezone' has no attribute 'today'
+>>> timezone.today()
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+AttributeError: module 'django.utils.timezone' has no attribute 'today'
+>>> timezone.now().date()
+datetime.date(2019, 2, 4)
