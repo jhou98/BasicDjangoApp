@@ -4,16 +4,54 @@ import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-def index(request):
+def graphs(request):
     """
     Home Page \n 
-    This will be modified to send the following data \n
+    This will be modified to send the following data: \n
+    Current Power \n 
     peakDaily power \n
-    peakWeekly power \n
     peakMonthly power \n 
     """
-    from .controller import getBaseData
-    return render(request, 'graphs.html', {'max_daily': 201, 'max_weekly': 250, 'max_monthly': 350})
+    from .controller import getCurrentPower, getDailyPeak, getMonthlyPeak
+
+    #Get the values using our controller functions 
+    ev_pwr = getCurrentPower('graphs_powerdata')
+    bd_pwr = getCurrentPower('graphs_powerdata')
+    ev_daily = getDailyPeak('graphs_powerdata')
+    bd_daily = getDailyPeak('graphs_powerdata')
+    ev_monthly = getMonthlyPeak('graphs_powerdata')
+    bd_monthly = getMonthlyPeak('graphs_powerdata')
+
+    #Compare to set our max for our gauges
+    if ev_pwr > ev_daily: 
+        daily_evpwr = ev_pwr
+    else: 
+        daily_evpwr = ev_daily
+    
+    if bd_pwr > bd_daily: 
+        daily_bdpwr = bd_pwr
+    else:
+        daily_bdpwr = bd_daily
+
+    if ev_pwr > ev_monthly: 
+        monthly_evpwr = ev_pwr
+    else: 
+        monthly_evpwr = ev_monthly
+    
+    if bd_pwr > bd_monthly: 
+        monthly_bdpwr = bd_pwr
+    else:
+        monthly_bdpwr = bd_monthly
+
+    #Debugging Purposes
+    print("current daily ev power is : ", daily_evpwr)
+    print("current daily building power is : ",daily_bdpwr)
+    print("current ev power is : ",ev_pwr)
+    print("current building power is : ",bd_pwr)
+    print("current monthly peak is : ",monthly_evpwr)
+    print("current monthly peak is : ",monthly_bdpwr)
+
+    return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': daily_evpwr, 'max_evmonthly': monthly_evpwr, 'max_bddaily': daily_bdpwr, 'max_bdmonthly': monthly_bdpwr})
 
 def recentData(request, num_req):
     """
@@ -22,6 +60,8 @@ def recentData(request, num_req):
     Returns an unordered list of datapoints (max of 1000)
     """
     from .controller import getRecentDataList as getRecent
+    if num_req > 1000:
+        raise Http404("Too many points requested. MAX=1000")
     latest_data_list = getRecent(num_req)
     return render(request, 'data.html', {'recent_data':latest_data_list})
 
@@ -32,6 +72,8 @@ def peakData(request, num_req):
     Returns an unordered list of datapoints (max of 1000)
     """
     from .controller import getMaxData 
+    if num_req > 1000:
+        raise Http404("Too many points requested. MAX=1000")
     latest_data_list = getMaxData(num_req)
     return render(request, 'max_val.html', {'max_power':latest_data_list})
 
@@ -78,6 +120,6 @@ class ErrData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('powererr',98,'Timestamp')
+        my_df = getRecentData('powererr',96,'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)

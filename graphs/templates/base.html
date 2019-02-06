@@ -17,15 +17,24 @@
     h1 {
       text-align: center;
       text-transform: uppercase;
-      color: #4F71D0;
+      color: #728eda;
       font-family: Arial, Helvetica, sans-serif;
+      font-size: 5em;
     }
 
     h2{
       text-align: center;
       text-transform: uppercase;
       font-family: Arial, Helvetica, sans-serif;
-      color: #4F71D0;
+      color: #728eda;
+    }
+
+    /*Body default style settings*/
+    body{
+      background-color: rgba(0, 0, 0, 0.85);
+      color: rgb(105, 140, 176)
+      ; 
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     /** 
@@ -33,29 +42,30 @@
       * Check out https://codepen.io/anon/pen/WPEbGe and https://github.com/naikus/svg-gauge for more info
       */
     .gauge-container>.gauge>.dial {
-      stroke: #334455;
+      stroke: #334a61;
       stroke-width: 10;
     }
 
     .gauge-container>.gauge>.value {
-      stroke: #F32450;
+      stroke: #ffcc00;
       stroke-dasharray: none;
       stroke-width: 10;
     }
 
     .gauge-container>.gauge>.value-text {
-      fill: #F32450;
+      fill: #ffcc00;
       transform: translate3d(24%, 23%, 0);
       display: inline-block;
     }
 
     .gauge-container>.value-text {
-      color: #F32450;
+      color: #ffcc00;
       font-weight: 100;
       position: absolute;
       bottom: 10%;
-      right: 10%;
+      right: 15%;
       display: inline-block;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     .gauge-container>.label {
@@ -66,7 +76,7 @@
       background: rgba(255, 255, 255, 0);
       font-family: Arial, Helvetica, sans-serif;
       font-size: 0.7em;
-      color: #666; 
+      color: rgb(105, 140, 176); 
     }
   </style>
   {% block head %}{% endblock %}
