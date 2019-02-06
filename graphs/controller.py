@@ -133,8 +133,8 @@ def getDailyPeak(tablename):
     Assumes Timestamp is the name of our date column \n
     Returns a decimal power value 
     """
-    # Only need 192 points of data maximum assuming sampling every 15 minutes 
-    df = getRecentData(tablename, 192, 'Timestamp')
+    # Only need the most recent point since we will sample the data we need with another query 
+    df = getRecentData(tablename, 1, 'Timestamp')
     #Calculating the current day 
     curr_year = df.iloc[0].Timestamp.year 
     curr_month = df.iloc[0].Timestamp.month 
@@ -157,8 +157,47 @@ def getDailyPeak(tablename):
                 #30th is the previous day
                 prev_day = 30
     
-    my_df = getSingleDateData(tablename, 'Timestamp', str(curr_year)+"-"+str(curr_month)+"-"+str(prev_day))
+    date = str(curr_year)+'-'+str(curr_month)+'-'+str(prev_day)
+    my_df = getSingleDateData(tablename, 'Timestamp', date )
     return my_df.max().Power
+
+def getMonthlyPeak(tablename):
+    """
+    Reads and returns the peak power for the previous month
+    :param str tablename: Name of table to be opened \n
+    Assumes Timestamp is the name of our date column \n
+    Returns a decimal power value 
+    """
+     # Only need the most recent point since we will sample the data we need with another query 
+    df = getRecentData(tablename, 1, 'Timestamp')
+    #Calculating the current month
+    curr_year = df.iloc[0].Timestamp.year 
+    curr_month = df.iloc[0].Timestamp.month 
+
+    if curr_month == 1: 
+        month = 12
+        year = curr_year-1
+    else: 
+        month = curr_month-1
+        year = curr_year
+    
+    if (month == 4 or month == 6 or month == 9 or month == 11):
+        day = 30
+    else: 
+        if month==2: 
+            if year%4==0: 
+                day = 29
+            else: 
+                day = 28 
+        else: 
+            day = 31 
+    
+    start = str(year)+'-'+str(month)+'-'+str(1)
+    end = str(year)+'-'+str(month)+'-'+str(day)
+    my_df = getDateData(tablename, 'Timestamp', start, end)
+
+    return my_df.max().Power
+
 
 ## ---------------- Don't need this method as we can just use getSingleDateData, but may be useful for the future so saved for reference --------------- ## 
 # def getDailyVals(df, date):
