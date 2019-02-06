@@ -22,7 +22,3 @@ venv.bak/
 package-lock.json
 package.json
 node_modules/
-
-# Others 
-.vscode/
-

@@ -44,8 +44,8 @@ def graphs(request):
         monthly_bdpwr = bd_monthly
 
     #Debugging Purposes
-    print("max ev power is : ", daily_evpwr)
-    print("max building power is : ",daily_bdpwr)
+    print("current daily ev power is : ", daily_evpwr)
+    print("current daily building power is : ",daily_bdpwr)
     print("current ev power is : ",ev_pwr)
     print("current building power is : ",bd_pwr)
     print("current monthly peak is : ",monthly_evpwr)
