@@ -11,16 +11,6 @@
             <canvas id="myChartEV" width="400" height="400"></canvas>
             <br>
             <div class='row'>
-                <!-- <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="evhourlygauge" class="gauge-container">
-                        <span class="value-text">kW</span>
-                        <span class="label">Hourly Peak</span>
-                        <input type="hidden" id="evhourlyval" value={{max_hourly}}>
-                        <input type="hidden" id="evhourlymax" value=250>
-                    </div>
-                </div>
-                <div class="clearfix visible-xs"></div>
-                <div class="clearfix visible-sm"></div> -->
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="evdailygauge" class="gauge-container">
                         <span class="value-text">kW</span>
@@ -42,9 +32,13 @@
                 </div>
             </div>
             <div class='row'>
-                <div class='col-sm-12'>
-                    <h2>EV Power Data</h2>
-                </div>
+                <div id = ""></div>
+            </div>
+            <div class='row'>
+                <input type="range" min="0.01" max="40" step="0.01" value={{curr_ev}} class="slider" id="TestEV">
+            </div>
+            <div class = 'row'>
+                <p>Value: <span id="demo"></span></p>
             </div>
         </div>
         <div class="clearfix visible-md"></div>
@@ -52,16 +46,6 @@
             <canvas id="myChartBuilding" width="400" height="400"></canvas>
             <br>
             <div class='row'>
-                <!-- <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="bdhourlygauge" class="gauge-container">
-                        <span class="value-text">kW/hr</span>
-                        <span class="label">Hourly Peak</span>
-                        <input type="hidden" id="bdhourlyval" value={{max_hourly}}>
-                        <input type="hidden" id="bdhourlymax" value=250>
-                    </div>
-                </div>
-                <div class="clearfix visible-xs"></div>
-                <div class="clearfix visible-sm"></div> -->
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="bddailygauge" class="gauge-container">
                         <span class="value-text">kW</span>
@@ -80,11 +64,6 @@
                         <input type="hidden" id="bdmonthlyval" value={{curr_bd}}>
                         <input type="hidden" id="bdmonthlymax" value={{max_bdmonthly}}>
                     </div>
-                </div>
-            </div>
-            <div class='row'>
-                <div class='col-sm-12'>
-                    <h2>Building Power Data</h2>
                 </div>
             </div>
         </div>
@@ -144,10 +123,20 @@
         createBuildingChart(date, power)
         createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
-        createGauge("evdailyval", "evdailymax", "evdailygauge")
-        createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
-        createGauge("bddailyval", "bddailymax", "bddailygauge")
-        createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
+        var evgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
+        var evmgauge = createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
+        var bdgaug = createGauge("bddailyval", "bddailymax", "bddailygauge")
+        var bdmgauge = createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
+
+        var slider = document.getElementById("TestEV");
+        var output = document.getElementById("demo");
+        var max = document.getElementById("evdailymax").value
+        output.innerHTML = slider.value;
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+            evgauge.setMaxValue(this.value);
+            evgauge.setValue(this.value)
+        }
     });
 
     function createGauge(val_id, maxval_id, id) {
@@ -163,17 +152,19 @@
         // Get values 
         var val = document.getElementById(val_id).value
         var max_val = document.getElementById(maxval_id).value
+        console.log("Element ", id, "has a val of ", val, "and max value of ", max_val)
         //Gauge Code 
         var gauge = Gauge(
             document.getElementById(id), {
                 max: max_val,
                 dialStartAngle: 90,
                 dialEndAngle: 0,
-                value: 0
+                value: 0,
             }
         );
         // Set value and animate (value, animation duration in seconds)
         gauge.setValueAnimated(val, 3)
+        return gauge 
     }
 
 
@@ -200,9 +191,9 @@
             options: {
                 title: {
                     display: true,
-                    text: 'EV Charging Stations',
+                    text: 'EV POWER DATA',
                     fontColor: 'rgba(105, 140, 176, 1)',
-                    fontSize: 22, 
+                    fontSize: 25,
                 },
                 scales: {
                     xAxes: [{
@@ -271,9 +262,9 @@
             options: {
                 title: {
                     display: true,
-                    text: 'Building Data',
+                    text: 'BUILDING POWER DATA',
                     fontColor: 'rgba(105, 140, 176, 1)',
-                    fontSize: 22,
+                    fontSize: 25,
                 },
                 scales: {
                     xAxes: [{
@@ -282,7 +273,7 @@
                             display: true,
                             labelString: 'Time',
                             fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
+                            fontSize: 20,
                         },
                         ticks: {
                             fontColor: 'rgba(105, 140, 176, 1)'
@@ -298,7 +289,7 @@
                             display: true,
                             labelString: 'Power',
                             fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
+                            fontSize: 20,
                         },
                         ticks: {
                             beginAtZero: true,
@@ -361,7 +352,7 @@
                     display: true,
                     text: 'Sample Data',
                     fontColor: 'rgba(105, 140, 176, 1)',
-                    fontSize: 22, 
+                    fontSize: 22,
                 },
                 scales: {
                     xAxes: [{
@@ -370,7 +361,7 @@
                             display: true,
                             labelString: 'Time',
                             fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
+                            fontSize: 20,
                         },
                         ticks: {
                             fontColor: 'rgba(105, 140, 176, 1)'
@@ -386,7 +377,7 @@
                             display: true,
                             labelString: 'Power',
                             fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
+                            fontSize: 20,
                         },
                         ticks: {
                             beginAtZero: true,

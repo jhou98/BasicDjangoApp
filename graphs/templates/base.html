@@ -78,6 +78,44 @@
       font-size: 0.7em;
       color: rgb(105, 140, 176); 
     }
+
+    /*Slider*/ 
+    .slider { 
+      -webkit-appearance: none; 
+      width: 80%;
+      height: 15px; 
+      border-radius: 10px; 
+      background: #334a61;
+      outline: none;
+      opacity: 1; 
+      -webkit-transition: .2s; 
+      transition: opacity .2s; 
+      margin-left: auto; 
+      margin-right: auto; 
+    }
+    /*mouse over effects*/ 
+    .slider:hover {
+      opacity: 1;
+    }
+    /*Slide handle (Chrome, Opera, Safari, Edge)*/ 
+    .slider::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px; 
+      height: 25px;
+      border-radius: 50%; 
+      background: #ffcc00; 
+      cursor: pointer; 
+    }
+    /*Slide Handle (firefox)*/ 
+    .slider::-moz-range-thumb{
+      width: 25px;
+      height: 25px;
+      border-radius: 50px; 
+      background: #ffcc00;
+      cursor: pointer; 
+    }
+
   </style>
   {% block head %}{% endblock %}
 </head>
