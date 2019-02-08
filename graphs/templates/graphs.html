@@ -32,13 +32,22 @@
                 </div>
             </div>
             <div class='row'>
-                <div id = ""></div>
+                <div class='col-xs-12 col-sm-12'>
+                    <div id="evcontrolgauge" class="gauge-container">
+                        <span class="large-value-text">kW</span>
+                        <span class="large-label">EV Control</span>
+                        <input type="hidden" id="evcurrval" value={{curr_ev}}>
+                        <input type="hidden" id="evmaxval" value="40">
+                    </div>
+                </div>
             </div>
             <div class='row'>
-                <input type="range" min="0.01" max="40" step="0.01" value={{curr_ev}} class="slider" id="TestEV">
-            </div>
-            <div class = 'row'>
-                <p>Value: <span id="demo"></span></p>
+                <div class='col-xs-10 col-sm-10'>
+                    <input type="range" min="0" max="40" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
+                </div>
+                <div class='col-xs-2 col-sm-2'>
+                    <button type="button" class="btn btn-warning">Enter</button>
+                </div>
             </div>
         </div>
         <div class="clearfix visible-md"></div>
@@ -64,6 +73,24 @@
                         <input type="hidden" id="bdmonthlyval" value={{curr_bd}}>
                         <input type="hidden" id="bdmonthlymax" value={{max_bdmonthly}}>
                     </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-xs-12 col-sm-12'>
+                    <div id="bdcontrolgauge" class="gauge-container">
+                        <span class="large-value-text">kW</span>
+                        <span class="large-label">Building Control</span>
+                        <input type="hidden" id="bdcurrval" value={{curr_bd}}>
+                        <input type="hidden" id="bdmaxval" value="40">
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-xs-10 col-sm-10'>
+                    <input type="range" min="0" max="40" step="0.001" value={{curr_bd}} class="slider" id="TestBd">
+                </div>
+                <div class='col-xs-2 col-sm-2'>
+                    <button type="button" class="btn btn-warning">Enter</button>
                 </div>
             </div>
         </div>
@@ -123,19 +150,23 @@
         createBuildingChart(date, power)
         createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
-        var evgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
+        var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
         var evmgauge = createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
-        var bdgaug = createGauge("bddailyval", "bddailymax", "bddailygauge")
+        var bddgauge = createGauge("bddailyval", "bddailymax", "bddailygauge")
         var bdmgauge = createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
 
-        var slider = document.getElementById("TestEV");
-        var output = document.getElementById("demo");
-        var max = document.getElementById("evdailymax").value
-        output.innerHTML = slider.value;
-        slider.oninput = function () {
-            output.innerHTML = this.value;
-            evgauge.setMaxValue(this.value);
-            evgauge.setValue(this.value)
+        var evctrlgauge = createGauge("evcurrval", "evmaxval", "evcontrolgauge")
+        var evslider = document.getElementById("TestEV");
+
+        evslider.oninput = function () {
+            evctrlgauge.setValue(this.value)
+        }
+
+        var bdctrlgauge = createGauge("bdcurrval", "bdmaxval", "bdcontrolgauge")
+        var bdslider = document.getElementById("TestBd");
+
+        bdslider.oninput = function () {
+            bdctrlgauge.setValue(this.value)
         }
     });
 
@@ -160,13 +191,15 @@
                 dialStartAngle: 90,
                 dialEndAngle: 0,
                 value: 0,
+                label: function (value) {
+                    return Math.round(value * 1000) / 1000;
+                } //allows us to have 3 decimal point accuracy 
             }
         );
         // Set value and animate (value, animation duration in seconds)
         gauge.setValueAnimated(val, 3)
-        return gauge 
+        return gauge
     }
-
 
     function createEVChart(x_axis, y_axis) {
         /**
