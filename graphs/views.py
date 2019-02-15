@@ -48,8 +48,8 @@ def graphs(request):
     print("current daily building power is : ",daily_bdpwr)
     print("current ev power is : ",ev_pwr)
     print("current building power is : ",bd_pwr)
-    print("current monthly peak is : ",monthly_evpwr)
-    print("current monthly peak is : ",monthly_bdpwr)
+    print("current monthly ev peak is : ",monthly_evpwr)
+    print("current monthly bd peak is : ",monthly_bdpwr)
 
     return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': daily_evpwr, 'max_evmonthly': monthly_evpwr, 'max_bddaily': daily_bdpwr, 'max_bdmonthly': monthly_bdpwr})
 
