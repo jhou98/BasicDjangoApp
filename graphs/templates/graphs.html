@@ -146,9 +146,9 @@
         }
 
         //call our chart functions
-        var evChart = createChart(date, power, "myChartEV", 'EV Charger Power Data')
-        var bdChart = createChart(date, power, "myChartBuilding", 'Building Power Data')
-        var testChart = createTestChart(errdate, errpower, maxerr, minerr)
+        createChart(date, power, "myChartEV", 'EV Charger Power Data')
+        createChart(date, power, "myChartBuilding", 'Building Power Data')
+        createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
         var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
         var evmgauge = createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
@@ -169,6 +169,8 @@
             bdctrlgauge.setValue(this.value)
         }
 
+        var evChart = Chart(document.getElementById("MyChartEV"))
+        console.log(evChart)
         poll(evChart)
 
     });
@@ -325,8 +327,6 @@
                 },
             }
         });
-
-        return myChart
     }
 
     function createTestChart(x_axis, main, max_err, min_err) {
