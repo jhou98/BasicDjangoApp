@@ -9,8 +9,30 @@
 <!--Content here -->
 <!--Unordered list of the Power Consumption listed from Greatest to Least-->
 <ol>
-{% for x in max_power %} 
+    {% for x in max_power %}
     <li><b>Date: </b>{{x.Timestamp}} <b>Power: </b>{{x.Power}}</li>
     {% endfor %}
 </ol>
 {% endblock %}
+
+<script> 
+{% block jquery %}
+//test 
+var num = 1; 
+(function poll(){
+    setTimeout(function() {
+        $.ajax({
+            url: "/api/data",
+            method: "GET",
+            success: function(data) {
+                console.log("polling ", num)
+                console.log(data)
+                num++
+            },
+        complete: poll,
+        timeout: 2000
+        })
+    }, 10000)
+})(); 
+{% endblock %}
+</script> 

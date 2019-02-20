@@ -11,16 +11,6 @@
             <canvas id="myChartEV" width="400" height="400"></canvas>
             <br>
             <div class='row'>
-                <!-- <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="evhourlygauge" class="gauge-container">
-                        <span class="value-text">kW</span>
-                        <span class="label">Hourly Peak</span>
-                        <input type="hidden" id="evhourlyval" value={{max_hourly}}>
-                        <input type="hidden" id="evhourlymax" value=250>
-                    </div>
-                </div>
-                <div class="clearfix visible-xs"></div>
-                <div class="clearfix visible-sm"></div> -->
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="evdailygauge" class="gauge-container">
                         <span class="value-text">kW</span>
@@ -42,8 +32,21 @@
                 </div>
             </div>
             <div class='row'>
-                <div class='col-sm-12'>
-                    <h2>EV Power Data</h2>
+                <div class='col-xs-12 col-sm-12'>
+                    <div id="evcontrolgauge" class="gauge-container">
+                        <span class="large-value-text">kW</span>
+                        <span class="large-label">EV Control</span>
+                        <input type="hidden" id="evcurrval" value={{curr_ev}}>
+                        <input type="hidden" id="evmaxval" value="40">
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-xs-10 col-sm-10'>
+                    <input type="range" min="0" max="40" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
+                </div>
+                <div class='col-xs-2 col-sm-2'>
+                    <button type="button" class="btn btn-warning">Enter</button>
                 </div>
             </div>
         </div>
@@ -52,16 +55,6 @@
             <canvas id="myChartBuilding" width="400" height="400"></canvas>
             <br>
             <div class='row'>
-                <!-- <div class='col-xs-12 col-sm-12 col-md-6 col-lg-4'>
-                    <div id="bdhourlygauge" class="gauge-container">
-                        <span class="value-text">kW/hr</span>
-                        <span class="label">Hourly Peak</span>
-                        <input type="hidden" id="bdhourlyval" value={{max_hourly}}>
-                        <input type="hidden" id="bdhourlymax" value=250>
-                    </div>
-                </div>
-                <div class="clearfix visible-xs"></div>
-                <div class="clearfix visible-sm"></div> -->
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="bddailygauge" class="gauge-container">
                         <span class="value-text">kW</span>
@@ -83,8 +76,21 @@
                 </div>
             </div>
             <div class='row'>
-                <div class='col-sm-12'>
-                    <h2>Building Power Data</h2>
+                <div class='col-xs-12 col-sm-12'>
+                    <div id="bdcontrolgauge" class="gauge-container">
+                        <span class="large-value-text">kW</span>
+                        <span class="large-label">Building Control</span>
+                        <input type="hidden" id="bdcurrval" value={{curr_bd}}>
+                        <input type="hidden" id="bdmaxval" value="40">
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-xs-10 col-sm-10'>
+                    <input type="range" min="0" max="40" step="0.001" value={{curr_bd}} class="slider" id="TestBd">
+                </div>
+                <div class='col-xs-2 col-sm-2'>
+                    <button type="button" class="btn btn-warning">Enter</button>
                 </div>
             </div>
         </div>
@@ -140,15 +146,84 @@
         }
 
         //call our chart functions
-        createEVChart(date, power)
-        createBuildingChart(date, power)
+        var evChart = createChart(date, power, "myChartEV", 'EV Charger Power Data')
+        var bdChart = createChart(date, power, "myChartBuilding", 'Building Power Data')
         createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
-        createGauge("evdailyval", "evdailymax", "evdailygauge")
-        createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
-        createGauge("bddailyval", "bddailymax", "bddailygauge")
-        createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
+        var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
+        var evmgauge = createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
+        var bddgauge = createGauge("bddailyval", "bddailymax", "bddailygauge")
+        var bdmgauge = createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
+
+        var evctrlgauge = createGauge("evcurrval", "evmaxval", "evcontrolgauge")
+        var evslider = document.getElementById("TestEV");
+
+        evslider.oninput = function () {
+            evctrlgauge.setValue(this.value)
+        }
+
+        var bdctrlgauge = createGauge("bdcurrval", "bdmaxval", "bdcontrolgauge")
+        var bdslider = document.getElementById("TestBd");
+
+        bdslider.oninput = function () {
+            bdctrlgauge.setValue(this.value)
+        }
+
+        console.log(evChart)
+        console.log(bdChart)
+        poll(evChart)
+
     });
+    {% endblock %}
+</script>
+
+<script>
+    {% block script %}
+
+    function poll(chart_1) {
+        /** 
+         * Function that calls itself over a set interval using setTimeout and ajax.
+         * 
+         * @param {Chart} chart_1 Chart object. 
+         */ 
+        setTimeout(function () {
+            $.ajax({
+                url: "/api/data",
+                type: "GET",
+                success: function (data) {
+                    console.log("polling")
+                    var result = JSON.parse(data)
+                    console.log(result)
+                    console.log(result.data[0][1])
+                    //Add most recent datapoint into our chart
+                    addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
+                },
+                complete: poll(chart_1),
+                timeout: 2000
+            })
+        }, 10*1000);
+    }
+
+    function addData(chart, label, datas) {
+        /** 
+         * Add a new label and datapoint (x,y) to chart object  
+         * 
+         * @param {Chart} chart Chart object.
+         * @param {string} label Our datetime label (x value).
+         * @param {double} datas Power value for our label (y value).
+         * 
+         * Note: This function assumes our chart has only one dataset. 
+         *  If there are multiple you must use dataset[0].data. etc. 
+         */
+        chart.data.labels.splice(0, 1)
+        chart.data.labels.push(label);
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.splice(0, 1);
+            dataset.data.push(datas);
+        });
+        chart.update();
+        console.log("Chart has been updated with ", label, datas)
+    }
 
     function createGauge(val_id, maxval_id, id) {
         /**
@@ -158,35 +233,44 @@
          * @param {double} maxval_id HTML id for our Maximum value of gauge.
          * @param {string} id HTML ID for our gauge element.
          * 
+         * @return {Gauge} returns Gauge object.
          */
 
         // Get values 
         var val = document.getElementById(val_id).value
         var max_val = document.getElementById(maxval_id).value
+        console.log("Element ", id, "has a val of ", val, "and max value of ", max_val)
         //Gauge Code 
         var gauge = Gauge(
             document.getElementById(id), {
                 max: max_val,
                 dialStartAngle: 90,
                 dialEndAngle: 0,
-                value: 0
+                value: 0,
+                label: function (value) {
+                    return Math.round(value * 1000) / 1000;
+                } //allows us to have 3 decimal point accuracy 
             }
         );
         // Set value and animate (value, animation duration in seconds)
         gauge.setValueAnimated(val, 3)
+        return gauge
     }
 
-
-    function createEVChart(x_axis, y_axis) {
+    function createChart(x_axis, y_axis, id, label_title) {
         /**
          * Creates a chart for EV Data. 
          * 
          * @param {Array} x_axis Array of dates for our chart. 
          * @param {Array} y_axis Array of power for our chart.
+         * @param {string} id HTML element id. 
+         * @param {string} label_title Title of the chart.
+         *
+         * @return {Chart} returns chart object.
          */
-        var ctx_ev = document.getElementById("myChartEV").getContext('2d');
+        var ctx = document.getElementById(id).getContext('2d');
 
-        var myChartEV = new Chart(ctx_ev, {
+        var myChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: x_axis,
@@ -200,9 +284,9 @@
             options: {
                 title: {
                     display: true,
-                    text: 'EV Charging Stations',
+                    text: label_title,
                     fontColor: 'rgba(105, 140, 176, 1)',
-                    fontSize: 22, 
+                    fontSize: 25,
                 },
                 scales: {
                     xAxes: [{
@@ -227,7 +311,7 @@
                             display: true,
                             labelString: 'Power',
                             fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20,
+                            fontSize: 20, 
                         },
                         ticks: {
                             beginAtZero: true,
@@ -246,77 +330,8 @@
                 },
             }
         });
-    }
 
-    function createBuildingChart(x_axis, y_axis) {
-        /**
-         * Creates a chart for Building Data.
-         * 
-         * @param {Array} x_axis Array of dates for our chart. 
-         * @param {Array} y_axis Array of power for our chart.
-         */
-        var ctx_building = document.getElementById("myChartBuilding").getContext('2d');
-
-        var myChartBuilding = new Chart(ctx_building, {
-            type: 'line',
-            data: {
-                labels: x_axis,
-                datasets: [{
-                    label: 'Power Consumption',
-                    data: y_axis,
-                    backgroundColor: 'rgba(255, 204, 0, 0.4)',
-                    borderColor: 'rgba(255, 204, 0, 1)',
-                }]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Building Data',
-                    fontColor: 'rgba(105, 140, 176, 1)',
-                    fontSize: 22,
-                },
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Time',
-                            fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
-                        },
-                        ticks: {
-                            fontColor: 'rgba(105, 140, 176, 1)'
-                        },
-                        gridLines: {
-                            color: 'rgba(51, 74, 97, 1)',
-                            display: true
-                        }
-                    }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Power',
-                            fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: 'rgba(105, 140, 176, 1)'
-                        },
-                        gridLines: {
-                            color: 'rgba(51, 74, 97, 1)',
-                            display: true
-                        }
-                    }]
-                },
-                legend: {
-                    labels: {
-                        fontColor: 'rgba(105, 140, 176, 1)'
-                    }
-                },
-            }
-        });
+        return myChart
     }
 
     function createTestChart(x_axis, main, max_err, min_err) {
@@ -326,13 +341,15 @@
          * @param {Array} x_axis Array of dates for our chart. 
          * @param {Array} main Array of power for our chart.
          * @param {Array} max_err Array of positive error bar for our chart.
-         * @param {Array} min_err Array of negative error bar for our chart
+         * @param {Array} min_err Array of negative error bar for our chart.
+         *
+         * @return {Chart} Returns the chart object. 
          */
         var ctx_Test = document.getElementById("myChartTest").getContext('2d');
         var presets = window.chartColors;
         var utils = Samples.utils;
 
-        var myChartBuilding = new Chart(ctx_Test, {
+        var myChart = new Chart(ctx_Test, {
             type: 'line',
             data: {
                 labels: x_axis,
@@ -361,7 +378,7 @@
                     display: true,
                     text: 'Sample Data',
                     fontColor: 'rgba(105, 140, 176, 1)',
-                    fontSize: 22, 
+                    fontSize: 22,
                 },
                 scales: {
                     xAxes: [{
@@ -370,7 +387,7 @@
                             display: true,
                             labelString: 'Time',
                             fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
+                            fontSize: 20,
                         },
                         ticks: {
                             fontColor: 'rgba(105, 140, 176, 1)'
@@ -386,7 +403,7 @@
                             display: true,
                             labelString: 'Power',
                             fontColor: 'rgba(105, 140, 176, 1)',
-                            fontSize: 20, 
+                            fontSize: 20,
                         },
                         ticks: {
                             beginAtZero: true,
@@ -410,6 +427,7 @@
                 },
             }
         });
+        return myChart
     }
     {% endblock %}
 </script>
