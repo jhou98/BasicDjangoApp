@@ -146,8 +146,8 @@
         }
 
         //call our chart functions
-        createChart(date, power, "myChartEV", 'EV Charger Power Data')
-        createChart(date, power, "myChartBuilding", 'Building Power Data')
+        var evChart = createChart(date, power, "myChartEV", 'EV Charger Power Data')
+        var bdChart = createChart(date, power, "myChartBuilding", 'Building Power Data')
         createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
         var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
@@ -169,8 +169,8 @@
             bdctrlgauge.setValue(this.value)
         }
 
-        var evChart = Chart(document.getElementById("MyChartEV"))
         console.log(evChart)
+        console.log(bdChart)
         poll(evChart)
 
     });
@@ -181,6 +181,11 @@
     {% block script %}
 
     function poll(chart_1) {
+        /** 
+         * Function that calls itself over a set interval using setTimeout and ajax.
+         * 
+         * @param {Chart} chart_1 Chart object. 
+         */ 
         setTimeout(function () {
             $.ajax({
                 url: "/api/data",
@@ -189,40 +194,35 @@
                     console.log("polling")
                     var result = JSON.parse(data)
                     console.log(result)
-                    var date = []
-                    var power = []
-                    //length (as our objects are in Most recent->least recent)
-                    var length = result.data.length - 1
-                    for (var x in result.data) {
-                        //slice the ISO-Format String 
-                        //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM
-                        date.push(result.data[length - x][1].slice(0, 16))
-                        power.push(result.data[length - x][2])
-                    }
-                    console.log(date)
-                    console.log(power)
-                    addData(chart_1, date, power)
+                    console.log(result.data[0][1])
+                    //Add most recent datapoint into our chart
+                    addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
                 },
                 complete: poll(chart_1),
                 timeout: 2000
             })
-        }, 5000);
+        }, 10*1000);
     }
 
-    function addData(chart, label, data) {
+    function addData(chart, label, datas) {
+        /** 
+         * Add a new label and datapoint (x,y) to chart object  
+         * 
+         * @param {Chart} chart Chart object.
+         * @param {string} label Our datetime label (x value).
+         * @param {double} datas Power value for our label (y value).
+         * 
+         * Note: This function assumes our chart has only one dataset. 
+         *  If there are multiple you must use dataset[0].data. etc. 
+         */
+        chart.data.labels.splice(0, 1)
         chart.data.labels.push(label);
         chart.data.datasets.forEach((dataset) => {
-            dataset.data.push(data);
+            dataset.data.splice(0, 1);
+            dataset.data.push(datas);
         });
         chart.update();
-    }
-
-    function removeData(chart) {
-        chart.data.labels.pop();
-        chart.data.datasets.forEach((dataset) => {
-            dataset.data.pop();
-        });
-        chart.update();
+        console.log("Chart has been updated with ", label, datas)
     }
 
     function createGauge(val_id, maxval_id, id) {
@@ -233,6 +233,7 @@
          * @param {double} maxval_id HTML id for our Maximum value of gauge.
          * @param {string} id HTML ID for our gauge element.
          * 
+         * @return {Gauge} returns Gauge object.
          */
 
         // Get values 
@@ -264,6 +265,8 @@
          * @param {Array} y_axis Array of power for our chart.
          * @param {string} id HTML element id. 
          * @param {string} label_title Title of the chart.
+         *
+         * @return {Chart} returns chart object.
          */
         var ctx = document.getElementById(id).getContext('2d');
 
@@ -327,6 +330,8 @@
                 },
             }
         });
+
+        return myChart
     }
 
     function createTestChart(x_axis, main, max_err, min_err) {
@@ -336,13 +341,15 @@
          * @param {Array} x_axis Array of dates for our chart. 
          * @param {Array} main Array of power for our chart.
          * @param {Array} max_err Array of positive error bar for our chart.
-         * @param {Array} min_err Array of negative error bar for our chart
+         * @param {Array} min_err Array of negative error bar for our chart.
+         *
+         * @return {Chart} Returns the chart object. 
          */
         var ctx_Test = document.getElementById("myChartTest").getContext('2d');
         var presets = window.chartColors;
         var utils = Samples.utils;
 
-        var myChartBuilding = new Chart(ctx_Test, {
+        var myChart = new Chart(ctx_Test, {
             type: 'line',
             data: {
                 labels: x_axis,
@@ -420,6 +427,7 @@
                 },
             }
         });
+        return myChart
     }
     {% endblock %}
 </script>
