@@ -16,7 +16,8 @@
 ------
 [Part 5 - Graphs](#Graphs) 
 ------
-
+[Part 6 - Gauges](#Gauges)
+------
 
 ## Models 
 - Assume you have your main project called __basic__ and you want to add a model to your app called __graphs__
@@ -409,4 +410,125 @@
             <canvas id="myChartEV" width="400" height="400"></canvas>
     </div>
     ```
+<br> [Back to Top](#Basic-Django-App)
+
+## Gauges 
+- Gauges is another different way to efficiently display data 
+- The gauge layout that we will be using is svg-gauges, you will need to add the javascript source to your __base.html__ file 
+- In base.html, add to the styling the following gauge settings.
+    ```css 
+        /** 
+        * Gauge Styling
+        * Check out https://codepen.io/anon/pen/WPEbGe and https://github.com/naikus/svg-gauge for more info
+        */
+        .gauge-container>.gauge>.dial {
+        stroke: #334a61;
+        stroke-width: 10;
+        }
+
+        .gauge-container>.gauge>.value {
+        stroke: #ffcc00;
+        stroke-dasharray: none;
+        stroke-width: 10;
+        }
+
+        .gauge-container>.gauge>.value-text {
+        fill: #ffcc00;
+        transform: translate3d(24%, 23%, 0);
+        display: inline-block;
+        }
+
+        .gauge-container>.value-text {
+        color: #ffcc00;
+        font-weight: 100;
+        font-size: 1.5em;
+        position: absolute;
+        bottom: 10%;
+        right: 15%;
+        display: inline-block;
+        font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .gauge-container>.large-value-text {
+        color: #ffcc00;
+        font-weight: 200;
+        font-size: 2.5em;
+        position: absolute;
+        bottom: 10%;
+        right: 15%;
+        display: inline-block;
+        font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .gauge-container>.large-label{
+        position: absolute;
+        right: 0%;
+        top: 0%;
+        display: inline-block;
+        background: rgba(255, 255, 255, 0);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 1.5em;
+        color: rgb(105, 140, 176); 
+        }
+
+        .gauge-container>.label {
+        position: absolute;
+        right: 0%;
+        top: 0%;
+        display: inline-block;
+        background: rgba(255, 255, 255, 0);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.7em;
+        color: rgb(105, 140, 176); 
+        }
+    ```
+- You can modify the settings according to the layout you wish to use for your project. 
+- In __graphs.html__, add a function that will create a new gauge in your scripts 
+    ```javascript
+        function createGauge(val_id, maxval_id, id) {
+            /**
+             * Creates a Gauge.
+            * 
+            * @param {double} val_id HTML id where our value gauge is set to. 
+            * @param {double} maxval_id HTML id for our Maximum value of gauge.
+            * @param {string} id HTML ID for our gauge element.
+            * 
+            * @return {Gauge} returns Gauge object.
+            */
+
+            // Get values 
+            var val = document.getElementById(val_id).value
+            var max_val = document.getElementById(maxval_id).value
+            console.log("Element ", id, "has a val of ", val, "and max value of ", max_val)
+            //Gauge Code 
+            var gauge = Gauge(
+                document.getElementById(id), {
+                    max: max_val,
+                    dialStartAngle: 90,
+                    dialEndAngle: 0,
+                    value: 0,
+                    label: function (value) {
+                        return Math.round(value * 1000) / 1000;
+                    } //allows us to have 3 decimal point accuracy 
+                }
+            );
+            // Set value and animate (value, animation duration in seconds)
+            gauge.setValueAnimated(val, 3)
+            return gauge
+        }
+    ```
+- In your HTML section, to add a new gauge object, you can add the following code.
+    ```html
+        <div id="%GAUGEID%" class="gauge-container">
+            <span class="value-text">%TEXT%</span>
+            <span class="label">%LABEL%</span>
+            <input type="hidden" id="evdailyval" value={{curr_ev}}>
+            <input type="hidden" id="evdailymax" value={{max_evdaily}}>
+        </div>
+    ```
+> GAUGEID refers to the ID of the gauge object, while the hidden inputs refer to the current electrical vehicle power consumption and max daily power consumption that is passed via python 
+- In the `{% block jquery %}` add the following line of code to be able to create your gauge object. 
+    ```javascript
+        var evdgauge = createGauge("evdailyval", "evdailymax", "%GAUGEID%")
+     ```
 <br> [Back to Top](#Basic-Django-App)

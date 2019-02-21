@@ -21,7 +21,6 @@
                 </div>
                 <div class="clearfix visible-xs"></div>
                 <div class="clearfix visible-sm"></div>
-                <!-- <div class="clearfix visible-md"></div> -->
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="evmonthlygauge" class="gauge-container">
                         <span class="value-text">kW</span>
@@ -65,7 +64,6 @@
                 </div>
                 <div class="clearfix visible-xs"></div>
                 <div class="clearfix visible-sm"></div>
-                <!-- <div class="clearfix visible-md"></div> -->
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="bdmonthlygauge" class="gauge-container">
                         <span class="value-text">kW</span>
@@ -148,13 +146,14 @@
         //call our chart functions
         var evChart = createChart(date, power, "myChartEV", 'EV Charger Power Data')
         var bdChart = createChart(date, power, "myChartBuilding", 'Building Power Data')
-        createTestChart(errdate, errpower, maxerr, minerr)
+        var testChart = createTestChart(errdate, errpower, maxerr, minerr)
         //call our gauge function 
         var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
         var evmgauge = createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
         var bddgauge = createGauge("bddailyval", "bddailymax", "bddailygauge")
         var bdmgauge = createGauge("bdmonthlyval", "bdmonthlymax", "bdmonthlygauge")
 
+        //Create the control gauge 
         var evctrlgauge = createGauge("evcurrval", "evmaxval", "evcontrolgauge")
         var evslider = document.getElementById("TestEV");
 
@@ -171,6 +170,7 @@
 
         console.log(evChart)
         console.log(bdChart)
+        //timeout function 
         poll(evChart)
 
     });
