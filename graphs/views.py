@@ -4,6 +4,8 @@ import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+__timecol = 'timestamp'
+
 def graphs(request):
     """
     Home Page \n 
@@ -15,12 +17,12 @@ def graphs(request):
     from .controller import getCurrentPower, getDailyPeak, getMonthlyPeak
 
     #Get the values using our controller functions 
-    ev_pwr = getCurrentPower('graphs_powerdata')
-    bd_pwr = getCurrentPower('graphs_powerdata')
-    ev_daily = getDailyPeak('graphs_powerdata')
-    bd_daily = getDailyPeak('graphs_powerdata')
-    ev_monthly = getMonthlyPeak('graphs_powerdata')
-    bd_monthly = getMonthlyPeak('graphs_powerdata')
+    ev_pwr = getCurrentPower('testtable', __timecol, 'value')
+    bd_pwr = getCurrentPower('testtable', __timecol, 'value')
+    ev_daily = getDailyPeak('testtable', __timecol)
+    bd_daily = getDailyPeak('testtable', __timecol)
+    ev_monthly = getMonthlyPeak('testtable')
+    bd_monthly = getMonthlyPeak('testtable')
 
     #Compare to set our max for our gauges
     if ev_pwr > ev_daily: 
@@ -98,12 +100,12 @@ class ChartData(APIView):
     """ 
     authentication_classes = []
     permission_classes = []
-
     def get(self, request, format=None):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_powerdata',100,'Timestamp')
+        #my_df = getRecentData('graphs_powerdata',100,'Timestamp')
+        my_df = getRecentData('testtable',100, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 

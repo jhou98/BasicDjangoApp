@@ -115,30 +115,36 @@ def getSingleDateData(tablename, timecol, dateval):
     df = getDateData(tablename,timecol,start_date,end_date)
     return df
 
-def getCurrentPower(tablename):
+def getCurrentPower(tablename, timecol, powercol):
     """
     Reads and returns the most recent power reading
     :param str tablename: Name of table to be opened \n
-    Assumes Timestamp is the name of our date column \n
-    Assume Power is the name of our power column \n
+    :param str timecol: Name of time column \n
+    :param str powercol: Name of the power column \n
     Returns a decimal power value 
     """
-    df = getRecentData(tablename, 1, 'Timestamp')
-    return df.at[0, 'Power']
+    #df = getRecentData(tablename, 1, 'Timestamp')
+    #return df.at[0, 'Power']
+    df = getRecentData(tablename, 1, timecol)
+    return df.at[0, 'value']
 
-def getDailyPeak(tablename):
+def getDailyPeak(tablename, timecol):
     """
     Reads and returns the peak power for yesterday
     :param str tablename: Name of table to be opened \n
-    Assumes Timestamp is the name of our date column \n
+    :param str timecol: Name of time column \n
     Returns a decimal power value 
     """
     # Only need the most recent point since we will sample the data we need with another query 
-    df = getRecentData(tablename, 1, 'Timestamp')
+    # df = getRecentData(tablename, 1, 'Timestamp')
+    df = getRecentData(tablename, 1, timecol)
     #Calculating the current day 
-    curr_year = df.iloc[0].Timestamp.year 
-    curr_month = df.iloc[0].Timestamp.month 
-    curr_day = df.iloc[0].Timestamp.day 
+    # curr_year = df.iloc[0].Timestamp.year 
+    # curr_month = df.iloc[0].Timestamp.month 
+    # curr_day = df.iloc[0].Timestamp.day 
+    curr_year = df.iloc[0].timestamp.year 
+    curr_month = df.iloc[0].timestamp.month 
+    curr_day = df.iloc[0].timestamp.day 
     prev_day = curr_day - 1
     #Calculate the previous day is the end of the previous month
     if curr_day == 1: 
@@ -158,8 +164,10 @@ def getDailyPeak(tablename):
                 prev_day = 30
     
     date = str(curr_year)+'-'+str(curr_month)+'-'+str(prev_day)
-    my_df = getSingleDateData(tablename, 'Timestamp', date )
-    return my_df.max().Power
+    # my_df = getSingleDateData(tablename, 'Timestamp', date )
+    my_df = getSingleDateData(tablename, timecol, date )
+    # return my_df.max().Power
+    return my_df.max().value
 
 def getMonthlyPeak(tablename):
     """
@@ -169,10 +177,14 @@ def getMonthlyPeak(tablename):
     Returns a decimal power value 
     """
      # Only need the most recent point since we will sample the data we need with another query 
-    df = getRecentData(tablename, 1, 'Timestamp')
+    # df = getRecentData(tablename, 1, 'Timestamp')
+    df = getRecentData(tablename, 1, 'timestamp')
+
     #Calculating the current month
-    curr_year = df.iloc[0].Timestamp.year 
-    curr_month = df.iloc[0].Timestamp.month 
+    # curr_year = df.iloc[0].Timestamp.year 
+    # curr_month = df.iloc[0].Timestamp.month 
+    curr_year = df.iloc[0].timestamp.year 
+    curr_month = df.iloc[0].timestamp.month 
 
     if curr_month == 1: 
         month = 12
@@ -194,29 +206,11 @@ def getMonthlyPeak(tablename):
     
     start = str(year)+'-'+str(month)+'-'+str(1)
     end = str(year)+'-'+str(month)+'-'+str(day)
-    my_df = getDateData(tablename, 'Timestamp', start, end)
+    # my_df = getDateData(tablename, 'Timestamp', start, end)
+    my_df = getDateData(tablename, 'timestamp', start, end)
 
-    return my_df.max().Power
-
-
-## ---------------- Don't need this method as we can just use getSingleDateData, but may be useful for the future so saved for reference --------------- ## 
-# def getDailyVals(df, date):
-#     """
-#     Helper function for getDailyPeak
-#     :param DataFrame df: Dataframe that we will iterated through for values \n
-#     :param int date: Date value that we will be searching for \n
-#     Returns a dataframe with values from the previous date
-#     """
-#     #Create a new empty dataframe 
-#     print("The date we are using is : ")
-#     print(date)
-#     new_df = pd.DataFrame()
-#     for i in range(len(df)):
-#         if df.iloc[i].Timestamp.day == date: 
-#             new_df = new_df.append(df.iloc[[i]])
-#         print(df.iloc[i].Timestamp.day)
-
-#     return new_df
+    # return my_df.max().Power
+    return my_df.max().value
 
 def getRecentData(tablename, num_req, col):
     """
