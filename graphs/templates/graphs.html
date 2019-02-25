@@ -104,6 +104,7 @@
     {% block jquery %}
     var endpoint = '/api/data'
     var errpoint = '/api/data2'
+    var endpoint2 = '/api/data3'
 
     //Running the ajax methods in parallel
     $.when(
@@ -114,12 +115,16 @@
         $.ajax({
             method: "GET",
             url: errpoint
+        }),
+        $.ajax({
+            method: "GET",
+            url: endpoint2
         })
-    ).then(function (data1, data2) {
-        //data1 currently corresponds to our powerData model class
+    ).then(function (data1, data2, data3) {
+        //data1 currently corresponds to our realtime EV data 
         var result = JSON.parse(data1[0])
-        var date = []
-        var power = []
+        var ev_date = []
+        var ev_power = []
         console.log(result)
         //length (as our objects are in Most recent->least recent)
         var length = result.data.length - 1
@@ -130,28 +135,39 @@
             // date.push(result.data[length - x][1].slice(0, 16))
             // power.push(result.data[length - x][2])
 
-            date.push(result.data[length - x][0].slice(0, 19))
-            power.push(result.data[length - x][1])
+            ev_date.push(result.data[length - x][0].slice(0, 19))
+            ev_power.push(result.data[length - x][1])
+        }
+
+        //data3 corresponds to our building data 
+        var bd_result = JSON.parse(data3[0])
+        var bd_date = []
+        var bd_power = []
+        console.log(bd_result)
+        var bd_length = result.data.length - 1
+        for (var x in bd_result.data) {
+            bd_date.push(bd_result.data[bd_length - x][0].slice(0, 19))
+            bd_power.push(bd_result.data[bd_length - x][1])
         }
 
         //data2 is the data with error bars 
         var err_result = JSON.parse(data2[0])
-        var errdate = []
-        var errpower = []
-        var maxerr = []
-        var minerr = []
+        var err_date = []
+        var err_power = []
+        var max_err = []
+        var min_err = []
         var err_length = err_result.data.length - 1
         for (var x in err_result.data) {
-            errdate.push(err_result.data[err_length - x][0])
-            errpower.push(err_result.data[err_length - x][1])
-            maxerr.push(err_result.data[err_length - x][2])
-            minerr.push(err_result.data[err_length - x][3])
+            err_date.push(err_result.data[err_length - x][0])
+            err_power.push(err_result.data[err_length - x][1])
+            max_err.push(err_result.data[err_length - x][2])
+            min_err.push(err_result.data[err_length - x][3])
         }
 
         //call our chart functions
-        var evChart = createChart(date, power, "myChartEV", 'EV Charger Power Data')
-        var bdChart = createChart(date, power, "myChartBuilding", 'Building Power Data')
-        var testChart = createTestChart(errdate, errpower, maxerr, minerr)
+        var evChart = createChart(ev_date, ev_power, "myChartEV", 'EV Charger Power Data')
+        var bdChart = createChart(bd_date, bd_power, "myChartBuilding", 'Building Power Data')
+        var testChart = createTestChart(err_date, err_power, max_err, min_err)
         //call our gauge function 
         var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
         var evmgauge = createGauge("evmonthlyval", "evmonthlymax", "evmonthlygauge")
@@ -175,8 +191,9 @@
 
         console.log(evChart)
         console.log(bdChart)
+        console.log(evdgauge)
         //timeout function 
-        poll(evChart)
+        poll(evChart, evdgauge)
 
     });
     {% endblock %}
@@ -185,7 +202,7 @@
 <script>
     {% block script %}
 
-    function poll(chart_1) {
+    function poll(chart_1, gauge_1) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
          * 
@@ -202,8 +219,9 @@
                     //Add most recent datapoint into our chart
                     // addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
                     addData(chart_1, result.data[0][0].slice(0,19), result.data[0][1])
+                    gauge_1.setValue(result.data[0][1])
                 },
-                complete: poll(chart_1),
+                complete: poll(chart_1, gauge_1),
                 timeout: 2000
             })
         }, 15*60000);
@@ -282,15 +300,15 @@
                 datasets: [{
                     label: 'Energy Consumption',
                     data: y_axis,
-                    backgroundColor: 'rgba(255, 204, 0, 0.4)',
-                    borderColor: 'rgba(255, 204, 0, 1)',
+                    backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                    borderColor: '#73C2E5',
                 }]
             },
             options: {
                 title: {
                     display: true,
                     text: label_title,
-                    fontColor: 'rgba(105, 140, 176, 1)',
+                    fontColor: '#0C5784',
                     fontSize: 25,
                 },
                 scales: {
@@ -299,14 +317,14 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Timestamp',
-                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontColor: '#0C5784',
                             fontSize: 20
                         },
                         ticks: {
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: '#0C5784'
                         },
                         gridLines: {
-                            color: 'rgba(51, 74, 97, 1)',
+                            color: '#0C5784',
                             display: true
                         }
                     }],
@@ -315,22 +333,22 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Energy (kWh)',
-                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontColor: '#0C5784',
                             fontSize: 20, 
                         },
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: '#0C5784'
                         },
                         gridLines: {
-                            color: 'rgba(51, 74, 97, 1)',
+                            color: '#0C5784',
                             display: true
                         }
                     }],
                 },
                 legend: {
                     labels: {
-                        fontColor: 'rgba(105, 140, 176, 1)'
+                        fontColor: '#0C5784'
                     }
                 },
             }
@@ -361,20 +379,20 @@
                 datasets: [{
                     label: 'Power Consumption',
                     data: main,
-                    backgroundColor: 'rgba(255, 204, 0, 0.4)',
-                    borderColor: 'rgba(255, 204, 0, 1)',
+                    backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                    borderColor: '#D78730',
                     fill: 'false',
                 }, {
                     label: 'Max Power Error',
                     data: max_err,
-                    backgroundColor: utils.transparentize(presets.blue),
-                    borderColor: presets.blue,
+                    backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                    borderColor: '#73C2E5',
                     fill: '-1',
                 }, {
                     label: 'Min Power Error',
                     data: min_err,
-                    backgroundColor: utils.transparentize(presets.blue),
-                    borderColor: presets.blue,
+                    backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                    borderColor: '#73C2E5',
                     fill: '-2',
                 }]
             },
@@ -382,7 +400,7 @@
                 title: {
                     display: true,
                     text: 'Sample Data',
-                    fontColor: 'rgba(105, 140, 176, 1)',
+                    fontColor: '#0C5784',
                     fontSize: 22,
                 },
                 scales: {
@@ -391,14 +409,14 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Time',
-                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontColor: '#0C5784',
                             fontSize: 20,
                         },
                         ticks: {
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: '#0C5784'
                         },
                         gridLines: {
-                            color: 'rgba(51, 74, 97, 1)',
+                            color: '#0C5784',
                             display: true
                         }
                     }],
@@ -407,15 +425,15 @@
                         scaleLabel: {
                             display: true,
                             labelString: 'Power',
-                            fontColor: 'rgba(105, 140, 176, 1)',
+                            fontColor: '#0C5784',
                             fontSize: 20,
                         },
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'rgba(105, 140, 176, 1)'
+                            fontColor: '#0C5784'
                         },
                         gridLines: {
-                            color: 'rgba(51, 74, 97, 1)',
+                            color: '#0C5784',
                             display: true
                         }
                     }],
@@ -427,7 +445,7 @@
                 },
                 legend: {
                     labels: {
-                        fontColor: 'rgba(105, 140, 176, 1)'
+                        fontColor: '#0C5784'
                     }
                 },
             }

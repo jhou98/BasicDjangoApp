@@ -8,11 +8,9 @@ __timecol = 'timestamp'
 
 def graphs(request):
     """
-    Home Page \n 
-    This will be modified to send the following data: \n
-    Current Power \n 
-    peakDaily power \n
-    peakMonthly power \n 
+    Sends the following data to our graphs page: 
+    EV: current power, previous days peak power, previous months peak power\n
+    Building: current power, previous days peak power, previous months peak power \n
     """
     from .controller import getCurrentPower, getDailyPeak, getMonthlyPeak
 
@@ -24,36 +22,36 @@ def graphs(request):
     ev_monthly = getMonthlyPeak('testtable')
     bd_monthly = getMonthlyPeak('testtable')
 
-    #Compare to set our max for our gauges
-    if ev_pwr > ev_daily: 
-        daily_evpwr = ev_pwr
-    else: 
-        daily_evpwr = ev_daily
+    # #Compare to set our max for our gauges
+    # if ev_pwr > ev_daily: 
+    #     daily_evpwr = ev_pwr
+    # else: 
+    #     daily_evpwr = ev_daily
     
-    if bd_pwr > bd_daily: 
-        daily_bdpwr = bd_pwr
-    else:
-        daily_bdpwr = bd_daily
+    # if bd_pwr > bd_daily: 
+    #     daily_bdpwr = bd_pwr
+    # else:
+    #     daily_bdpwr = bd_daily
 
-    if ev_pwr > ev_monthly: 
-        monthly_evpwr = ev_pwr
-    else: 
-        monthly_evpwr = ev_monthly
+    # if ev_pwr > ev_monthly: 
+    #     monthly_evpwr = ev_pwr
+    # else: 
+    #     monthly_evpwr = ev_monthly
     
-    if bd_pwr > bd_monthly: 
-        monthly_bdpwr = bd_pwr
-    else:
-        monthly_bdpwr = bd_monthly
+    # if bd_pwr > bd_monthly: 
+    #     monthly_bdpwr = bd_pwr
+    # else:
+    #     monthly_bdpwr = bd_monthly
 
     #Debugging Purposes
-    print("current daily ev power is : ", daily_evpwr)
-    print("current daily building power is : ",daily_bdpwr)
+    print("current daily ev power is : ", ev_daily)
+    print("current daily building power is : ",bd_daily)
     print("current ev power is : ",ev_pwr)
     print("current building power is : ",bd_pwr)
-    print("current monthly peak is : ",monthly_evpwr)
-    print("current monthly peak is : ",monthly_bdpwr)
+    print("current monthly peak is : ",ev_monthly)
+    print("current monthly peak is : ",bd_monthly)
 
-    return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': daily_evpwr, 'max_evmonthly': monthly_evpwr, 'max_bddaily': daily_bdpwr, 'max_bdmonthly': monthly_bdpwr})
+    return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
 
 def recentData(request, num_req):
     """
@@ -91,10 +89,10 @@ def dateData(request, date_val):
         raise Http404("Timestamp does not exist!")
     return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
 
-# Rest Framework v1
+# Rest Framework v1 - ev data 
 class ChartData(APIView):
     """
-    This method is used to send 100 most recent data points as a JSON string\n
+    This method is used to send 100 most recent ev data points as a JSON string\n
     Has built in support for authentication and permissions \n 
     See https://www.django-rest-framework.org/api-guide/views/ for more details 
     """ 
@@ -109,7 +107,7 @@ class ChartData(APIView):
         data = pandasToJSON(my_df)
         return Response(data)
 
-# Rest framework v2
+# Rest framework v2 - error bars 
 class ErrData(APIView):
     """
     This method takes our trial data points with error as a JSON string \n
@@ -123,5 +121,22 @@ class ErrData(APIView):
         from .controller import pandasToJSON 
         
         my_df = getRecentData('powererr',96,'Timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework v3 - building data 
+class BuildingData(APIView):
+    """
+    This method is used to send 100 most recent building data points as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('buildingdata',100, 'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
