@@ -30,24 +30,6 @@
                     </div>
                 </div>
             </div>
-            <div class='row'>
-                <div class='col-xs-12 col-sm-12'>
-                    <div id="evcontrolgauge" class="gauge-container">
-                        <span class="large-value-text">kWh</span>
-                        <span class="large-label">EV Control</span>
-                        <input type="hidden" id="evcurrval" value={{curr_ev}}>
-                        <input type="hidden" id="evmaxval" value="40">
-                    </div>
-                </div>
-            </div>
-            <div class='row'>
-                <div class='col-xs-10 col-sm-10'>
-                    <input type="range" min="0" max="40" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
-                </div>
-                <div class='col-xs-2 col-sm-2'>
-                    <button type="button" class="btn btn-warning">Enter</button>
-                </div>
-            </div>
         </div>
         <div class="clearfix visible-md"></div>
         <div class='col-md-12 col-lg-6'>
@@ -73,24 +55,24 @@
                     </div>
                 </div>
             </div>
-            <div class='row'>
-                <div class='col-xs-12 col-sm-12'>
-                    <div id="bdcontrolgauge" class="gauge-container">
-                        <span class="large-value-text">kWh</span>
-                        <span class="large-label">Building Control</span>
-                        <input type="hidden" id="bdcurrval" value={{curr_bd}}>
-                        <input type="hidden" id="bdmaxval" value="40">
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class='row justify-content-center'>
+        <div class='col-xs-12 col-sm-12 col-md-8 col-lg-6'>
+            <div id="evcontrolgauge" class="gauge-container">
+                <span class="large-value-text">kWh</span>
+                <span class="large-label">EV Control</span>
+                <input type="hidden" id="evcurrval" value={{curr_ev}}>
+                <input type="hidden" id="evmaxval" value="40">
             </div>
-            <div class='row'>
-                <div class='col-xs-10 col-sm-10'>
-                    <input type="range" min="0" max="40" step="0.001" value={{curr_bd}} class="slider" id="TestBd">
-                </div>
-                <div class='col-xs-2 col-sm-2'>
-                    <button type="button" class="btn btn-warning">Enter</button>
-                </div>
-            </div>
+        </div>
+    </div>
+    <div class='row justify-content-center'>
+        <div class='col-xs-10 col-sm-10 col-md-6 col-lg-4'>
+            <input type="range" min="0" max="40" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
+        </div>
+        <div class='col-xs-2 col-sm-2'>
+            <button type="button" class="btn btn-warning">Enter</button>
         </div>
     </div>
 </div>
@@ -146,7 +128,7 @@
         console.log(bd_result)
         var bd_length = result.data.length - 1
         for (var x in bd_result.data) {
-            bd_date.push(bd_result.data[bd_length - x][0].slice(0, 19))
+            bd_date.push(bd_result.data[bd_length - x][0].slice(0, 16))
             bd_power.push(bd_result.data[bd_length - x][1])
         }
 
@@ -162,7 +144,7 @@
             err_power.push(err_result.data[err_length - x][1])
             max_err.push(err_result.data[err_length - x][2])
             min_err.push(err_result.data[err_length - x][3])
-        }
+        }        
 
         //call our chart functions
         var evChart = createChart(ev_date, ev_power, "myChartEV", 'EV Charger Power Data')
@@ -182,12 +164,12 @@
             evctrlgauge.setValue(this.value)
         }
 
-        var bdctrlgauge = createGauge("bdcurrval", "bdmaxval", "bdcontrolgauge")
-        var bdslider = document.getElementById("TestBd");
+        // var bdctrlgauge = createGauge("bdcurrval", "bdmaxval", "bdcontrolgauge")
+        // var bdslider = document.getElementById("TestBd");
 
-        bdslider.oninput = function () {
-            bdctrlgauge.setValue(this.value)
-        }
+        // bdslider.oninput = function () {
+        //     bdctrlgauge.setValue(this.value)
+        // }
 
         console.log(evChart)
         console.log(bdChart)

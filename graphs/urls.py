@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.graphs, name='graphs'),
+    path(r'graphs', views.graphs, name='graphs'),
     path(r'recent/<int:num_req>/',views.recentData, name='recent'),
     path(r'max/<int:num_req>/',views.peakData, name='max'),
     path(r'date/<str:date_val>/',views.dateData, name='date'),
