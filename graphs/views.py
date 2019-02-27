@@ -16,11 +16,11 @@ def graphs(request):
 
     #Get the values using our controller functions 
     ev_pwr = getCurrentPower('testtable', __timecol, 'value')
-    bd_pwr = getCurrentPower('testtable', __timecol, 'value')
+    bd_pwr = getCurrentPower('buildingdata', __timecol, 'value')
     ev_daily = getDailyPeak('testtable', __timecol)
-    bd_daily = getDailyPeak('testtable', __timecol)
+    bd_daily = getDailyPeak('buildingdata', __timecol)
     ev_monthly = getMonthlyPeak('testtable')
-    bd_monthly = getMonthlyPeak('testtable')
+    bd_monthly = getMonthlyPeak('buildingdata')
 
     # #Compare to set our max for our gauges
     # if ev_pwr > ev_daily: 
@@ -48,8 +48,8 @@ def graphs(request):
     print("current daily building power is : ",bd_daily)
     print("current ev power is : ",ev_pwr)
     print("current building power is : ",bd_pwr)
-    print("current monthly peak is : ",ev_monthly)
-    print("current monthly peak is : ",bd_monthly)
+    print("current monthly ev peak is : ",ev_monthly)
+    print("current monthly building peak is : ",bd_monthly)
 
     return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
 
