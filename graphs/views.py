@@ -22,27 +22,6 @@ def graphs(request):
     ev_monthly = getMonthlyPeak('testtable')
     bd_monthly = getMonthlyPeak('buildingdata')
 
-    # #Compare to set our max for our gauges
-    # if ev_pwr > ev_daily: 
-    #     daily_evpwr = ev_pwr
-    # else: 
-    #     daily_evpwr = ev_daily
-    
-    # if bd_pwr > bd_daily: 
-    #     daily_bdpwr = bd_pwr
-    # else:
-    #     daily_bdpwr = bd_daily
-
-    # if ev_pwr > ev_monthly: 
-    #     monthly_evpwr = ev_pwr
-    # else: 
-    #     monthly_evpwr = ev_monthly
-    
-    # if bd_pwr > bd_monthly: 
-    #     monthly_bdpwr = bd_pwr
-    # else:
-    #     monthly_bdpwr = bd_monthly
-
     #Debugging Purposes
     print("current daily ev power is : ", ev_daily)
     print("current daily building power is : ",bd_daily)

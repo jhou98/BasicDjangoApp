@@ -9,16 +9,44 @@ function addData(chart, label, datas) {
      * Note: This function assumes our chart has only one dataset. 
      *  If there are multiple you must use dataset[0].data. etc. 
      */
-    chart.data.labels.splice(0, 1)
-    chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.splice(0, 1);
-        dataset.data.push(datas);
-    });
-    chart.update();
-    console.log("Chart has been updated with ", label, datas)
+    if (checkData(chart, label)) {
+        chart.data.labels.splice(0, 1)
+        chart.data.labels.push(label);
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.splice(0, 1);
+            dataset.data.push(datas);
+        });
+        chart.update();
+        console.log("Chart has been updated with ", label, datas)
+    }
+    else { 
+        console.log("Chart has not been updated")
+    }
 }
 
+function checkData(chart, label) {
+    /**
+     * Checks the Chart to see if the new label is a new point or not. 
+     * 
+     * @param {Chart} chart Chart object. 
+     * @param {string} label Our datetime label. 
+     * 
+     * @return {Boolean} returns True if we have a new point, false otherwise. 
+     */
+
+    var index = chart.data.labels.length
+    var last_label = chart.data.labels[index - 1]
+
+    console.log(last_label)
+    console.log(label)
+
+    if (last_label == label) {
+        console.log("no update")
+        return false
+    }
+
+    return true
+}
 function createGauge(val_id, maxval_id, id) {
     /**
      * Creates a Gauge.
@@ -105,7 +133,7 @@ function createChart(x_axis, y_axis, id, label_title) {
                         display: true,
                         labelString: 'Energy (kWh)',
                         fontColor: '#0C5784',
-                        fontSize: 20, 
+                        fontSize: 20,
                     },
                     ticks: {
                         beginAtZero: true,

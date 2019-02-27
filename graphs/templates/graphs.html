@@ -63,13 +63,13 @@
                 <span class="large-value-text">kWh</span>
                 <span class="large-label">EV Control</span>
                 <input type="hidden" id="evcurrval" value={{curr_ev}}>
-                <input type="hidden" id="evmaxval" value="40">
+                <input type="hidden" id="evmaxval" value="20000">
             </div>
         </div>
     </div>
     <div class='row justify-content-center'>
         <div class='col-xs-10 col-sm-10 col-md-6 col-lg-4'>
-            <input type="range" min="0" max="40" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
+            <input type="range" min="0" max="20000" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
         </div>
         <div class='col-xs-2 col-sm-2'>
             <button type="button" class="btn btn-warning">Enter</button>
@@ -140,7 +140,7 @@
             err_power.push(err_result.data[err_length - x][1])
             max_err.push(err_result.data[err_length - x][2])
             min_err.push(err_result.data[err_length - x][3])
-        }        
+        }
 
         //call our chart function to create charts 
         var evChart = createChart(ev_date, ev_power, "myChartEV", 'EV Charger Power Data')
@@ -164,6 +164,7 @@
         console.log(evChart)
         console.log(bdChart)
         console.log(evdgauge)
+        getLabel(evChart)
         //timeout function 
         evpoll(evChart, evdgauge)
 
@@ -181,7 +182,7 @@
          * 
          * @param {Chart} chart_1 Chart object. 
          * @param {Gauge} gauge_1 Gauge Object. 
-         */ 
+         */
         setTimeout(function () {
             $.ajax({
                 url: "/api/data",
@@ -192,15 +193,33 @@
                     console.log(result.data[0][1])
                     //Add most recent datapoint into our chart
                     // addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
-                    addData(chart_1, result.data[0][0].slice(0,19), result.data[0][1])
+                    addData(chart_1, result.data[0][0].slice(0, 19), result.data[0][1])
                     gauge_1.setValue(result.data[0][1])
                 },
                 complete: evpoll(chart_1, gauge_1),
                 timeout: 2000
             })
-        }, 15*60000);
+        }, 15 * 60000);
     }
-    
+
+    function getLabel(chart /*, label, datas*/) {
+        /** 
+         * Add a new label and datapoint (x,y) to chart object  
+         * 
+         * @param {Chart} chart Chart object.
+         * @param {string} label Our datetime label (x value).
+         * @param {double} datas Power value for our label (y value).
+         * 
+         * Note: This function assumes our chart has only one dataset. 
+         *  If there are multiple you must use dataset[0].data. etc. 
+         */
+        console.log(chart.data.labels)
+        console.log(chart.data.labels.length)
+        console.log(chart.data.labels[99])
+
+        console.log("Hello we are here")
+    }
+
     /*--------------------------------------Will figure out this function once we get Real Time Building data-------------------------------------------------------*/
     // function bdpoll(chart_1, gauge_1) {
     //     /** 
@@ -228,6 +247,6 @@
     //     }, 15*60000);
     // }
 
-    
+
     {% endblock %}
 </script>
