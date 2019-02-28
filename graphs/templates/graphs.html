@@ -164,9 +164,8 @@
         console.log(evChart)
         console.log(bdChart)
         console.log(evdgauge)
-        getLabel(evChart)
         //timeout function 
-        evpoll(evChart, evdgauge)
+        evpoll(evChart, evdgauge, evmgauge)
 
     });
     {% endblock %}
@@ -175,7 +174,7 @@
 <script>
     {% block script %}
 
-    function evpoll(chart_1, gauge_1) {
+    function evpoll(chart_1, gauge_1, gauge_2) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
          * Used for EV power. 
@@ -195,31 +194,15 @@
                     // addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
                     addData(chart_1, result.data[0][0].slice(0, 19), result.data[0][1])
                     gauge_1.setValue(result.data[0][1])
+                    gauge_2.setValue(result.data[0][1])
                 },
-                complete: evpoll(chart_1, gauge_1),
+                complete: evpoll(chart_1, gauge_1, gauge_2),
                 timeout: 2000
             })
-        }, 15 * 60000);
+        }, 5 * 60000);
     }
 
-    function getLabel(chart /*, label, datas*/) {
-        /** 
-         * Add a new label and datapoint (x,y) to chart object  
-         * 
-         * @param {Chart} chart Chart object.
-         * @param {string} label Our datetime label (x value).
-         * @param {double} datas Power value for our label (y value).
-         * 
-         * Note: This function assumes our chart has only one dataset. 
-         *  If there are multiple you must use dataset[0].data. etc. 
-         */
-        console.log(chart.data.labels)
-        console.log(chart.data.labels.length)
-        console.log(chart.data.labels[99])
-
-        console.log("Hello we are here")
-    }
-
+    
     /*--------------------------------------Will figure out this function once we get Real Time Building data-------------------------------------------------------*/
     // function bdpoll(chart_1, gauge_1) {
     //     /** 
