@@ -219,34 +219,5 @@
 
         console.log("Hello we are here")
     }
-
-    /*--------------------------------------Will figure out this function once we get Real Time Building data-------------------------------------------------------*/
-    // function bdpoll(chart_1, gauge_1) {
-    //     /** 
-    //      * Function that calls itself over a set interval using setTimeout and ajax. 
-    //      * Used for Building Power
-    //      * 
-    //      * @param {Chart} chart_1 Chart object. 
-    //      * @param {Gauge} gauge_1 Gauge object. 
-    //      */ 
-    //     setTimeout(function () {
-    //         $.ajax({
-    //             url: "/api/data3",
-    //             type: "GET",
-    //             success: function (data) {
-    //                 console.log("polling next point")
-    //                 var result = JSON.parse(data)
-    //                 console.log(result.data[0][1])
-    //                 //Add most recent datapoint into our chart
-    //                 addData(chart_1, result.data[0][0].slice(0,16), result.data[0][1])
-    //                 gauge_1.setValue(result.data[0][1])
-    //             },
-    //             complete: evpoll(chart_1, gauge_1),
-    //             timeout: 2000
-    //         })
-    //     }, 15*60000);
-    // }
-
-
     {% endblock %}
 </script>

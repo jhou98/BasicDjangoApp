@@ -88,6 +88,8 @@ def replaceTable(pathtofile, tablename):
 
     df.to_sql(con=engine, name=tablename, if_exists='replace', index=False, index_label = 'Timestamp')
     
+# ------------------------- Querying Database ------------------------------- #
+
 def getBaseData(tablename):
     """
     Reads the raw data and returns it \n
@@ -143,8 +145,6 @@ def getCurrentPower(tablename, timecol, powercol):
     :param str powercol: Name of the power column \n
     Returns a decimal power value 
     """
-    #df = getRecentData(tablename, 1, 'Timestamp')
-    #return df.at[0, 'Power']
     df = getRecentData(tablename, 1, timecol)
     return df.at[0, 'value']
 
@@ -156,12 +156,8 @@ def getDailyPeak(tablename, timecol):
     Returns a decimal power value 
     """
     # Only need the most recent point since we will sample the data we need with another query 
-    # df = getRecentData(tablename, 1, 'Timestamp')
     df = getRecentData(tablename, 1, timecol)
     #Calculating the current day 
-    # curr_year = df.iloc[0].Timestamp.year 
-    # curr_month = df.iloc[0].Timestamp.month 
-    # curr_day = df.iloc[0].Timestamp.day 
     curr_year = df.iloc[0].timestamp.year 
     curr_month = df.iloc[0].timestamp.month 
     curr_day = df.iloc[0].timestamp.day 
@@ -184,9 +180,7 @@ def getDailyPeak(tablename, timecol):
                 prev_day = 30
     
     date = str(curr_year)+'-'+str(curr_month)+'-'+str(prev_day)
-    # my_df = getSingleDateData(tablename, 'Timestamp', date )
     my_df = getSingleDateData(tablename, timecol, date )
-    # return my_df.max().Power
     return my_df.max().value
 
 def getMonthlyPeak(tablename):
@@ -197,12 +191,9 @@ def getMonthlyPeak(tablename):
     Returns a decimal power value 
     """
      # Only need the most recent point since we will sample the data we need with another query 
-    # df = getRecentData(tablename, 1, 'Timestamp')
     df = getRecentData(tablename, 1, 'timestamp')
 
     #Calculating the current month
-    # curr_year = df.iloc[0].Timestamp.year 
-    # curr_month = df.iloc[0].Timestamp.month 
     curr_year = df.iloc[0].timestamp.year 
     curr_month = df.iloc[0].timestamp.month 
 
@@ -226,10 +217,8 @@ def getMonthlyPeak(tablename):
     
     start = str(year)+'-'+str(month)+'-'+str(1)
     end = str(year)+'-'+str(month)+'-'+str(day)
-    # my_df = getDateData(tablename, 'Timestamp', start, end)
     my_df = getDateData(tablename, 'timestamp', start, end)
 
-    # return my_df.max().Power
     return my_df.max().value
 
 def getRecentData(tablename, num_req, col):
@@ -255,22 +244,3 @@ def pandasToJSON(df):
     Converts a dataframe into a JSON string 
     """
     return df.to_json(date_format='iso', orient='split')
-
-def getRecentDataList(num_req):
-    """
-    Reads and returns a Query list of data from powerdata \n 
-    :param int num_req: Number of datapoints to retrieve
-    """
-    from .models import powerData 
-    latest_data_list = powerData.objects.order_by('-Timestamp')[:num_req]
-    return latest_data_list
-
-def getMaxData(num_req):
-    """
-    Gets a list of data points ordered by power consumption \n
-    :param int num_req: Number of data points to be extracted \n
-    """
-    from .models import powerData 
-    latest_data_list = powerData.objects.order_by('-Power')[:num_req]
-    return latest_data_list
-

@@ -32,41 +32,6 @@ def graphs(request):
 
     return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
 
-def recentData(request, num_req):
-    """
-    Gets a list of the most recent data points in our powerData table model \n
-    :param int num_req: Number of data points to extracted \n
-    Returns an unordered list of datapoints (max of 1000)
-    """
-    from .controller import getRecentDataList as getRecent
-    if num_req > 1000:
-        raise Http404("Too many points requested. MAX=1000")
-    latest_data_list = getRecent(num_req)
-    return render(request, 'data.html', {'recent_data':latest_data_list})
-
-def peakData(request, num_req):
-    """
-    Gets a list of data points ordered by power consumption \n
-    :param int num_req: Number of data points to be extracted \n
-    Returns an unordered list of datapoints (max of 1000)
-    """
-    from .controller import getMaxData 
-    if num_req > 1000:
-        raise Http404("Too many points requested. MAX=1000")
-    latest_data_list = getMaxData(num_req)
-    return render(request, 'max_val.html', {'max_power':latest_data_list})
-
-def dateData(request, date_val):
-    """
-    Gets a list of data points corresponding to the specific date \n
-    :param Datetime date_val: Date in YYYY-MM-DD format
-    Returns an unorder list of datapoints, error if date does not exist
-    """
-    from .controller import getSingleDateData as getDateData
-    my_df = getDateData('graphs_powerdata','Timestamp',date_val)
-    if my_df.empty: 
-        raise Http404("Timestamp does not exist!")
-    return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
 
 # Rest Framework v1 - ev data 
 class ChartData(APIView):
@@ -81,7 +46,6 @@ class ChartData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        #my_df = getRecentData('graphs_powerdata',100,'Timestamp')
         my_df = getRecentData('testtable',100, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
@@ -116,6 +80,6 @@ class BuildingData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('buildingdata',100, 'Timestamp')
+        my_df = getRecentData('buildingdata',100, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
