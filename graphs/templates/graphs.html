@@ -63,13 +63,13 @@
                 <span class="large-value-text">kWh</span>
                 <span class="large-label">EV Control</span>
                 <input type="hidden" id="evcurrval" value={{curr_ev}}>
-                <input type="hidden" id="evmaxval" value="20000">
+                <input type="hidden" id="evmaxval" value="200">
             </div>
         </div>
     </div>
     <div class='row justify-content-center'>
         <div class='col-xs-10 col-sm-10 col-md-6 col-lg-4'>
-            <input type="range" min="0" max="20000" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
+            <input type="range" min="0" max="200" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
         </div>
         <div class='col-xs-2 col-sm-2'>
             <button type="button" class="btn btn-warning">Enter</button>
@@ -113,7 +113,7 @@
         for (var x in result.data) {
             //slice the ISO-Format String 
             //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM:SS
-            ev_date.push(result.data[length - x][0].slice(0, 19))
+            ev_date.push(result.data[length - x][0].slice(0, 16))
             ev_power.push(result.data[length - x][1])
         }
 
@@ -122,7 +122,7 @@
         var bd_date = []
         var bd_power = []
         console.log(bd_result)
-        var bd_length = result.data.length - 1
+        var bd_length = bd_result.data.length - 1
         for (var x in bd_result.data) {
             bd_date.push(bd_result.data[bd_length - x][0].slice(0, 16))
             bd_power.push(bd_result.data[bd_length - x][1])
@@ -192,7 +192,7 @@
                     console.log(result.data[0][1])
                     //Add most recent datapoint into our chart
                     // addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
-                    addData(chart_1, result.data[0][0].slice(0, 19), result.data[0][1])
+                    addData(chart_1, result.data[0][0].slice(0, 16), result.data[0][1])
                     gauge_1.setValue(result.data[0][1])
                     gauge_2.setValue(result.data[0][1])
                 },

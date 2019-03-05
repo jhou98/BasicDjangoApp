@@ -1,24 +1,5 @@
 from django.db import models
 
-class EVData(models.Model):
-    """
-    Class that represents EV data and has the following: 
-        1. data_date - in Date format 
-        2. data_time - in Time format 
-        3. data_kW - up to 999 with 3 decimal places
-    See https://docs.djangoproject.com/en/2.1/ref/models/fields/#django.db.models.DateField for more details on the models
-    """
-    data_date = models.DateField()
-    data_time = models.TimeField() 
-    data_kW = models.DecimalField(max_digits = 8, decimal_places = 3)
-
-    """
-        Returns a string of the following format
-        Date: MM/DD/YYYY Time: HH:MM:SS kW: #
-    """
-    def __str__(self):
-        return "Date: " + self.data_date.strftime('%m/%d/%Y') + " Time: " + self.data_time.strftime('%H:%M:%S')  + " kW: " + str(self.data_kW)
-
 class powerData(models.Model):
     """
     Class that holds 3 variables
@@ -34,3 +15,87 @@ class powerData(models.Model):
         return "Date: " + self.Timestamp.strftime("%m/%d/%y %H:%M:%S") + "  Power: " + str(self.Power)
 
 ##Create two seperate classes: EV and Building so we have two separate databases to hold our data 
+class EVEnergy(models.Model):
+    """
+    Class that represents overall EV energy consumption 
+        1. timestamp: Datetime field 
+        2. value: Energy consumption
+    """
+    timestamp = models.DateTimeField()
+    value = models.DecimalField(max_digits = 15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class BuildingEnergy(models.Model):
+    """
+    Class that represents overall building energy consumption 
+        1. timestamp: Datetime field 
+        2. value: Energy consumption
+    """
+    timestamp = models.DateTimeField()
+    value = models.DecimalField(max_digits = 15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+##Class specific to each EV parkade 
+class WestEV(models.Model):
+    """
+    Class that represents West Parkade energy consumption 
+        1. timestamp: Datetime field 
+        2. value: Energy consumption
+    """
+    timestamp = models.DateTimeField()
+    value = models.DecimalField(max_digits = 15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class RoseEV(models.Model):
+    """
+    Class that represents Rose Parkade energy consumption 
+        1. timestamp: Datetime field 
+        2. value: Energy consumption
+    """
+    timestamp = models.DateTimeField()
+    value = models.DecimalField(max_digits = 15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class NorthEV(models.Model):
+    """
+    Class that represents North Parkade energy consumption 
+        1. timestamp: Datetime field 
+        2. value: Energy consumption
+    """
+    timestamp = models.DateTimeField()
+    value = models.DecimalField(max_digits = 15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class HealthEV(models.Model):
+    """
+    Class that represents Health Sciences Parkade energy consumption 
+        1. timestamp: Datetime field 
+        2. value: Energy consumption
+    """
+    timestamp = models.DateTimeField()
+    value = models.DecimalField(max_digits = 15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class FraserEV(models.Model):
+    """
+    Class that represents Fraser Parkade energy consumption 
+        1. timestamp: Datetime field 
+        2. value: Energy consumption
+    """
+    timestamp = models.DateTimeField()
+    value = models.DecimalField(max_digits = 15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
