@@ -143,8 +143,6 @@ def getCurrentPower(tablename, timecol, powercol):
     :param str powercol: Name of the power column \n
     Returns a decimal power value 
     """
-    #df = getRecentData(tablename, 1, 'Timestamp')
-    #return df.at[0, 'Power']
     df = getRecentData(tablename, 1, timecol)
     return df.at[0, 'value']
 
@@ -156,16 +154,12 @@ def getDailyPeak(tablename, timecol):
     Returns a decimal power value 
     """
     # Only need the most recent point since we will sample the data we need with another query 
-    # df = getRecentData(tablename, 1, 'Timestamp')
     df = getRecentData(tablename, 1, timecol)
     #Calculating the current day 
-    # curr_year = df.iloc[0].Timestamp.year 
-    # curr_month = df.iloc[0].Timestamp.month 
-    # curr_day = df.iloc[0].Timestamp.day 
     curr_year = df.iloc[0].timestamp.year 
     curr_month = df.iloc[0].timestamp.month 
     curr_day = df.iloc[0].timestamp.day 
-    prev_day = curr_day - 1
+    prev_day = curr_day-1
     #Calculate the previous day is the end of the previous month
     if curr_day == 1: 
         if (curr_month == 4 or curr_month == 6 or curr_month == 9 or curr_month == 11): 
@@ -182,11 +176,14 @@ def getDailyPeak(tablename, timecol):
             else: 
                 #30th is the previous day
                 prev_day = 30
+        if curr_month == 1: 
+            curr_month = 12
+            curr_year = curr_year-1
+        else: 
+            curr_month = curr_month - 1
     
     date = str(curr_year)+'-'+str(curr_month)+'-'+str(prev_day)
-    # my_df = getSingleDateData(tablename, 'Timestamp', date )
     my_df = getSingleDateData(tablename, timecol, date )
-    # return my_df.max().Power
     return my_df.max().value
 
 def getMonthlyPeak(tablename):
@@ -226,10 +223,7 @@ def getMonthlyPeak(tablename):
     
     start = str(year)+'-'+str(month)+'-'+str(1)
     end = str(year)+'-'+str(month)+'-'+str(day)
-    # my_df = getDateData(tablename, 'Timestamp', start, end)
     my_df = getDateData(tablename, 'timestamp', start, end)
-
-    # return my_df.max().Power
     return my_df.max().value
 
 def getRecentData(tablename, num_req, col):
