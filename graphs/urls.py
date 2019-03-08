@@ -9,4 +9,8 @@ urlpatterns = [
     path(r'api/data',views.ChartData.as_view(), name='chart' ),
     path(r'api/data2',views.ErrData.as_view(), name='err'),
     path(r'api/data3', views.BuildingData.as_view(), name='building'),
+    path(r'api/west', views.WestEVData.as_view(), name='west'),
+    path(r'api/rose', views.RoseEVData.as_view(), name='rose'),
+    path(r'api/fraser', views.FraserEVData.as_view(), name='fraser'),
+    path(r'api/health', views.HealthEVData.as_view(), name='health'),
 ]

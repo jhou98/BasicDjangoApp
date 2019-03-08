@@ -21,7 +21,7 @@ class EVEnergy(models.Model):
         1. timestamp: Datetime field 
         2. value: Energy consumption
     """
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(primary_key=True)
     value = models.DecimalField(max_digits = 15, decimal_places = 5)
 
     def __str__(self):
@@ -33,7 +33,7 @@ class BuildingEnergy(models.Model):
         1. timestamp: Datetime field 
         2. value: Energy consumption
     """
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(primary_key=True)
     value = models.DecimalField(max_digits = 15, decimal_places = 5)
 
     def __str__(self):
@@ -46,7 +46,7 @@ class WestEV(models.Model):
         1. timestamp: Datetime field 
         2. value: Energy consumption
     """
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(primary_key=True)
     value = models.DecimalField(max_digits = 15, decimal_places = 5)
 
     def __str__(self):
@@ -58,7 +58,7 @@ class RoseEV(models.Model):
         1. timestamp: Datetime field 
         2. value: Energy consumption
     """
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(primary_key=True)
     value = models.DecimalField(max_digits = 15, decimal_places = 5)
 
     def __str__(self):
@@ -70,7 +70,7 @@ class NorthEV(models.Model):
         1. timestamp: Datetime field 
         2. value: Energy consumption
     """
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(primary_key=True)
     value = models.DecimalField(max_digits = 15, decimal_places = 5)
 
     def __str__(self):
@@ -82,7 +82,7 @@ class HealthEV(models.Model):
         1. timestamp: Datetime field 
         2. value: Energy consumption
     """
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(primary_key=True)
     value = models.DecimalField(max_digits = 15, decimal_places = 5)
 
     def __str__(self):
@@ -94,7 +94,7 @@ class FraserEV(models.Model):
         1. timestamp: Datetime field 
         2. value: Energy consumption
     """
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(primary_key=True)
     value = models.DecimalField(max_digits = 15, decimal_places = 5)
 
     def __str__(self):

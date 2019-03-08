@@ -119,3 +119,71 @@ class BuildingData(APIView):
         my_df = getRecentData('buildingdata',100, 'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
+
+# Rest Framework - West Parkade EV data 
+class WestEVData(APIView):
+    """
+    This method is used to send 100 most recent ev data points from West Parkade as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_westev',100, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Rose Parkade EV data 
+class RoseEVData(APIView):
+    """
+    This method is used to send 100 most recent ev data points from Rose Parkade as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_roseev',100, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Fraser Parkade EV data 
+class FraserEVData(APIView):
+    """
+    This method is used to send 100 most recent ev data points from Fraser Parkade as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_fraserev',100, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Health Parkade EV data 
+class HealthEVData(APIView):
+    """
+    This method is used to send 100 most recent ev data points from Health Parkade as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_healthev',100, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
