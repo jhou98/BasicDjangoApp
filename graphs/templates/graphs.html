@@ -107,13 +107,14 @@
         var result = JSON.parse(data1[0])
         var ev_date = []
         var ev_power = []
-        console.log(result)
+        console.log("our result is", result)
         //length (as our objects are in Most recent->least recent)
         var length = result.data.length - 1
         for (var x in result.data) {
             //slice the ISO-Format String 
             //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM:SS
-            ev_date.push(result.data[length - x][0].slice(0, 19))
+            console.log("here at ", x)
+            ev_date.push(result.data[length - x][0].slice(0, 16))
             ev_power.push(result.data[length - x][1])
         }
 
@@ -121,15 +122,18 @@
         var bd_result = JSON.parse(data3[0])
         var bd_date = []
         var bd_power = []
-        console.log(bd_result)
-        var bd_length = result.data.length - 1
+        console.log("Our building result is", bd_result)
+        var bd_length = bd_result.data.length - 1
         for (var x in bd_result.data) {
+            console.log("here in", x)
             bd_date.push(bd_result.data[bd_length - x][0].slice(0, 16))
             bd_power.push(bd_result.data[bd_length - x][1])
         }
 
         //data2 is the data with error bars (static data currently)
+        console.log("err data", data2)
         var err_result = JSON.parse(data2[0])
+        console.log("our err result is", err_result)
         var err_date = []
         var err_power = []
         var max_err = []
@@ -164,7 +168,6 @@
         console.log(evChart)
         console.log(bdChart)
         console.log(evdgauge)
-        getLabel(evChart)
         //timeout function 
         evpoll(evChart, evdgauge)
 
@@ -193,31 +196,13 @@
                     console.log(result.data[0][1])
                     //Add most recent datapoint into our chart
                     // addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
-                    addData(chart_1, result.data[0][0].slice(0, 19), result.data[0][1])
+                    addData(chart_1, result.data[0][0].slice(0, 16), result.data[0][1])
                     gauge_1.setValue(result.data[0][1])
                 },
                 complete: evpoll(chart_1, gauge_1),
                 timeout: 2000
             })
-        }, 15 * 60000);
-    }
-
-    function getLabel(chart /*, label, datas*/) {
-        /** 
-         * Add a new label and datapoint (x,y) to chart object  
-         * 
-         * @param {Chart} chart Chart object.
-         * @param {string} label Our datetime label (x value).
-         * @param {double} datas Power value for our label (y value).
-         * 
-         * Note: This function assumes our chart has only one dataset. 
-         *  If there are multiple you must use dataset[0].data. etc. 
-         */
-        console.log(chart.data.labels)
-        console.log(chart.data.labels.length)
-        console.log(chart.data.labels[99])
-
-        console.log("Hello we are here")
+        }, 15 * 60000); //recheck every 15 mins
     }
     {% endblock %}
 </script>

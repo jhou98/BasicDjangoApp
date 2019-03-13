@@ -21,7 +21,7 @@ def graphs(request):
     bd_daily = getDailyPeak('buildingdata', __timecol)
     ev_monthly = getMonthlyPeak('testtable')
     bd_monthly = getMonthlyPeak('buildingdata')
-
+    
     #Debugging Purposes
     print("current daily ev power is : ", ev_daily)
     print("current daily building power is : ",bd_daily)
