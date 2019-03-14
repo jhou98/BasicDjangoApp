@@ -1,0 +1,6 @@
+create table testtable (
+    "value" float,
+    "timestamp" datetime
+)
+
+select * from testtable;

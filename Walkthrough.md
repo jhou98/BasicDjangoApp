@@ -465,9 +465,90 @@
 - The _value-text_ refers to the text beneath the value, in our example kWh
 - The _label_ refers to the label on the upper right hand corner 
 
+## Connecting to an Azure SQL server 
+- To being migrating the project from a localhost to the cloud, we need to first set up and connect to a Cloud Database, which we chose to be __Azure SQL__
+- This section will walk through the following steps: 
+    1. Creating a SQL Server
+    2. Setting up Firewall 
+    3. Testing Connection
+### Creating a SQL Server 
+- Follow the instructions in the __Create a single database section__ found on [the following tutorial by Microsoft](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-single-database-get-started) as a guide for creating a single database 
+- Make sure to keep note of the server name, admin login and password
+- Use __Canada Central__ for location and __Basic__ for pricing tier
+### Setting up a Firewall
+- Once your database is created, follow [these instructions](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-server-level-firewall-rule) to setup a firewall to enable connections 
+### Testing Connection
+- To start off, we will use the Azure portal to create a table and input a datapoint 
+- In your Azure Portal, navigate to your Database's Query Editor and login according to your username and password set when you created the database 
+![Query Editor](/static/images/azurefig1.png)
+- In the Query, add the following code and run it, making sure you get a table returned successfully with the values inserted
 
+<table>
+    CREATE TABLE testtable(
+        "timestamp" datetime, 
+        "value" float
+    );
 
+    INSERT INTO testtable(
+        "timestamp",
+        "value"
+    ) VALUES (
+        '2019-01-30 12:00:00',
+        1.01
+    );
 
+    SELECT * FROM testtable; 
+</table>
+
+- Now we will try creating a python file to try connecting. We will assume you have a method that returns to you a dataframe with the following 2 columns: timestamp and value
+- Make sure you have pandas and pyodbc installed. If not, use `pip install` to add them to your virtual environment
+    ```python  
+        import pandas as pd 
+        import pyodbc 
+
+        # Note that these are all strings
+        server = <servername> 
+        database =  <databasename>
+        username = <username>
+        password = <password>
+        driver = '{ODBC Driver 13 for SQL Server}' # Depends, check your server information 
+
+        cnxn = pyodbc.connect('DRIVER='+driver+';SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
+        cursor = cnxn.cursor()
+
+        cursor.execute('select * from testtable;')
+        print(cursor.fetchone())
+    ```
+![ODBC Driver](/static/images/azurefig2.png)
+- You should be able to get the same information as you had from your previous Query in the Azure portal 
+- To create a connection with pandas, create a file with the following code
+    ```python
+        from sqlalchemy import create_engine
+
+        ### Azure SQL Setup (all strings)
+        __server = <servername>
+        __db = <databasename>
+        __uid = <username>
+        __pwd = <password>
+        __drv = 'ODBC Driver 17 for SQL Server' #note that the { } are dropped 
+        __tbl = <tablename> #testtable in our previous example
+        __idx = <indexname> #timestamp in our previous example 
+
+        ## Connection Engine
+        connectionstring = 'mssql+pyodbc://{uid}:{password}@{server}:1433/{database}?driver={driver}'.format(
+            uid=__uid,
+            password=__pwd,        
+            server=__server,
+            database=__db,
+            driver=__drv.replace(' ', '+'))    
+        cxn = create_engine(connectionstring)
+        print("Connected to sql\n")
+
+        df = getDf() #assume you have are returned dataframe with 2 columns: timestamp and value 
+        print(df)
+        df.to_sql(name = __tbl, con=cxn, if_exists='append', index=False, index_label=__idx)
+    ```
+- Once you run the file, you should be able to see the df rows appended to your table that you created already in your Azure portal
 
 
 
