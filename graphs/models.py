@@ -99,3 +99,19 @@ class FraserEV(models.Model):
 
     def __str__(self):
         return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class carData(models.Model):
+    """
+    Class the represents cars within the lot that are connected to EV chargers 
+        1. timestamp: Datetime field
+        2. totalcars: Total number cars connected to EV chargers
+        3. chargedcars: Total number of cars that are fully charged but still connected 
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    totalcars = models.IntegerField()
+    chargedcars = models.IntegerField()
+
+    def __str__(self):
+        return "Timestamp: " +  self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Total Cars: "+str(self.totalcars) + ", Charged Cars: "+str(self.chargedcars)
+
+ 

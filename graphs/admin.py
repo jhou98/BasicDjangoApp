@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import powerData, EVEnergy, BuildingEnergy, WestEV, NorthEV, FraserEV, RoseEV, HealthEV
+from .models import powerData, EVEnergy, BuildingEnergy, WestEV, NorthEV, FraserEV, RoseEV, HealthEV, carData
 
 admin.site.register(powerData)
 admin.site.register(EVEnergy)
@@ -9,3 +9,4 @@ admin.site.register(NorthEV)
 admin.site.register(FraserEV)
 admin.site.register(RoseEV)
 admin.site.register(HealthEV)
+admin.site.register(carData)

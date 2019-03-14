@@ -187,3 +187,17 @@ class HealthEVData(APIView):
         my_df = getRecentData('graphs_healthev',100, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
+
+class carData(APIView):
+    """
+    Method to send 100 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_cardata',100,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
