@@ -79,6 +79,12 @@
 <div class='container'>
     <canvas id="myChartTest" width="400" height="400"></canvas>
 </div>
+<div class='container'>
+    <canvas id='myChartCar' width='400' height='400'></canvas>
+</div>
+<div class='container'>
+    <canvas id='myBarChart' width='400' height='400'></canvas>
+</div>
 {% endblock %}
 
 <!--Script for our Charts and Gauges-->
@@ -87,6 +93,7 @@
     var endpoint = '/api/data'
     var errpoint = '/api/data2'
     var endpoint2 = '/api/data3'
+    var carendpoint = '/api/cars'
 
     //Running the ajax methods in parallel
     $.when(
@@ -101,13 +108,16 @@
         $.ajax({
             method: "GET",
             url: endpoint2
+        }),
+        $.ajax({
+            method: "GET",
+            url: carendpoint
         })
-    ).then(function (data1, data2, data3) {
+    ).then(function (data1, data2, data3, data4) {
         //data1 currently corresponds to our realtime EV data 
         var result = JSON.parse(data1[0])
         var ev_date = []
         var ev_power = []
-        console.log(result)
         //length (as our objects are in Most recent->least recent)
         var length = result.data.length - 1
         for (var x in result.data) {
@@ -121,7 +131,6 @@
         var bd_result = JSON.parse(data3[0])
         var bd_date = []
         var bd_power = []
-        console.log(bd_result)
         var bd_length = bd_result.data.length - 1
         for (var x in bd_result.data) {
             bd_date.push(bd_result.data[bd_length - x][0].slice(0, 16))
@@ -142,10 +151,28 @@
             min_err.push(err_result.data[err_length - x][3])
         }
 
+        //data4 corresponds to our car data (static currently)
+        var car_result = JSON.parse(data4[0])
+        console.log(car_result)
+        var car_date = []
+        var car_total = []
+        var car_charged = []
+        var car_length = car_result.data.length - 1
+        for (var x in car_result.data) {
+            car_date.push(car_result.data[car_length - x][0])
+            car_total.push(car_result.data[car_length - x][1])
+            car_charged.push(car_result.data[car_length - x][2])
+        }
+        console.log(car_date)
+        console.log(car_total)
+        console.log(car_charged)
+
         //call our chart function to create charts 
         var evChart = createChart(ev_date, ev_power, "myChartEV", 'EV Charger Power Data')
         var bdChart = createChart(bd_date, bd_power, "myChartBuilding", 'Building Power Data')
         var testChart = createTestChart("myChartTest", err_date, err_power, max_err, min_err)
+        var carChart = createCarChart("myChartCar", car_date, car_total, car_charged)
+        var barChart = createBarChart("myBarChart", ["EV", "Building", "Total"],[5,10,15]) 
 
         //call our gauge function to create gauges
         var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
@@ -160,7 +187,6 @@
         evslider.oninput = function () {
             evctrlgauge.setValue(this.value)
         }
-
         console.log(evChart)
         console.log(bdChart)
         console.log(evdgauge)
@@ -202,7 +228,7 @@
         }, 5 * 60000);
     }
 
-    
+
     /*--------------------------------------Will figure out this function once we get Real Time Building data-------------------------------------------------------*/
     // function bdpoll(chart_1, gauge_1) {
     //     /** 
@@ -230,6 +256,170 @@
     //     }, 15*60000);
     // }
 
+    function createCarChart(id, x_axis, totalcars, chargedcars) {
+        /**
+         * Creates a chart for number of cars.
+         * 
+         * @param {string} id string of element ID in HTML.
+         * @param {Array} x_axis Array of dates for our chart. 
+         * @param {Array} totalcars Array of total cars within the EV parkade. 
+         * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
+         * 
+         * @return {Chart} Returns chart object 
+         */
+        var ctx = document.getElementById(id).getContext('2d');
+
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: x_axis,
+                datasets: [{
+                    label: 'Total Connected Vehicles',
+                    data: totalcars,
+                    backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                    borderColor: '#D78730',
+                    fill: '1',
+                }, {
+                    label: 'Charged Vehicles',
+                    data: chargedcars,
+                    backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                    borderColor: '#73C2E5',
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Vehicle Data',
+                    fontColor: '#0C5784',
+                    fontSize: 22,
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time',
+                            fontColor: '#0C5784',
+                            fontSize: 20,
+                        },
+                        ticks: {
+                            fontColor: '#0C5784'
+                        },
+                        gridLines: {
+                            color: '#0C5784',
+                            display: true
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Number of Vehicles',
+                            fontColor: '#0C5784',
+                            fontSize: 20,
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: '#0C5784'
+                        },
+                        gridLines: {
+                            color: '#0C5784',
+                            display: true
+                        }
+                    }],
+                },
+                plugins: {
+                    filler: {
+                        propagate: true
+                    }
+                },
+                legend: {
+                    labels: {
+                        fontColor: '#0C5784'
+                    }
+                },
+            }
+        });
+        return myChart
+    }
+
+    function createBarChart(id, x_axis, values) {
+        /**
+         * Creates a chart for number of cars.
+         * 
+         * @param {string} id string of element ID in HTML.
+         * @param {Array} x_axis Array of dates for our chart. 
+         * @param {Array} values Array of vals for our bar chart 
+         * 
+         * @return {Chart} Returns chart object 
+         */
+        var ctx = document.getElementById(id).getContext('2d');
+
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: x_axis,
+                datasets: [{
+                    label: 'EV Power Consumption',
+                    data: values,
+                    backgroundColor: [
+                        'rgba(155, 194, 229, 0.4)',
+                        'rgba(215, 135, 48, 0.4)',
+                        'rgba(91, 122, 139, 0.4)',
+                    ],
+                    borderColor: [
+                        '#73C2E5',
+                        '#D78730',
+                        '#5B7A8B'
+                    ],
+                    borderWidth: 3 
+                }],
+            },
+            options: {
+                scales: {               
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Location',
+                            fontColor: '#0C5784',
+                            fontSize: 20,
+                        },
+                        ticks: {
+                            fontColor: '#0C5784'
+                        },
+                        gridLines: {
+                            color: '#0C5784',
+                            display: true
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Power (kW)',
+                            fontColor: '#0C5784',
+                            fontSize: 20,
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: '#0C5784'
+                        },
+                        gridLines: {
+                            color: '#0C5784',
+                            display: true
+                        }
+                    }]
+                }
+            },
+            legend: {
+                    labels: {
+                        fontColor: '#0C5784',
+                    }
+            },
+        })
+        return myChart
+    }
 
     {% endblock %}
 </script>

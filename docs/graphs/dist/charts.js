@@ -131,7 +131,7 @@ function createChart(x_axis, y_axis, id, label_title) {
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Energy (kWh)',
+                        labelString: 'Energy (kW)',
                         fontColor: '#0C5784',
                         fontSize: 20,
                     },
@@ -160,6 +160,7 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
     /**
      * Creates a chart for with Error Bars.  
      * 
+     * @param {string} id String of the Element ID in HTML.
      * @param {Array} x_axis Array of dates for our chart. 
      * @param {Array} main Array of power for our chart.
      * @param {Array} max_err Array of positive error bar for our chart.
@@ -221,7 +222,7 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Power',
+                        labelString: 'Power (kW)',
                         fontColor: '#0C5784',
                         fontSize: 20,
                     },

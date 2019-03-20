@@ -114,4 +114,15 @@ class carData(models.Model):
     def __str__(self):
         return "Timestamp: " +  self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Total Cars: "+str(self.totalcars) + ", Charged Cars: "+str(self.chargedcars)
 
- 
+class buildingData(models.Model):
+    """
+     Class the represents building data energy 
+        1. timestamp: Datetime field
+        2. value: Energy consumption 
+    Currently not used (waiting for API connection)
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.DecimalField(max_digits=15, decimal_places = 5)
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
