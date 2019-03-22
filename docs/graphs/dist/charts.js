@@ -250,3 +250,182 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
     });
     return myChart
 }
+
+function createCarChart(id, x_axis, totalcars, chargedcars) {
+    /**
+     * Creates a chart for number of cars.
+     * 
+     * @param {string} id string of element ID in HTML.
+     * @param {Array} x_axis Array of dates for our chart. 
+     * @param {Array} totalcars Array of total cars within the EV parkade. 
+     * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
+     * 
+     * @return {Chart} Returns chart object 
+     */
+    var ctx = document.getElementById(id).getContext('2d');
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: x_axis,
+            datasets: [{
+                label: 'Total Connected Vehicles',
+                data: totalcars,
+                backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                borderColor: '#D78730',
+                fill: '1',
+            }, {
+                label: 'Charged Vehicles',
+                data: chargedcars,
+                backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                borderColor: '#73C2E5',
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Vehicle Data',
+                fontColor: '#0C5784',
+                fontSize: 22,
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Timestamp',
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Number of Vehicles',
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }],
+            },
+            plugins: {
+                filler: {
+                    propagate: true
+                }
+            },
+            legend: {
+                labels: {
+                    fontColor: '#0C5784'
+                }
+            },
+        }
+    });
+    return myChart
+}
+
+function createBarChart(id, x_axis, values, powercap) {
+    /**
+     * Creates a chart for number of cars.
+     * 
+     * @param {string} id string of element ID in HTML.
+     * @param {Array} x_axis Array of dates for our chart. 
+     * @param {Array} values Array of vals for our bar chart 
+     * @param {double} powercap Double val that represents the max power we want to avoid.
+     * 
+     * @return {Chart} Returns chart object 
+     */
+    var ctx = document.getElementById(id).getContext('2d');
+
+    var pwrcap = []
+    for (var x in x_axis) {
+        pwrcap.push(powercap)
+    }
+
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: x_axis,
+            datasets: [{
+                label: 'EV Power Consumption',
+                data: values,
+                backgroundColor: [
+                    'rgba(155, 194, 229, 0.4)',
+                    'rgba(215, 135, 48, 0.4)',
+                    'rgba(91, 122, 139, 0.4)',
+                ],
+                borderColor: [
+                    '#73C2E5',
+                    '#D78730',
+                    '#5B7A8B'
+                ],
+                borderWidth: 3
+            }, {
+                type: 'line',
+                label: 'Power Cap',
+                data: pwrcap,
+                backgroundColor: 'rgba(48, 48, 52, 0.4)',
+                borderColor: '#303034',
+                borderWidth: 4,
+                fill: 'false'
+            }],
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Location',
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Power (kW)',
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }]
+            }
+        },
+        legend: {
+            labels: {
+                fontColor: '#0C5784',
+            }
+        },
+    })
+    return myChart
+}

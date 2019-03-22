@@ -5,9 +5,10 @@
 
 {% block content %}
 <!--HTML Content Here-->
-<div class='container'>
+<div class='margs'>
     <div class='row'>
-        <div class='col-md-12 col-lg-6'>
+        <!--EV Chart-->
+        <div class='col-md-12 col-lg-4'>
             <canvas id="myChartEV" width="400" height="400"></canvas>
             <br>
             <div class='row'>
@@ -31,8 +32,14 @@
                 </div>
             </div>
         </div>
+        <!--Car Chart-->
         <div class="clearfix visible-md"></div>
-        <div class='col-md-12 col-lg-6'>
+        <div class='col-md-12 col-lg-4'>
+            <canvas id='myChartCar' width='400' height='400'></canvas>
+        </div>
+        <!--Building Chart-->
+        <div class="clearfix visible-md"></div>
+        <div class='col-md-12 col-lg-4'>
             <canvas id="myChartBuilding" width="400" height="400"></canvas>
             <br>
             <div class='row'>
@@ -57,33 +64,36 @@
             </div>
         </div>
     </div>
-    <div class='row justify-content-center'>
-        <div class='col-xs-12 col-sm-12 col-md-8 col-lg-6'>
+    <!--Control Row / Building + EV Data-->
+    <div class='row'>
+        <!--Bar Chart-->
+        <div class='col-md-12 col-lg-4'>
+            <canvas id='myBarChart' width='400' height='400'></canvas>
+        </div>
+        <!--Building and EV Chart-->
+        <div class="clearfix visible-md"></div>
+        <div class='col-md-12 col-lg-4'>
+            <canvas id="myChartTest" width="400" height="400"></canvas>
+        </div>
+        <!--Control Gauge-->
+        <div class="clearfix visible-md"></div>
+        <div class='col-md-12 col-lg-4'>
             <div id="evcontrolgauge" class="gauge-container">
                 <span class="large-value-text">kWh</span>
                 <span class="large-label">EV Control</span>
                 <input type="hidden" id="evcurrval" value={{curr_ev}}>
                 <input type="hidden" id="evmaxval" value="200">
             </div>
+            <div class='row justify-content-center'>
+                <div class='col-xs-10 col-sm-10 col-md-8 col-lg-8'>
+                    <input type="range" min="0" max="200" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
+                </div>
+                <div class='col-xs-2 col-sm-2'>
+                    <button type="button" class="btn btn-warning">Enter</button>
+                </div>
+            </div>
         </div>
     </div>
-    <div class='row justify-content-center'>
-        <div class='col-xs-10 col-sm-10 col-md-6 col-lg-4'>
-            <input type="range" min="0" max="200" step="0.001" value={{curr_ev}} class="slider" id="TestEV">
-        </div>
-        <div class='col-xs-2 col-sm-2'>
-            <button type="button" class="btn btn-warning">Enter</button>
-        </div>
-    </div>
-</div>
-<div class='container'>
-    <canvas id="myChartTest" width="400" height="400"></canvas>
-</div>
-<div class='container'>
-    <canvas id='myChartCar' width='400' height='400'></canvas>
-</div>
-<div class='container'>
-    <canvas id='myBarChart' width='400' height='400'></canvas>
 </div>
 {% endblock %}
 
@@ -118,6 +128,7 @@
         var result = JSON.parse(data1[0])
         var ev_date = []
         var ev_power = []
+        var bar_power = []
         //length (as our objects are in Most recent->least recent)
         var length = result.data.length - 1
         for (var x in result.data) {
@@ -137,6 +148,11 @@
             bd_power.push(bd_result.data[bd_length - x][1])
         }
 
+        //create an array for bar chart
+        bar_power.push(ev_power[99])
+        bar_power.push(bd_power[99])
+        bar_power.push((ev_power[99] + bd_power[99]))
+
         //data2 is the data with error bars (static data currently)
         var err_result = JSON.parse(data2[0])
         var err_date = []
@@ -153,26 +169,22 @@
 
         //data4 corresponds to our car data (static currently)
         var car_result = JSON.parse(data4[0])
-        console.log(car_result)
         var car_date = []
         var car_total = []
         var car_charged = []
         var car_length = car_result.data.length - 1
         for (var x in car_result.data) {
-            car_date.push(car_result.data[car_length - x][0])
+            car_date.push(car_result.data[car_length - x][0].slice(0, 16))
             car_total.push(car_result.data[car_length - x][1])
             car_charged.push(car_result.data[car_length - x][2])
         }
-        console.log(car_date)
-        console.log(car_total)
-        console.log(car_charged)
 
         //call our chart function to create charts 
         var evChart = createChart(ev_date, ev_power, "myChartEV", 'EV Charger Power Data')
         var bdChart = createChart(bd_date, bd_power, "myChartBuilding", 'Building Power Data')
         var testChart = createTestChart("myChartTest", err_date, err_power, max_err, min_err)
         var carChart = createCarChart("myChartCar", car_date, car_total, car_charged)
-        var barChart = createBarChart("myBarChart", ["EV", "Building", "Total"],[5,10,15]) 
+        var barChart = createBarChart("myBarChart", ["EV", "Building", "Total"], bar_power, 100)
 
         //call our gauge function to create gauges
         var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
@@ -187,9 +199,6 @@
         evslider.oninput = function () {
             evctrlgauge.setValue(this.value)
         }
-        console.log(evChart)
-        console.log(bdChart)
-        console.log(evdgauge)
         //timeout function 
         evpoll(evChart, evdgauge, evmgauge)
 
@@ -298,7 +307,7 @@
                         display: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'Time',
+                            labelString: 'Timestamp',
                             fontColor: '#0C5784',
                             fontSize: 20,
                         },
@@ -343,17 +352,23 @@
         return myChart
     }
 
-    function createBarChart(id, x_axis, values) {
+    function createBarChart(id, x_axis, values, powercap) {
         /**
          * Creates a chart for number of cars.
          * 
          * @param {string} id string of element ID in HTML.
          * @param {Array} x_axis Array of dates for our chart. 
          * @param {Array} values Array of vals for our bar chart 
+         * @param {double} powercap Double val that represents the max power we want to avoid.
          * 
          * @return {Chart} Returns chart object 
          */
         var ctx = document.getElementById(id).getContext('2d');
+
+        var pwrcap = []
+        for (var x in x_axis) {
+            pwrcap.push(powercap)
+        }
 
         var myChart = new Chart(ctx, {
             type: 'bar',
@@ -372,11 +387,19 @@
                         '#D78730',
                         '#5B7A8B'
                     ],
-                    borderWidth: 3 
+                    borderWidth: 3
+                }, {
+                    type: 'line',
+                    label: 'Power Cap',
+                    data: pwrcap,
+                    backgroundColor: 'rgba(48, 48, 52, 0.4)',
+                    borderColor: '#303034',
+                    borderWidth: 4,
+                    fill: 'false'
                 }],
             },
             options: {
-                scales: {               
+                scales: {
                     xAxes: [{
                         display: true,
                         scaleLabel: {
@@ -413,9 +436,9 @@
                 }
             },
             legend: {
-                    labels: {
-                        fontColor: '#0C5784',
-                    }
+                labels: {
+                    fontColor: '#0C5784',
+                }
             },
         })
         return myChart
