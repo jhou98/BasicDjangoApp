@@ -77,26 +77,14 @@ WSGI_APPLICATION = 'basic.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'basic',
-    #     'USER': 'root',
-    #     'PASSWORD': 'Cerc2019',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '3306',
-    # } 
-    ## Working azure sql server 
     'default': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'myTestDatabase',
-        'USER': 'azureuser',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'basic',
+        'USER': 'root',
         'PASSWORD': 'Cerc2019',
-        'HOST': 'powertest.database.windows.net',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    }
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    } 
 }
 
 
