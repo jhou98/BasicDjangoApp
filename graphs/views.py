@@ -82,7 +82,7 @@ class ChartData(APIView):
         from .controller import pandasToJSON 
         
         #my_df = getRecentData('graphs_powerdata',100,'Timestamp')
-        my_df = getRecentData('testtable',100, 'timestamp')
+        my_df = getRecentData('testtable',96, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
@@ -116,7 +116,7 @@ class BuildingData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('buildingdata',100, 'Timestamp')
+        my_df = getRecentData('buildingdata',96, 'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
@@ -133,7 +133,7 @@ class WestEVData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_westev',100, 'timestamp')
+        my_df = getRecentData('graphs_westev',96, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
@@ -150,7 +150,7 @@ class RoseEVData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_roseev',100, 'timestamp')
+        my_df = getRecentData('graphs_roseev',96, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
@@ -167,7 +167,7 @@ class FraserEVData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_fraserev',100, 'timestamp')
+        my_df = getRecentData('graphs_fraserev',96, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
@@ -184,6 +184,35 @@ class HealthEVData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_healthev',100, 'timestamp')
+        my_df = getRecentData('graphs_healthev',96, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+class carData(APIView):
+    """
+    Method to send 100 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_cardata',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - West Future EV Data 
+class WestPredictedData(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_westevfuture',48, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)

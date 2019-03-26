@@ -13,4 +13,6 @@ urlpatterns = [
     path(r'api/rose', views.RoseEVData.as_view(), name='rose'),
     path(r'api/fraser', views.FraserEVData.as_view(), name='fraser'),
     path(r'api/health', views.HealthEVData.as_view(), name='health'),
+    path(r'api/cars',views.carData.as_view(), name='cars'),
+    path(r'api/prediction/west', views.WestPredictedData.as_view(), name='west_future'),
 ]

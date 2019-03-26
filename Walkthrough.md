@@ -403,16 +403,21 @@
 ## Creating Gauges 
 - To look at a bit more static data, we will be using gauges from [svg-gauges](https://github.com/naikus/svg-gauge)
 - For our case, we will generate gauges that will look like the image below:
-<br>
+
 ![Basic Gauge](/static/images/gauge_basic.JPG)
+
 - In order to use the svg-gauges library, you will need to download and host the source code remotely. Fortunately Github allows you to do this pretty easily. 
+
 > Navigate to your Github Project __Settings__ Page (or create a new github project if you have not done so already)
 > Scroll down the __Github Pages__ section where you have the option to host project pages on Github repository
 > Choose __master branch /docs folder__ as your source to build from and publish your page 
 > In your Github Project, create a new folder called docs and add the code from svg-gauges into that folder, and then push the changes to your Github Repository
 > If setup correctly, you should be able to navigate according to the URL to something similar to https://username.github.io/#PROJECTNAME/svg-gauge/dist/gauges.js 
+
 - In your __base.html__ file, add your new URL as a javascript source 
-- In addition, in your base.html file, modify the style of the gauge with the following code: 
+
+- In addition, in your base.html file, modify the style of the gauge with the following code:
+
     ```html
     <style>
     /** 
@@ -459,6 +464,7 @@
     }
     </style>
     ```
+
 - The _gauge dial_ refers to the background dial
 - The _gauge value_ refers to the colored value fill for the dial 
 - The _gauge value-text_ refers to the displayed number corresponding to the colored value fill for the dial 

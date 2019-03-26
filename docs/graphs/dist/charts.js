@@ -19,7 +19,7 @@ function addData(chart, label, datas) {
         chart.update();
         console.log("Chart has been updated with ", label, datas)
     }
-    else { 
+    else {
         console.log("Chart has not been updated")
     }
 }
@@ -47,6 +47,7 @@ function checkData(chart, label) {
 
     return true
 }
+
 function createGauge(val_id, maxval_id, id) {
     /**
      * Creates a Gauge.
@@ -79,34 +80,67 @@ function createGauge(val_id, maxval_id, id) {
     return gauge
 }
 
-function createChart(x_axis, y_axis, id, label_title) {
+function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lbl_title, x_axis, y_axis) {
     /**
      * Creates a chart for EV Data. 
      * 
-     * @param {Array} x_axis Array of dates for our chart. 
-     * @param {Array} y_axis Array of power for our chart.
+     * @param {Array} dates Array of dates for our chart. 
+     * @param {Array} pwr_vals Array of power for our chart.
+     * @param {Array} future_pwr Array of future values for our chart. 
+     * @param {Array} maxerr_pwr Array of max error for future values.
+     * @param {Array} minerr_pwr Array of min error for future values.
      * @param {string} id HTML element id. 
-     * @param {string} label_title Title of the chart.
+     * @param {string} lbl_title Title of the chart.
+     * @param {string} x_axis Title for x-axis of the chart.
+     * @param {string} y_axis Title for y-axis of the chart. 
      *
      * @return {Chart} returns chart object.
      */
     var ctx = document.getElementById(id).getContext('2d');
 
+
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: x_axis,
+            labels: dates,
             datasets: [{
-                label: 'Energy Consumption',
-                data: y_axis,
+                label: 'EV Consumption',
+                data: pwr_vals,
+                spanGaps: false,
                 backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#73C2E5',
+            }, {
+                label: 'Predicted Consumption',
+                data: future_pwr,
+                spanGaps: false,
+                backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                borderColor: '#73C2E5',
+                fill: false,
+                borderDash: [10, 10]
+            }, {
+                label: 'Max',
+                data: maxerr_pwr,
+                spanGaps: false,
+                backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                borderColor: '#D78730',
+                borderWidth: 1,
+                fill: '-1',
+                pointRadius: 0,
+            }, {
+                label: 'Min',
+                data: minerr_pwr,
+                spanGaps: false,
+                backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                borderColor: '#D78730',
+                borderWidth: 1,
+                fill: '-2',
+                pointRadius: 0,
             }]
         },
         options: {
             title: {
                 display: true,
-                text: label_title,
+                text: lbl_title,
                 fontColor: '#0C5784',
                 fontSize: 25,
             },
@@ -115,7 +149,7 @@ function createChart(x_axis, y_axis, id, label_title) {
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Timestamp',
+                        labelString: x_axis,
                         fontColor: '#0C5784',
                         fontSize: 20
                     },
@@ -131,7 +165,7 @@ function createChart(x_axis, y_axis, id, label_title) {
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Energy (kWh)',
+                        labelString: y_axis,
                         fontColor: '#0C5784',
                         fontSize: 20,
                     },
@@ -152,7 +186,6 @@ function createChart(x_axis, y_axis, id, label_title) {
             },
         }
     });
-
     return myChart
 }
 
@@ -160,6 +193,7 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
     /**
      * Creates a chart for with Error Bars.  
      * 
+     * @param {string} id String of the Element ID in HTML.
      * @param {Array} x_axis Array of dates for our chart. 
      * @param {Array} main Array of power for our chart.
      * @param {Array} max_err Array of positive error bar for our chart.
@@ -221,7 +255,7 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Power',
+                        labelString: 'Power (kW)',
                         fontColor: '#0C5784',
                         fontSize: 20,
                     },
@@ -243,6 +277,197 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
             legend: {
                 labels: {
                     fontColor: '#0C5784'
+                }
+            },
+        }
+    });
+    return myChart
+}
+
+
+function createCarChart(dates, totalcars, chargedcars, id, title, x_axis, y_axis) {
+    /**
+     * Creates a chart for number of cars.
+     * 
+     * @param {string} id string of element ID in HTML.
+     * @param {Array} dates Array of dates for our chart. 
+     * @param {Array} totalcars Array of total cars within the EV parkade. 
+     * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
+     * @param {string} title Title of our chart. 
+     * @param {string} x_axis Label for our x_axis. 
+     * @param {string} y_axis Label for our y_axis
+     * 
+     * @return {Chart} Returns chart object 
+     */
+    var ctx = document.getElementById(id).getContext('2d');
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Total Connected Vehicles',
+                data: totalcars,
+                backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                borderColor: '#D78730',
+                fill: '1',
+                stepped: true,
+            }, {
+                label: 'Charged Vehicles',
+                data: chargedcars,
+                backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                borderColor: '#73C2E5',
+                stepped: true,
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: title,
+                fontColor: '#0C5784',
+                fontSize: 22,
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: x_axis,
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: y_axis,
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }],
+            },
+            plugins: {
+                filler: {
+                    propagate: true
+                }
+            },
+            legend: {
+                labels: {
+                    fontColor: '#0C5784'
+                }
+            },
+        }
+    });
+    return myChart
+}
+
+function createBarChart(dates, values, powercap, id, title, x_axis, y_axis) {
+    /**
+     * Creates a chart for number of cars.
+     * 
+     * @param {string} id string of element ID in HTML.
+     * @param {Array} dates Array of dates for our chart. 
+     * @param {Array} values Array of vals for our bar chart 
+     * @param {double} powercap Double val that represents the max power we want to avoid.
+     * 
+     * @return {Chart} Returns chart object 
+     */
+    var ctx = document.getElementById(id).getContext('2d');
+
+    var pwrcap = []
+    for (var x in x_axis) {
+        pwrcap.push(powercap)
+    }
+
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'EV Power Consumption',
+                data: values,
+                backgroundColor: [
+                    'rgba(155, 194, 229, 0.4)',
+                    'rgba(215, 135, 48, 0.4)',
+                    'rgba(91, 122, 139, 0.4)',
+                ],
+                borderColor: [
+                    '#73C2E5',
+                    '#D78730',
+                    '#5B7A8B'
+                ],
+                borderWidth: 3
+            }, {
+                type: 'line',
+                label: 'Power Cap',
+                data: pwrcap,
+                backgroundColor: 'rgba(48, 48, 52, 0.4)',
+                borderColor: '#303034',
+                borderWidth: 4,
+                fill: 'false'
+            }],
+        },
+        options: {
+            title: {
+                display: true,
+                text: title,
+                fontColor: '#0C5784',
+                fontSize: 22,
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: x_axis,
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: y_axis,
+                        fontColor: '#0C5784',
+                        fontSize: 20,
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: '#0C5784'
+                    },
+                    gridLines: {
+                        color: '#0C5784',
+                        display: true
+                    }
+                }]
+            },
+            legend: {
+                labels: {
+                    fontColor: '#0C5784',
                 }
             },
         }
