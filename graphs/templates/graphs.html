@@ -73,7 +73,7 @@
         <!--Building and EV Chart-->
         <div class="clearfix visible-md"></div>
         <div class='col-md-12 col-lg-4'>
-            <canvas id="myChartTest" width="400" height="400"></canvas>
+            <canvas id="myChartCombo" width="400" height="400"></canvas>
         </div>
         <!--Control Gauge-->
         <div class="clearfix visible-md"></div>
@@ -101,20 +101,16 @@
 <script>
     {% block jquery %}
     var evpoint = '/api/data'
-    var errpoint = '/api/data2'
     var buildingpoint = '/api/data3'
     var vehiclepoint = '/api/cars'
-    var predictedpoint = 'api/prediction/west'
+    var evpredictedpoint = 'api/prediction/west'
+    var bdpredictedpoint = 'api/prediction/west'
 
     //Running the ajax methods in parallel
     $.when(
         $.ajax({
             method: "GET",
             url: evpoint
-        }),
-        $.ajax({
-            method: "GET",
-            url: errpoint
         }),
         $.ajax({
             method: "GET",
@@ -126,9 +122,13 @@
         }),
         $.ajax({
             method: "GET",
-            url: predictedpoint
+            url: evpredictedpoint
+        }),
+        $.ajax({
+            method: "GET",
+            url: bdpredictedpoint
         })
-    ).then(function (data_ev, data_err, data_building, data_vehicles, data_prediction) {
+    ).then(function (data_ev, data_building, data_vehicles, data_evprediction, data_bdprediction) {
 
         //Parse our EV data and format it into arrays 
         var ev_result = JSON.parse(data_ev[0])
@@ -160,20 +160,6 @@
         bar_power.push(bd_power[bd_length])
         bar_power.push((ev_power[length] + bd_power[bd_length]))
 
-        // currently a static Error bar graph 
-        var err_result = JSON.parse(data_err[0])
-        var err_date = []
-        var err_power = []
-        var max_err = []
-        var min_err = []
-        var err_length = err_result.data.length - 1
-        for (var x in err_result.data) {
-            err_date.push(err_result.data[err_length - x][0])
-            err_power.push(err_result.data[err_length - x][1])
-            max_err.push(err_result.data[err_length - x][2])
-            min_err.push(err_result.data[err_length - x][3])
-        }
-
         // Our vehicle data (static currently)
         var car_result = JSON.parse(data_vehicles[0])
         var car_date = []
@@ -186,8 +172,8 @@
             car_charged.push(car_result.data[car_length - x][2])
         }
 
-        //Our predicted data (static currently, but update is supported)
-        var predicted_result = JSON.parse(data_prediction[0])
+        //Our predicted data for ev
+        var predicted_result = JSON.parse(data_evprediction[0])
         var predicted_date = []
         var predicted_val = []
         var predicted_max = []
@@ -201,7 +187,7 @@
         }
 
         // Formatting the ev graph data to include the predicted vals w/ error bars 
-        // NOTE: Currently just using static random data for predicted values
+        // NOTE: Currently just using static random data for predicted values, change API url once setup
         var evgraph_timestamp = ev_date
         var evgraph_pwr = ev_power
         var evpredicted_pwr = []
@@ -220,8 +206,21 @@
             evpredicted_min.push(predicted_min[x])
         }
 
+        // Our predicted results for building 
+        // NOTE: Currently just using the same predicted data as ev (some random false data), change the API url once setup
+        var predicted_resultbd = JSON.parse(data_bdprediction[0])
+        var predicted_datebd = []
+        var predicted_valbd = []
+        var predicted_maxbd = []
+        var predicted_minbd = []
+        var predicted_lengthbd = predicted_resultbd.data.length - 1
+        for (var x in predicted_resultbd.data) {
+            predicted_datebd.push((predicted_resultbd.data[predicted_lengthbd - x][0]).slice(0, 16))
+            predicted_valbd.push(predicted_resultbd.data[predicted_lengthbd - x][1])
+            predicted_maxbd.push(predicted_resultbd.data[predicted_lengthbd - x][2])
+            predicted_minbd.push(predicted_resultbd.data[predicted_lengthbd - x][3])
+        }
         // Formatting the building graph data to include the predicted vals w/ error bars 
-        // NOTE: Currently just using the same predicted data as ev (some random false data), change to get realtime
         var bdgraph_timestamp = bd_date
         var bdgraph_pwr = bd_power
         var bdpredicted_pwr = []
@@ -233,20 +232,23 @@
             bdpredicted_min.push(null)
         }
         for (var x in predicted_date) {
-            bdgraph_timestamp.push(predicted_date[x])
+            bdgraph_timestamp.push(predicted_datebd[x])
             bdgraph_pwr.push(null)
-            bdpredicted_pwr.push(predicted_val[x])
-            bdpredicted_max.push(predicted_max[x])
-            bdpredicted_min.push(predicted_min[x])
+            bdpredicted_pwr.push(predicted_valbd[x])
+            bdpredicted_max.push(predicted_maxbd[x])
+            bdpredicted_min.push(predicted_minbd[x])
         }
 
         //call our chart function to create charts 
-        //createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lbl_title, x_axis, y_axis)
+        //createChart creates our basic chart with predictions 
         var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
         var bdChart = createChart(bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min, "myChartBuilding", 'Building Power Data', 'Timestamp', 'Power (kW)')
+        //createCarChart creates our vehicle chart 
         var carChart = createCarChart(car_date, car_total, car_charged, "myChartCar", 'Vehicle Data', 'Timestamp', 'Number of Vehicles')
+        //createBarChart creates our basic bar chart 
         var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Total Power (kW)", "Power (kW)", "Location")
-        var testChart = createTestChart("myChartTest", err_date, err_power, max_err, min_err)
+        //createComboChart creates our ev + building chart (assumes we have the same datetime values)
+        var testChart = createComboChart(ev_date, ev_power, bd_power, "myChartCombo", "Total EV and Building Power Consumption", "Timestamp", "Power (kW)")
 
 
         //call our gauge function to create gauges
@@ -341,45 +343,6 @@
                 console.log("error", err_data)
             }
         });
-    }
-
-    function addDataChart(chart, curr_x, curr_y, pred_x, pred_y, pred_max, pred_min) {
-        /**
-         * Helper function to update our chart. 
-         * 
-         * @param {Chart} chart Chart object.
-         * @param {Array} curr_x Current/Historical timestamps. 
-         * @param {Array} curr_y Current/Historical power values.
-         * @param {Array} pred_x Predicted timestamps. 
-         * @param {Array} pred_y Predicted power values.
-         * @param {Array} pred_max Predicted maximum error value. 
-         * @param {Array} pred_min Predicted minimum error value. 
-         * 
-         */
-        var timestamp = curr_x
-        var evpwr = curr_y
-        var predictedpwr = []
-        var predictedmax = []
-        var predictedmin = []
-        for (var x in curr_x) {
-            predictedpwr.push(null)
-            predictedmax.push(null)
-            predictedmin.push(null)
-        }
-        for (var x in pred_x) {
-            timestamp.push(pred_x[x])
-            evpwr.push(null)
-            predictedpwr.push(pred_y[x])
-            predictedmax.push(pred_max[x])
-            predictedmin.push(pred_min[x])
-        }
-
-        chart.data.datasets[0].data = evpwr
-        chart.data.datasets[1].data = predictedpwr
-        chart.data.datasets[2].data = predictedmax
-        chart.data.datasets[3].data = predictedmin
-        chart.data.labels = timestamp
-        chart.update();
     }
 
     {% endblock %}

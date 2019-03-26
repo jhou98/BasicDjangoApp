@@ -138,48 +138,51 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lb
 }
 
 /**
- * Creates a chart for with Error Bars.  
+ * Creates a chart with EV power, Building Power, and Total Power. 
+ * Assumes that the datetime for EV and Building power are the same. 
  * 
- * @param {string} id String of the Element ID in HTML.
- * @param {Array} x_axis Array of dates for our chart. 
- * @param {Array} main Array of power for our chart.
- * @param {Array} max_err Array of positive error bar for our chart.
- * @param {Array} min_err Array of negative error bar for our chart.
- *
- * @returns {Chart} Returns the chart object. 
+ * @param {Array} dates array of datetime.  
+ * @param {Array} ev_pwr array of ev power values.  
+ * @param {Array} bd_pwr array of building power values. 
+ * @param {string} id Element id in HTMl. 
+ * @param {string} title title of the chart.  
+ * @param {string} x_axis label of x-axis.  
+ * @param {string} y_axis label of y-axis. 
  */
-function createTestChart(id, x_axis, main, max_err, min_err) {
+function createComboChart(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
 
-    var ctx_Test = document.getElementById(id).getContext('2d');
+    var ctx = document.getElementById(id).getContext('2d');
 
-    var myChart = new Chart(ctx_Test, {
+    var total_pwr = ev_pwr+bd_pwr; 
+
+    var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: x_axis,
+            labels: dates,
             datasets: [{
-                label: 'Power Consumption',
-                data: main,
+                label: 'EV Power Consumption',
+                data: ev_pwr,
                 backgroundColor: 'rgba(215, 135, 48, 0.4)',
                 borderColor: '#D78730',
-                fill: 'false',
+                fill: 'true',
             }, {
-                label: 'Max Power Error',
-                data: max_err,
+                label: 'Building Power Consumption',
+                data: bd_pwr,
                 backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#73C2E5',
                 fill: '-1',
             }, {
-                label: 'Min Power Error',
-                data: min_err,
-                backgroundColor: 'rgba(155, 194, 229, 0.4)',
-                borderColor: '#73C2E5',
-                fill: '-2',
+                label: 'Total Power Consumption',
+                data: total_pwr,
+                backgroundColor:'rgba(91, 122, 139, 0.4)',
+                borderColor: '#5B7A8B',
+                fill: '-1',
             }]
         },
         options: {
             title: {
                 display: true,
-                text: 'Sample Data',
+                text: title,
                 fontColor: '#0C5784',
                 fontSize: 22,
             },
@@ -188,7 +191,7 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Time',
+                        labelString: x_axis,
                         fontColor: '#0C5784',
                         fontSize: 20,
                     },
@@ -204,7 +207,7 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Power (kW)',
+                        labelString: y_axis,
                         fontColor: '#0C5784',
                         fontSize: 20,
                     },
@@ -239,7 +242,7 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
  * @param {Array} dates Array of dates for our chart. 
  * @param {Array} totalcars Array of total cars within the EV parkade. 
  * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
- * @param {string} id Elemend ID in HTML. 
+ * @param {string} id Element ID in HTML. 
  * @param {string} title Title of our chart. 
  * @param {string} x_axis Label for our x_axis. 
  * @param {string} y_axis Label for our y_axis
@@ -329,13 +332,15 @@ function createCarChart(dates, totalcars, chargedcars, id, title, x_axis, y_axis
 /**
  * Creates a bar chart for the power consumption of EV, Building and total.  
  *
- * @param {Array} dates Array of dates for our chart. 
- * @param {Array} values 
- * @param {*} powercap 
- * @param {*} id 
- * @param {*} title 
- * @param {*} x_axis 
- * @param {*} y_axis 
+ * @param {Array} locations Array of locations for our chart. 
+ * @param {Array} values Values corresponding to power at each location. 
+ * @param {double} powercap A cap value that you wish to avoid hitting.  
+ * @param {string} id Element ID in HTML.
+ * @param {string} title Title of our chart. 
+ * @param {string} x_axis Label for our x_axis.
+ * @param {string} y_axis Label for our y_axis. 
+ * 
+ * @returns {Chart} Returns a chart object. 
  */
 function createBarChart(locations, values, powercap, id, title, x_axis, y_axis) {
    
