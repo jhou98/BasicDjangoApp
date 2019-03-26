@@ -1,64 +1,12 @@
-function addData(chart, label, datas) {
-    /** 
-     * Add a new label and datapoint (x,y) to chart object  
-     * 
-     * @param {Chart} chart Chart object.
-     * @param {string} label Our datetime label (x value).
-     * @param {double} datas Power value for our label (y value).
-     * 
-     * Note: This function assumes our chart has only one dataset. 
-     *  If there are multiple you must use dataset[0].data. etc. 
-     */
-    if (checkData(chart, label)) {
-        chart.data.labels.splice(0, 1)
-        chart.data.labels.push(label);
-        chart.data.datasets.forEach((dataset) => {
-            dataset.data.splice(0, 1);
-            dataset.data.push(datas);
-        });
-        chart.update();
-        console.log("Chart has been updated with ", label, datas)
-    }
-    else {
-        console.log("Chart has not been updated")
-    }
-}
-
-function checkData(chart, label) {
-    /**
-     * Checks the Chart to see if the new label is a new point or not. 
-     * 
-     * @param {Chart} chart Chart object. 
-     * @param {string} label Our datetime label. 
-     * 
-     * @return {Boolean} returns True if we have a new point, false otherwise. 
-     */
-
-    var index = chart.data.labels.length
-    var last_label = chart.data.labels[index - 1]
-
-    console.log(last_label)
-    console.log(label)
-
-    if (last_label == label) {
-        console.log("no update")
-        return false
-    }
-
-    return true
-}
-
+/**
+ * 
+ * @param {double} val_id HTML id where our value gauge is set to.
+ * @param {double} maxval_id HTML id for our Maximum value of gauge.
+ * @param {string} id HTML ID for our gauge element.
+ * 
+ * @returns {Gauge} returns a Gauge object. 
+ */
 function createGauge(val_id, maxval_id, id) {
-    /**
-     * Creates a Gauge.
-     * 
-     * @param {double} val_id HTML id where our value gauge is set to. 
-     * @param {double} maxval_id HTML id for our Maximum value of gauge.
-     * @param {string} id HTML ID for our gauge element.
-     * 
-     * @return {Gauge} returns Gauge object.
-     */
-
     // Get values 
     var val = document.getElementById(val_id).value
     var max_val = document.getElementById(maxval_id).value
@@ -80,22 +28,22 @@ function createGauge(val_id, maxval_id, id) {
     return gauge
 }
 
+/**
+ * Creates a chart for either building or ev along with predicted values. 
+ * 
+ * @param {Array} dates Array of dates for our chart. 
+ * @param {Array} pwr_vals Array of power for our chart.
+ * @param {Array} future_pwr Array of future values for our chart. 
+ * @param {Array} maxerr_pwr Array of max error for future values.
+ * @param {Array} minerr_pwr Array of min error for future values.
+ * @param {string} id HTML element id. 
+ * @param {string} lbl_title Title of the chart.
+ * @param {string} x_axis Title for x-axis of the chart.
+ * @param {string} y_axis Title for y-axis of the chart. 
+ * 
+ * @returns {Chart} Chart object. 
+ */
 function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lbl_title, x_axis, y_axis) {
-    /**
-     * Creates a chart for EV Data. 
-     * 
-     * @param {Array} dates Array of dates for our chart. 
-     * @param {Array} pwr_vals Array of power for our chart.
-     * @param {Array} future_pwr Array of future values for our chart. 
-     * @param {Array} maxerr_pwr Array of max error for future values.
-     * @param {Array} minerr_pwr Array of min error for future values.
-     * @param {string} id HTML element id. 
-     * @param {string} lbl_title Title of the chart.
-     * @param {string} x_axis Title for x-axis of the chart.
-     * @param {string} y_axis Title for y-axis of the chart. 
-     *
-     * @return {Chart} returns chart object.
-     */
     var ctx = document.getElementById(id).getContext('2d');
 
 
@@ -189,18 +137,19 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lb
     return myChart
 }
 
+/**
+ * Creates a chart for with Error Bars.  
+ * 
+ * @param {string} id String of the Element ID in HTML.
+ * @param {Array} x_axis Array of dates for our chart. 
+ * @param {Array} main Array of power for our chart.
+ * @param {Array} max_err Array of positive error bar for our chart.
+ * @param {Array} min_err Array of negative error bar for our chart.
+ *
+ * @returns {Chart} Returns the chart object. 
+ */
 function createTestChart(id, x_axis, main, max_err, min_err) {
-    /**
-     * Creates a chart for with Error Bars.  
-     * 
-     * @param {string} id String of the Element ID in HTML.
-     * @param {Array} x_axis Array of dates for our chart. 
-     * @param {Array} main Array of power for our chart.
-     * @param {Array} max_err Array of positive error bar for our chart.
-     * @param {Array} min_err Array of negative error bar for our chart.
-     *
-     * @return {Chart} Returns the chart object. 
-     */
+
     var ctx_Test = document.getElementById(id).getContext('2d');
 
     var myChart = new Chart(ctx_Test, {
@@ -284,21 +233,21 @@ function createTestChart(id, x_axis, main, max_err, min_err) {
     return myChart
 }
 
-
+/**
+ * Creates a chart for number of cars.
+ * 
+ * @param {Array} dates Array of dates for our chart. 
+ * @param {Array} totalcars Array of total cars within the EV parkade. 
+ * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
+ * @param {string} id Elemend ID in HTML. 
+ * @param {string} title Title of our chart. 
+ * @param {string} x_axis Label for our x_axis. 
+ * @param {string} y_axis Label for our y_axis
+ * 
+ * @returns {Chart} Returns chart object.
+ */
 function createCarChart(dates, totalcars, chargedcars, id, title, x_axis, y_axis) {
-    /**
-     * Creates a chart for number of cars.
-     * 
-     * @param {string} id string of element ID in HTML.
-     * @param {Array} dates Array of dates for our chart. 
-     * @param {Array} totalcars Array of total cars within the EV parkade. 
-     * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
-     * @param {string} title Title of our chart. 
-     * @param {string} x_axis Label for our x_axis. 
-     * @param {string} y_axis Label for our y_axis
-     * 
-     * @return {Chart} Returns chart object 
-     */
+
     var ctx = document.getElementById(id).getContext('2d');
 
     var myChart = new Chart(ctx, {
@@ -377,17 +326,19 @@ function createCarChart(dates, totalcars, chargedcars, id, title, x_axis, y_axis
     return myChart
 }
 
-function createBarChart(dates, values, powercap, id, title, x_axis, y_axis) {
-    /**
-     * Creates a chart for number of cars.
-     * 
-     * @param {string} id string of element ID in HTML.
-     * @param {Array} dates Array of dates for our chart. 
-     * @param {Array} values Array of vals for our bar chart 
-     * @param {double} powercap Double val that represents the max power we want to avoid.
-     * 
-     * @return {Chart} Returns chart object 
-     */
+/**
+ * Creates a bar chart for the power consumption of EV, Building and total.  
+ *
+ * @param {Array} dates Array of dates for our chart. 
+ * @param {Array} values 
+ * @param {*} powercap 
+ * @param {*} id 
+ * @param {*} title 
+ * @param {*} x_axis 
+ * @param {*} y_axis 
+ */
+function createBarChart(locations, values, powercap, id, title, x_axis, y_axis) {
+   
     var ctx = document.getElementById(id).getContext('2d');
 
     var pwrcap = []
@@ -398,7 +349,7 @@ function createBarChart(dates, values, powercap, id, title, x_axis, y_axis) {
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: dates,
+            labels: locations,
             datasets: [{
                 label: 'EV Power Consumption',
                 data: values,

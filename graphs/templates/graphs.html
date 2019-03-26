@@ -303,7 +303,7 @@
                     gauge_2.setValue(result.data[0][1])
                     updateChart(chart, ev_date, ev_power)
                 },
-                complete: evpoll(chart_1, chart_2, gauge_1, gauge_2),
+                complete: evpoll(chart, gauge_1, gauge_2),
                 timeout: 2000
             })
         }, 0.5 * 60000);
@@ -380,7 +380,6 @@
         chart.data.datasets[3].data = predictedmin
         chart.data.labels = timestamp
         chart.update();
-        console.log("chart is updated")
     }
 
     {% endblock %}
