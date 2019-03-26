@@ -149,32 +149,35 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lb
  * @param {string} x_axis label of x-axis.  
  * @param {string} y_axis label of y-axis. 
  */
-function createComboChart(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
+function createComboChart1(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
 
     var ctx = document.getElementById(id).getContext('2d');
 
-    var total_pwr = ev_pwr+bd_pwr; 
-
+    var total_pwr = [] 
+    for (var x in dates){
+        total_pwr.push(ev_pwr[x]+bd_pwr[x])
+    }
+    console.log(total_pwr)
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: dates,
             datasets: [{
-                label: 'EV Power Consumption',
+                label: 'EV Power',
                 data: ev_pwr,
-                backgroundColor: 'rgba(215, 135, 48, 0.4)',
-                borderColor: '#D78730',
-                fill: 'true',
-            }, {
-                label: 'Building Power Consumption',
-                data: bd_pwr,
                 backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#73C2E5',
+                fill: 'zero',
+            }, {
+                label: 'Building Power',
+                data: bd_pwr,
+                backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                borderColor: '#D78730',
                 fill: '-1',
             }, {
-                label: 'Total Power Consumption',
+                label: 'Total Power',
                 data: total_pwr,
-                backgroundColor:'rgba(91, 122, 139, 0.4)',
+                backgroundColor: 'rgba(91, 122, 139, 0.4)',
                 borderColor: '#5B7A8B',
                 fill: '-1',
             }]

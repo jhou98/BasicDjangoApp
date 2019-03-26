@@ -188,8 +188,8 @@
 
         // Formatting the ev graph data to include the predicted vals w/ error bars 
         // NOTE: Currently just using static random data for predicted values, change API url once setup
-        var evgraph_timestamp = ev_date
-        var evgraph_pwr = ev_power
+        var evgraph_timestamp = ev_date.slice(0)
+        var evgraph_pwr = ev_power.slice(0)
         var evpredicted_pwr = []
         var evpredicted_max = []
         var evpredicted_min = []
@@ -221,8 +221,8 @@
             predicted_minbd.push(predicted_resultbd.data[predicted_lengthbd - x][3])
         }
         // Formatting the building graph data to include the predicted vals w/ error bars 
-        var bdgraph_timestamp = bd_date
-        var bdgraph_pwr = bd_power
+        var bdgraph_timestamp = bd_date.slice(0)
+        var bdgraph_pwr = bd_power.slice(0)
         var bdpredicted_pwr = []
         var bdpredicted_max = []
         var bdpredicted_min = []
@@ -239,6 +239,10 @@
             bdpredicted_min.push(predicted_minbd[x])
         }
 
+        console.log("ev date is: ", ev_date)
+        console.log("ev power is: ", ev_power)
+        console.log("bd power is ", bd_power)
+
         //call our chart function to create charts 
         //createChart creates our basic chart with predictions 
         var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
@@ -246,9 +250,9 @@
         //createCarChart creates our vehicle chart 
         var carChart = createCarChart(car_date, car_total, car_charged, "myChartCar", 'Vehicle Data', 'Timestamp', 'Number of Vehicles')
         //createBarChart creates our basic bar chart 
-        var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Total Power (kW)", "Power (kW)", "Location")
+        var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Current Power Consumption", "Power (kW)", "Location")
         //createComboChart creates our ev + building chart (assumes we have the same datetime values)
-        var testChart = createComboChart(ev_date, ev_power, bd_power, "myChartCombo", "Total EV and Building Power Consumption", "Timestamp", "Power (kW)")
+        var testChart = createComboChart1(ev_date, ev_power, bd_power, "myChartCombo", "Power Consumption", "Timestamp", "Power (kW)")
 
 
         //call our gauge function to create gauges
@@ -273,7 +277,6 @@
 
 <script>
     {% block script %}
-
     function evpoll(chart, gauge_1, gauge_2) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
