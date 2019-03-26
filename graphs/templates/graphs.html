@@ -94,26 +94,23 @@
             </div>
         </div>
     </div>
-    <div class='row'>
-        <canvas id='myNewChart'></canvas>
-    </div>
 </div>
 {% endblock %}
 
 <!--Script for our Charts and Gauges-->
 <script>
     {% block jquery %}
-    var endpoint = '/api/data'
+    var evpoint = '/api/data'
     var errpoint = '/api/data2'
-    var endpoint2 = '/api/data3'
-    var carendpoint = '/api/cars'
-    var futurepoint = 'api/prediction/west'
+    var buildingpoint = '/api/data3'
+    var vehiclepoint = '/api/cars'
+    var predictedpoint = 'api/prediction/west'
 
     //Running the ajax methods in parallel
     $.when(
         $.ajax({
             method: "GET",
-            url: endpoint
+            url: evpoint
         }),
         $.ajax({
             method: "GET",
@@ -121,33 +118,33 @@
         }),
         $.ajax({
             method: "GET",
-            url: endpoint2
+            url: buildingpoint
         }),
         $.ajax({
             method: "GET",
-            url: carendpoint
+            url: vehiclepoint
         }),
         $.ajax({
             method: "GET",
-            url: futurepoint
+            url: predictedpoint
         })
-    ).then(function (data1, data2, data3, data4, data5) {
-        //data1 currently corresponds to our realtime EV data 
-        var result = JSON.parse(data1[0])
+    ).then(function (data_ev, data_err, data_building, data_vehicles, data_prediction) {
+
+        //Parse our EV data and format it into arrays 
+        var ev_result = JSON.parse(data_ev[0])
         var ev_date = []
         var ev_power = []
-        var bar_power = []
         //length (as our objects are in Most recent->least recent)
-        var length = result.data.length - 1
-        for (var x in result.data) {
+        var ev_length = ev_result.data.length - 1
+        for (var x in ev_result.data) {
             //slice the ISO-Format String 
             //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM:SS
-            ev_date.push(result.data[length - x][0].slice(0, 16))
-            ev_power.push(result.data[length - x][1])
+            ev_date.push(ev_result.data[ev_length - x][0].slice(0, 16))
+            ev_power.push(ev_result.data[ev_length - x][1])
         }
 
-        //data3 corresponds to our building data (static data currently)
-        var bd_result = JSON.parse(data3[0])
+        //Similarly for our building data (static currently)
+        var bd_result = JSON.parse(data_building[0])
         var bd_date = []
         var bd_power = []
         var bd_length = bd_result.data.length - 1
@@ -157,12 +154,14 @@
         }
 
         //create an array for bar chart
+        //The array will look like this -> [ev power, building power, combined power]
+        var bar_power = []
         bar_power.push(ev_power[length])
         bar_power.push(bd_power[bd_length])
         bar_power.push((ev_power[length] + bd_power[bd_length]))
 
-        //data2 is the data with error bars (static data currently)
-        var err_result = JSON.parse(data2[0])
+        // currently a static Error bar graph 
+        var err_result = JSON.parse(data_err[0])
         var err_date = []
         var err_power = []
         var max_err = []
@@ -175,8 +174,8 @@
             min_err.push(err_result.data[err_length - x][3])
         }
 
-        //data4 corresponds to our car data (static currently)
-        var car_result = JSON.parse(data4[0])
+        // Our vehicle data (static currently)
+        var car_result = JSON.parse(data_vehicles[0])
         var car_date = []
         var car_total = []
         var car_charged = []
@@ -187,8 +186,8 @@
             car_charged.push(car_result.data[car_length - x][2])
         }
 
-        //data5 corresponds to our west future ev values (static prediction currently)
-        var predicted_result = JSON.parse(data5[0])
+        //Our predicted data (static currently, but update is supported)
+        var predicted_result = JSON.parse(data_prediction[0])
         var predicted_date = []
         var predicted_val = []
         var predicted_max = []
@@ -201,34 +200,54 @@
             predicted_min.push(predicted_result.data[predicted_length - x][3])
         }
 
-        //variable for newtestdates
-        var newtestdates = []
-        var newev_vals = ev_power
-        var newpredicted_vals = []
-        var newpredicted_max = []
-        var newpredicted_min = []
+        // Formatting the ev graph data to include the predicted vals w/ error bars 
+        // NOTE: Currently just using static random data for predicted values
+        var evgraph_timestamp = ev_date
+        var evgraph_pwr = ev_power
+        var evpredicted_pwr = []
+        var evpredicted_max = []
+        var evpredicted_min = []
         for (var x in ev_date) {
-            newtestdates.push(ev_date[x])
-            newpredicted_vals.push(null)
-            newpredicted_max.push(null)
-            newpredicted_min.push(null)
+            evpredicted_pwr.push(null)
+            evpredicted_max.push(null)
+            evpredicted_min.push(null)
         }
         for (var x in predicted_date) {
-            newtestdates.push(predicted_date[x])
-            newev_vals.push(null)
-            newpredicted_vals.push(predicted_val[x])
-            newpredicted_max.push(predicted_max[x])
-            newpredicted_min.push(predicted_min[x])
+            evgraph_timestamp.push(predicted_date[x])
+            evgraph_pwr.push(null)
+            evpredicted_pwr.push(predicted_val[x])
+            evpredicted_max.push(predicted_max[x])
+            evpredicted_min.push(predicted_min[x])
+        }
 
+        // Formatting the building graph data to include the predicted vals w/ error bars 
+        // NOTE: Currently just using the same predicted data as ev (some random false data), change to get realtime
+        var bdgraph_timestamp = bd_date
+        var bdgraph_pwr = bd_power
+        var bdpredicted_pwr = []
+        var bdpredicted_max = []
+        var bdpredicted_min = []
+        for (var x in bd_date) {
+            bdpredicted_pwr.push(null)
+            bdpredicted_max.push(null)
+            bdpredicted_min.push(null)
+        }
+        for (var x in predicted_date) {
+            bdgraph_timestamp.push(predicted_date[x])
+            bdgraph_pwr.push(null)
+            bdpredicted_pwr.push(predicted_val[x])
+            bdpredicted_max.push(predicted_max[x])
+            bdpredicted_min.push(predicted_min[x])
         }
 
         //call our chart function to create charts 
-        var evChart = createChart(ev_date, ev_power, "myChartEV", 'EV Charger Power Data')
-        var bdChart = createChart(bd_date, bd_power, "myChartBuilding", 'Building Power Data')
+        //createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lbl_title, x_axis, y_axis)
+        var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
+        var bdChart = createChart(bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min, "myChartBuilding", 'Building Power Data', 'Timestamp', 'Power (kW)')
+        var carChart = createCarChart(car_date, car_total, car_charged, "myChartCar", 'Vehicle Data', 'Timestamp', 'Number of Vehicles')
+        var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Total Power (kW)", "Power (kW)", "Location")
         var testChart = createTestChart("myChartTest", err_date, err_power, max_err, min_err)
-        var carChart = createCarChart("myChartCar", car_date, car_total, car_charged)
-        var barChart = createBarChart("myBarChart", ["EV", "Building", "Total"], bar_power, 100)
-        var newChart = createNewChart(newtestdates, newev_vals, newpredicted_vals, newpredicted_max, newpredicted_min, "myNewChart", "Test Chart", "Timestamp", "Power (kW)")
+
 
         //call our gauge function to create gauges
         var evdgauge = createGauge("evdailyval", "evdailymax", "evdailygauge")
@@ -244,8 +263,7 @@
             evctrlgauge.setValue(this.value)
         }
         //timeout function 
-        console.log(newChart)
-        evpoll(evChart, newChart, evdgauge, evmgauge)
+        evpoll(evChart, evdgauge, evmgauge)
 
     });
     {% endblock %}
@@ -254,13 +272,14 @@
 <script>
     {% block script %}
 
-    function evpoll(chart_1, chart_2, gauge_1, gauge_2) {
+    function evpoll(chart, gauge_1, gauge_2) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
          * Used for EV power. 
          * 
-         * @param {Chart} chart_1 Chart object. 
-         * @param {Gauge} gauge_1 Gauge Object. 
+         * @param {Chart} chart Chart object. 
+         * @param {Gauge} gauge_1 Gauge Object.
+         * @param {Gauge} gauge_2 Gauge Object.  
          */
         setTimeout(function () {
             $.ajax({
@@ -280,25 +299,23 @@
                         ev_power.push(result.data[length - x][1])
                     }
                     //Add most recent datapoint into our chart
-                    // addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
-                    // testData(chart_1, chart_2, ev_date, ev_power)
                     gauge_1.setValue(result.data[0][1])
                     gauge_2.setValue(result.data[0][1])
-                    nextpoll(chart_1, chart_2, gauge_1, gauge_2, ev_date, ev_power)
+                    updateChart(chart, ev_date, ev_power)
                 },
                 complete: evpoll(chart_1, chart_2, gauge_1, gauge_2),
                 timeout: 2000
             })
-        }, 0.3 * 60000);
+        }, 0.5 * 60000);
     }
 
-    function nextpoll(chart_1, chart_2, gauge_1, gauge_2, ev_timestamps, ev_pwrval) {
+    function updateChart(chart, timestamps, pwr) {
         /** 
-         * Function that calls itself over a set interval using setTimeout and ajax.
-         * Used for EV power. 
+         * Function that updates our chart. 
          * 
-         * @param {Chart} chart_1 Chart object. 
-         * @param {Gauge} gauge_1 Gauge Object. 
+         * @param {Chart} chart Chart object.
+         * @param {Array} timestamps Array of dates. 
+         * @param {Array} pwr Array of power values. 
          */
 
         $.ajax({
@@ -318,27 +335,33 @@
                     predicted_min.push(result.data[predicted_length - x][3])
                 }
                 //Add most recent datapoint into our chart
-                // addData(chart_1, result.data[0][1].slice(0,16), result.data[0][2])
-                addDataChart(chart_2, ev_timestamps, ev_pwrval, predicted_date, predicted_val, predicted_max, predicted_min)
+                addDataChart(chart, timestamps, pwr, predicted_date, predicted_val, predicted_max, predicted_min)
             },
-            error: function(err_data){
+            error: function (err_data) {
                 console.log("error", err_data)
             }
         });
     }
 
-
-
-    function addDataChart(chart_2, ev_x, ev_y, pred_x, pred_y, pred_max, pred_min) {
+    function addDataChart(chart, curr_x, curr_y, pred_x, pred_y, pred_max, pred_min) {
         /**
+         * Helper function to update our chart. 
+         * 
+         * @param {Chart} chart Chart object.
+         * @param {Array} curr_x Current/Historical timestamps. 
+         * @param {Array} curr_y Current/Historical power values.
+         * @param {Array} pred_x Predicted timestamps. 
+         * @param {Array} pred_y Predicted power values.
+         * @param {Array} pred_max Predicted maximum error value. 
+         * @param {Array} pred_min Predicted minimum error value. 
          * 
          */
-        var timestamp = ev_x
-        var evpwr = ev_y
+        var timestamp = curr_x
+        var evpwr = curr_y
         var predictedpwr = []
         var predictedmax = []
         var predictedmin = []
-        for (var x in ev_x) {
+        for (var x in curr_x) {
             predictedpwr.push(null)
             predictedmax.push(null)
             predictedmin.push(null)
@@ -351,378 +374,13 @@
             predictedmin.push(pred_min[x])
         }
 
-        console.log(evpwr)
-        console.log(predictedpwr)
-        console.log(predictedmax)
-        console.log(predictedmin)
-        console.log(timestamp)
-        chart_2.data.datasets[0].data = evpwr
-        chart_2.data.datasets[1].data = predictedpwr
-        chart_2.data.datasets[2].data = predictedmax
-        chart_2.data.datasets[3].data = predictedmin
-        chart_2.data.labels = timestamp 
-        chart_2.update();
-        console.log("chart 2 updated")
-    }
-    function testData(chart, chart2, x_arr, y_arr) {
-        /** 
-         * Add a new label and datapoint (x,y) to chart object  
-         * 
-         * @param {Chart} chart Chart object.
-         * @param {string} label Our datetime label (x value).
-         * @param {double} datas Power value for our label (y value).
-         * 
-         * Note: This function assumes our chart has only one dataset. 
-         *  If there are multiple you must use dataset[0].data. etc. 
-         */
-
-        chart2.data.datasets[0].data = y_arr
-        var x = 0
-        while (x < 44) {
-            chart2.data.datasets[0].data.push(null)
-        }
-        chart2.update();
-        console.log("chart 2 is updated")
-    }
-
-    function checknewData(chart, label) {
-        /**
-         * Checks the Chart to see if the new label is a new point or not. 
-         * 
-         * @param {Chart} chart Chart object. 
-         * @param {string} label Our datetime label. 
-         * 
-         * @return {Boolean} returns True if we have a new point, false otherwise. 
-         */
-
-        var index = chart.data.labels.length
-        var last_label = chart.data.labels[index - 1]
-
-        console.log(last_label)
-        console.log(label)
-
-        if (last_label == label) {
-            console.log("no update")
-            return false
-        }
-
-        return true
-    }
-    /*--------------------------------------Will figure out this function once we get Real Time Building data-------------------------------------------------------*/
-    // function bdpoll(chart_1, gauge_1) {
-    //     /** 
-    //      * Function that calls itself over a set interval using setTimeout and ajax. 
-    //      * Used for Building Power
-    //      * 
-    //      * @param {Chart} chart_1 Chart object. 
-    //      * @param {Gauge} gauge_1 Gauge object. 
-    //      */ 
-    //     setTimeout(function () {
-    //         $.ajax({
-    //             url: "/api/data3",
-    //             type: "GET",
-    //             success: function (data) {
-    //                 console.log("polling next point")
-    //                 var result = JSON.parse(data)
-    //                 console.log(result.data[0][1])
-    //                 //Add most recent datapoint into our chart
-    //                 addData(chart_1, result.data[0][0].slice(0,16), result.data[0][1])
-    //                 gauge_1.setValue(result.data[0][1])
-    //             },
-    //             complete: evpoll(chart_1, gauge_1),
-    //             timeout: 2000
-    //         })
-    //     }, 15*60000);
-    // }
-
-    function createCarChart(id, x_axis, totalcars, chargedcars) {
-        /**
-         * Creates a chart for number of cars.
-         * 
-         * @param {string} id string of element ID in HTML.
-         * @param {Array} x_axis Array of dates for our chart. 
-         * @param {Array} totalcars Array of total cars within the EV parkade. 
-         * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
-         * 
-         * @return {Chart} Returns chart object 
-         */
-        var ctx = document.getElementById(id).getContext('2d');
-
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: x_axis,
-                datasets: [{
-                    label: 'Total Connected Vehicles',
-                    data: totalcars,
-                    backgroundColor: 'rgba(215, 135, 48, 0.4)',
-                    borderColor: '#D78730',
-                    fill: '1',
-                    stepped: true,
-                }, {
-                    label: 'Charged Vehicles',
-                    data: chargedcars,
-                    backgroundColor: 'rgba(155, 194, 229, 0.4)',
-                    borderColor: '#73C2E5',
-                    stepped: true,
-                }]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: 'Vehicle Data',
-                    fontColor: '#0C5784',
-                    fontSize: 22,
-                },
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Timestamp',
-                            fontColor: '#0C5784',
-                            fontSize: 20,
-                        },
-                        ticks: {
-                            fontColor: '#0C5784'
-                        },
-                        gridLines: {
-                            color: '#0C5784',
-                            display: true
-                        }
-                    }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Number of Vehicles',
-                            fontColor: '#0C5784',
-                            fontSize: 20,
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: '#0C5784'
-                        },
-                        gridLines: {
-                            color: '#0C5784',
-                            display: true
-                        }
-                    }],
-                },
-                plugins: {
-                    filler: {
-                        propagate: true
-                    }
-                },
-                legend: {
-                    labels: {
-                        fontColor: '#0C5784'
-                    }
-                },
-            }
-        });
-        return myChart
-    }
-
-    function createBarChart(id, x_axis, values, powercap) {
-        /**
-         * Creates a chart for number of cars.
-         * 
-         * @param {string} id string of element ID in HTML.
-         * @param {Array} x_axis Array of dates for our chart. 
-         * @param {Array} values Array of vals for our bar chart 
-         * @param {double} powercap Double val that represents the max power we want to avoid.
-         * 
-         * @return {Chart} Returns chart object 
-         */
-        var ctx = document.getElementById(id).getContext('2d');
-
-        var pwrcap = []
-        for (var x in x_axis) {
-            pwrcap.push(powercap)
-        }
-
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: x_axis,
-                datasets: [{
-                    label: 'EV Power Consumption',
-                    data: values,
-                    backgroundColor: [
-                        'rgba(155, 194, 229, 0.4)',
-                        'rgba(215, 135, 48, 0.4)',
-                        'rgba(91, 122, 139, 0.4)',
-                    ],
-                    borderColor: [
-                        '#73C2E5',
-                        '#D78730',
-                        '#5B7A8B'
-                    ],
-                    borderWidth: 3
-                }, {
-                    type: 'line',
-                    label: 'Power Cap',
-                    data: pwrcap,
-                    backgroundColor: 'rgba(48, 48, 52, 0.4)',
-                    borderColor: '#303034',
-                    borderWidth: 4,
-                    fill: 'false'
-                }],
-            },
-            options: {
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Location',
-                            fontColor: '#0C5784',
-                            fontSize: 20,
-                        },
-                        ticks: {
-                            fontColor: '#0C5784'
-                        },
-                        gridLines: {
-                            color: '#0C5784',
-                            display: true
-                        }
-                    }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Power (kW)',
-                            fontColor: '#0C5784',
-                            fontSize: 20,
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: '#0C5784'
-                        },
-                        gridLines: {
-                            color: '#0C5784',
-                            display: true
-                        }
-                    }]
-                }
-            },
-            legend: {
-                labels: {
-                    fontColor: '#0C5784',
-                }
-            },
-        })
-        return myChart
-    }
-
-    function createNewChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lbl_title, x_axis, y_axis) {
-        /**
-         * Creates a chart for EV Data. 
-         * 
-         * @param {Array} dates Array of dates for our chart. 
-         * @param {Array} pwr_vals Array of power for our chart.
-         * @param {Array} future_pwr Array of future values for our chart. 
-         * @param {Array} maxerr_pwr Array of max error for future values.
-         * @param {Array} minerr_pwr Array of min error for future values.
-         * @param {string} id HTML element id. 
-         * @param {string} lbl_title Title of the chart.
-         * @param {string} x_axis Title for x-axis of the chart.
-         * @param {string} y_axis Title for y-axis of the chart. 
-         *
-         * @return {Chart} returns chart object.
-         */
-        var ctx = document.getElementById(id).getContext('2d');
-
-
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [{
-                    label: 'EV Consumption',
-                    data: pwr_vals,
-                    spanGaps: false,
-                    backgroundColor: 'rgba(155, 194, 229, 0.4)',
-                    borderColor: '#73C2E5',
-                }, {
-                    label: 'Predicted Consumption',
-                    data: future_pwr,
-                    spanGaps: false,
-                    backgroundColor: 'rgba(155, 194, 229, 0.4)',
-                    borderColor: '#73C2E5',
-                    fill: false,
-                    borderDash: [10, 10]
-                }, {
-                    label: 'Max',
-                    data: maxerr_pwr,
-                    spanGaps: false,
-                    backgroundColor: 'rgba(215, 135, 48, 0.4)',
-                    borderColor: '#D78730',
-                    borderWidth: 1,
-                    fill: '-1',
-                    pointRadius: 0,
-                }, {
-                    label: 'Min',
-                    data: minerr_pwr,
-                    spanGaps: false,
-                    backgroundColor: 'rgba(215, 135, 48, 0.4)',
-                    borderColor: '#D78730',
-                    borderWidth: 1,
-                    fill: '-2',
-                    pointRadius: 0,
-                }]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: lbl_title,
-                    fontColor: '#0C5784',
-                    fontSize: 25,
-                },
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: x_axis,
-                            fontColor: '#0C5784',
-                            fontSize: 20
-                        },
-                        ticks: {
-                            fontColor: '#0C5784'
-                        },
-                        gridLines: {
-                            color: '#0C5784',
-                            display: true
-                        }
-                    }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: y_axis,
-                            fontColor: '#0C5784',
-                            fontSize: 20,
-                        },
-                        ticks: {
-                            beginAtZero: true,
-                            fontColor: '#0C5784'
-                        },
-                        gridLines: {
-                            color: '#0C5784',
-                            display: true
-                        }
-                    }],
-                },
-                legend: {
-                    labels: {
-                        fontColor: '#0C5784'
-                    }
-                },
-            }
-        });
-        return myChart
+        chart.data.datasets[0].data = evpwr
+        chart.data.datasets[1].data = predictedpwr
+        chart.data.datasets[2].data = predictedmax
+        chart.data.datasets[3].data = predictedmin
+        chart.data.labels = timestamp
+        chart.update();
+        console.log("chart is updated")
     }
 
     {% endblock %}
