@@ -59,8 +59,8 @@ function checkData(chart, label) {
 function addDataChart(chart, curr_x, curr_y, pred_x, pred_y, pred_max, pred_min) {
    
     //create the new arrays that will have null values so that total sizes are equal to the label size 
-    var timestamp = curr_x
-    var evpwr = curr_y
+    var timestamp = curr_x.slice(0)
+    var evpwr = curr_y.slice(0)
     var predictedpwr = []
     var predictedmax = []
     var predictedmin = []

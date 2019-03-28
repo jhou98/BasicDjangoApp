@@ -156,9 +156,9 @@
         //create an array for bar chart
         //The array will look like this -> [ev power, building power, combined power]
         var bar_power = []
-        bar_power.push(ev_power[length])
-        bar_power.push(bd_power[bd_length])
-        bar_power.push((ev_power[length] + bd_power[bd_length]))
+        bar_power.push(ev_power[ev_power.length-1])
+        bar_power.push(bd_power[bd_power.length-1])
+        bar_power.push(bar_power[0] + bar_power[1])
 
         // Our vehicle data (static currently)
         var car_result = JSON.parse(data_vehicles[0])
@@ -239,10 +239,6 @@
             bdpredicted_min.push(predicted_minbd[x])
         }
 
-        console.log("ev date is: ", ev_date)
-        console.log("ev power is: ", ev_power)
-        console.log("bd power is ", bd_power)
-
         //call our chart function to create charts 
         //createChart creates our basic chart with predictions 
         var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
@@ -269,7 +265,7 @@
             evctrlgauge.setValue(this.value)
         }
         //timeout function 
-        evpoll(evChart, evdgauge, evmgauge)
+        poll(evChart, bdChart, testChart, barChart, evdgauge, evmgauge, bddgauge, bdmgauge)
 
     });
     {% endblock %}
@@ -277,7 +273,7 @@
 
 <script>
     {% block script %}
-    function evpoll(chart, gauge_1, gauge_2) {
+    function poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
          * Used for EV power. 
@@ -303,18 +299,29 @@
                         ev_date.push(result.data[length - x][0].slice(0, 16))
                         ev_power.push(result.data[length - x][1])
                     }
-                    //Add most recent datapoint into our chart
-                    gauge_1.setValue(result.data[0][1])
-                    gauge_2.setValue(result.data[0][1])
-                    updateChart(chart, ev_date, ev_power)
+                    //Update our EV gauge and Charts
+                    ev_gauge1.setValue(result.data[0][1])
+                    ev_gauge2.setValue(result.data[0][1])
+                    updateChart(evchart, ev_date, ev_power, "/api/prediction/west")
+
+                    //Update our BD Gauge and Charts 
+                    var bd_power = updateBuildingData(bdchart, bd_gauge1, bd_gauge2, '/api/data3', "/api/prediction/west")
+                    //Update our Combo Chart
+                    updateComboData(combochart, ev_date, ev_power, bd_power)
+                    //update our bar graph 
+                    var bar_power = []
+                    bar_power.push(ev_power[ev_power.length-1])
+                    bar_power.push(bd_power[bd_power.length-1])
+                    bar_power.push((bar_power[0] + bar_power[1]))
+                    updateBarData(barchart, bar_power)
                 },
-                complete: evpoll(chart, gauge_1, gauge_2),
+                complete: poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2),
                 timeout: 2000
             })
-        }, 0.5 * 60000);
+        }, 0.5 * 60000); //sleep for 5 mins
     }
 
-    function updateChart(chart, timestamps, pwr) {
+    function updateChart(chart, timestamps, pwr, _url) {
         /** 
          * Function that updates our chart. 
          * 
@@ -324,8 +331,9 @@
          */
 
         $.ajax({
-            url: "/api/prediction/west",
+            url: _url,
             type: "GET",
+            async: true,
             success: function (data) {
                 var result = JSON.parse(data)
                 var predicted_date = []
@@ -346,6 +354,67 @@
                 console.log("error", err_data)
             }
         });
+    }
+
+    function updateBuildingData(chart, daily_gauge, monthly_gauge, bd_url, pred_url) {
+        /**
+         * 
+         * 
+         */
+
+        var retval = []
+        $.ajax({
+            url: bd_url,
+            type: "GET",
+            async: false,
+            success: function (data) {
+                console.log("polling next building point")
+                var result = JSON.parse(data)
+                var date = []
+                var power = []
+                //length (as our objects are in Most recent->least recent)
+                var length = result.data.length - 1
+                for (var x in result.data) {
+                    //slice the ISO-Format String 
+                    //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM:SS
+                    date.push(result.data[length - x][0].slice(0, 16))
+                    power.push(result.data[length - x][1])
+                }
+                //Update our EV gauge and Charts
+                daily_gauge.setValue(result.data[0][1])
+                monthly_gauge.setValue(result.data[0][1])
+                updateChart(chart, date, power, pred_url)
+                retval = power.slice(0)
+            },
+            error: function (err_data) {
+                console.log("error", err_data)
+            }
+        });
+
+        return retval
+    }
+
+    function updateComboData(chart, timestamp, ev_pwr, bd_pwr) {
+        /**
+         * 
+         */
+
+        var total_pwr = []
+        for (var x in timestamp) {
+            total_pwr.push(ev_pwr[x] + bd_pwr[x])
+        }
+        console.log("updating combo data")
+        chart.data.labels = timestamp
+        chart.data.datasets[0].data = ev_pwr
+        chart.data.datasets[1].data = bd_pwr
+        chart.data.datasets[2].data = total_pwr
+        chart.update();
+    }
+
+    function updateBarData(chart, power){
+        chart.data.datasets[0].data = power
+        chart.update(); 
+        console.log("updating bar data")
     }
 
     {% endblock %}

@@ -10,7 +10,6 @@ function createGauge(val_id, maxval_id, id) {
     // Get values 
     var val = document.getElementById(val_id).value
     var max_val = document.getElementById(maxval_id).value
-    console.log("Element ", id, "has a val of ", val, "and max value of ", max_val)
     //Gauge Code 
     var gauge = Gauge(
         document.getElementById(id), {
@@ -157,7 +156,6 @@ function createComboChart1(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
     for (var x in dates){
         total_pwr.push(ev_pwr[x]+bd_pwr[x])
     }
-    console.log(total_pwr)
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
