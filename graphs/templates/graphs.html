@@ -265,7 +265,7 @@
             evctrlgauge.setValue(this.value)
         }
         //timeout function 
-        poll(evChart, bdChart, testChart, barChart, evdgauge, evmgauge, bddgauge, bdmgauge)
+        poll(evChart, bdChart, testChart, barChart, evdgauge, evmgauge, bddgauge, bdmgauge, evpoint, buildingpoint, evpredictedpoint, bdpredictedpoint)
 
     });
     {% endblock %}
@@ -273,7 +273,7 @@
 
 <script>
     {% block script %}
-    function poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2) {
+    function poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, evpred_url, bdpred_url) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
          * Used for EV power. 
@@ -284,7 +284,7 @@
          */
         setTimeout(function () {
             $.ajax({
-                url: "/api/data",
+                url: ev_url,
                 type: "GET",
                 success: function (data) {
                     console.log("polling next point")
@@ -302,10 +302,10 @@
                     //Update our EV gauge and Charts
                     ev_gauge1.setValue(result.data[0][1])
                     ev_gauge2.setValue(result.data[0][1])
-                    updateChart(evchart, ev_date, ev_power, "/api/prediction/west")
+                    updateChart(evchart, ev_date, ev_power, evpred_url)
 
                     //Update our BD Gauge and Charts 
-                    var bd_power = updateBuildingData(bdchart, bd_gauge1, bd_gauge2, '/api/data3', "/api/prediction/west")
+                    var bd_power = updateBuildingData(bdchart, bd_gauge1, bd_gauge2, bd_url, bdpred_url)
                     //Update our Combo Chart
                     updateComboData(combochart, ev_date, ev_power, bd_power)
                     //update our bar graph 
@@ -315,7 +315,7 @@
                     bar_power.push((bar_power[0] + bar_power[1]))
                     updateBarData(barchart, bar_power)
                 },
-                complete: poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2),
+                complete: poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, evpred_url, bdpred_url),
                 timeout: 2000
             })
         }, 0.5 * 60000); //sleep for 5 mins
@@ -333,7 +333,6 @@
         $.ajax({
             url: _url,
             type: "GET",
-            async: true,
             success: function (data) {
                 var result = JSON.parse(data)
                 var predicted_date = []
@@ -404,6 +403,8 @@
             total_pwr.push(ev_pwr[x] + bd_pwr[x])
         }
         console.log("updating combo data")
+        console.log(timestamp)
+        console.log(ev_pwr)
         chart.data.labels = timestamp
         chart.data.datasets[0].data = ev_pwr
         chart.data.datasets[1].data = bd_pwr
