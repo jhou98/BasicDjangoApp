@@ -14,7 +14,7 @@
             <div class='row'>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="evdailygauge" class="gauge-container">
-                        <span class="value-text">kWh</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Daily Peak</span>
                         <input type="hidden" id="evdailyval" value={{curr_ev}}>
                         <input type="hidden" id="evdailymax" value={{max_evdaily}}>
@@ -24,7 +24,7 @@
                 <div class="clearfix visible-sm"></div>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="evmonthlygauge" class="gauge-container">
-                        <span class="value-text">kWh</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Monthly Peak</span>
                         <input type="hidden" id="evmonthlyval" value={{curr_ev}}>
                         <input type="hidden" id="evmonthlymax" value={{max_evmonthly}}>
@@ -35,7 +35,13 @@
         <!--Car Chart-->
         <div class="clearfix visible-md"></div>
         <div class='col-md-12 col-lg-4'>
-            <canvas id='myChartCar' width='400' height='400'></canvas>
+            <canvas id='myChartCharged' width='400' height='400'></canvas>
+            <br>
+            <div class = 'row'>
+                <div class = 'col-sm-12'>
+                    <canvas id='myChartCharging' width='400' height='400'></canvas>
+                </div>
+            </div>
         </div>
         <!--Building Chart-->
         <div class="clearfix visible-md"></div>
@@ -45,7 +51,7 @@
             <div class='row'>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="bddailygauge" class="gauge-container">
-                        <span class="value-text">kWh</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Daily Peak</span>
                         <input type="hidden" id="bddailyval" value={{curr_bd}}>
                         <input type="hidden" id="bddailymax" value={{max_bddaily}}>
@@ -55,7 +61,7 @@
                 <div class="clearfix visible-sm"></div>
                 <div class='col-xs-12 col-sm-12 col-md-6 col-lg-6'>
                     <div id="bdmonthlygauge" class="gauge-container">
-                        <span class="value-text">kWh</span>
+                        <span class="value-text">kW</span>
                         <span class="label">Monthly Peak</span>
                         <input type="hidden" id="bdmonthlyval" value={{curr_bd}}>
                         <input type="hidden" id="bdmonthlymax" value={{max_bdmonthly}}>
@@ -79,7 +85,7 @@
         <div class="clearfix visible-md"></div>
         <div class='col-md-12 col-lg-4'>
             <div id="evcontrolgauge" class="gauge-container">
-                <span class="large-value-text">kWh</span>
+                <span class="large-value-text">kW</span>
                 <span class="large-label">EV Control</span>
                 <input type="hidden" id="evcurrval" value={{curr_ev}}>
                 <input type="hidden" id="evmaxval" value="200">
@@ -100,11 +106,14 @@
 <!--Script for our Charts and Gauges-->
 <script>
     {% block jquery %}
-    var evpoint = '/api/data'
-    var buildingpoint = '/api/data3'
-    var vehiclepoint = '/api/cars'
+    var evpoint = '/api/west'
+    var buildingpoint = '/api/building'
+    var chargedcarpoint = '/api/chargedcars'
+    var chargingcarpoint = 'api/chargingcars'
     var evpredictedpoint = 'api/prediction/west'
-    var bdpredictedpoint = 'api/prediction/west'
+    var bdpredictedpoint = 'api/prediction/building'
+    var chargedpredictedpoint = 'api/prediction/chargedcars'
+    var chargingpredictedpoint = 'api/prediction/chargingcars'
 
     //Running the ajax methods in parallel
     $.when(
@@ -118,7 +127,11 @@
         }),
         $.ajax({
             method: "GET",
-            url: vehiclepoint
+            url: chargedcarpoint
+        }),
+        $.ajax({
+            method: "GET",
+            url: chargingcarpoint
         }),
         $.ajax({
             method: "GET",
@@ -127,50 +140,36 @@
         $.ajax({
             method: "GET",
             url: bdpredictedpoint
+        }),
+        $.ajax({
+            method: "GET",
+            url: chargedpredictedpoint
+        }),
+        $.ajax({
+            method: "GET",
+            url: chargingpredictedpoint
         })
-    ).then(function (data_ev, data_building, data_vehicles, data_evprediction, data_bdprediction) {
+    ).then(function (data_ev, data_building, data_chargedcar, data_chargingcar, data_evprediction, data_bdprediction, data_chargedprediction, data_chargingprediction) {
 
         //Parse our EV data and format it into arrays 
         var ev_result = JSON.parse(data_ev[0])
         var ev_date = []
         var ev_power = []
         //length (as our objects are in Most recent->least recent)
-        var ev_length = ev_result.data.length - 1
-        for (var x in ev_result.data) {
-            //slice the ISO-Format String 
-            //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM:SS
-            ev_date.push(ev_result.data[ev_length - x][0].slice(0, 16))
-            ev_power.push(ev_result.data[ev_length - x][1])
-        }
+        parsedata(ev_date, ev_power, ev_result.data)
 
         //Similarly for our building data (static currently)
         var bd_result = JSON.parse(data_building[0])
         var bd_date = []
         var bd_power = []
-        var bd_length = bd_result.data.length - 1
-        for (var x in bd_result.data) {
-            bd_date.push(bd_result.data[bd_length - x][0].slice(0, 16))
-            bd_power.push(bd_result.data[bd_length - x][1])
-        }
+        parsedata(bd_date, bd_power, bd_result.data)
 
         //create an array for bar chart
         //The array will look like this -> [ev power, building power, combined power]
         var bar_power = []
-        bar_power.push(ev_power[ev_power.length-1])
-        bar_power.push(bd_power[bd_power.length-1])
+        bar_power.push(ev_power[ev_power.length - 1])
+        bar_power.push(bd_power[bd_power.length - 1])
         bar_power.push(bar_power[0] + bar_power[1])
-
-        // Our vehicle data (static currently)
-        var car_result = JSON.parse(data_vehicles[0])
-        var car_date = []
-        var car_total = []
-        var car_charged = []
-        var car_length = car_result.data.length - 1
-        for (var x in car_result.data) {
-            car_date.push(car_result.data[car_length - x][0].slice(0, 16))
-            car_total.push(car_result.data[car_length - x][1])
-            car_charged.push(car_result.data[car_length - x][2])
-        }
 
         //Our predicted data for ev
         var predicted_result = JSON.parse(data_evprediction[0])
@@ -178,13 +177,7 @@
         var predicted_val = []
         var predicted_max = []
         var predicted_min = []
-        var predicted_length = predicted_result.data.length - 1
-        for (var x in predicted_result.data) {
-            predicted_date.push((predicted_result.data[predicted_length - x][0]).slice(0, 16))
-            predicted_val.push(predicted_result.data[predicted_length - x][1])
-            predicted_max.push(predicted_result.data[predicted_length - x][2])
-            predicted_min.push(predicted_result.data[predicted_length - x][3])
-        }
+        parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, predicted_result.data)
 
         // Formatting the ev graph data to include the predicted vals w/ error bars 
         // NOTE: Currently just using static random data for predicted values, change API url once setup
@@ -193,58 +186,77 @@
         var evpredicted_pwr = []
         var evpredicted_max = []
         var evpredicted_min = []
-        for (var x in ev_date) {
-            evpredicted_pwr.push(null)
-            evpredicted_max.push(null)
-            evpredicted_min.push(null)
-        }
-        for (var x in predicted_date) {
-            evgraph_timestamp.push(predicted_date[x])
-            evgraph_pwr.push(null)
-            evpredicted_pwr.push(predicted_val[x])
-            evpredicted_max.push(predicted_max[x])
-            evpredicted_min.push(predicted_min[x])
-        }
+        formatpredicted(ev_date, predicted_date, predicted_val, predicted_max, predicted_min, evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min)
 
         // Our predicted results for building 
-        // NOTE: Currently just using the same predicted data as ev (some random false data), change the API url once setup
+        // NOTE: Currently just using the some random static data 
         var predicted_resultbd = JSON.parse(data_bdprediction[0])
         var predicted_datebd = []
         var predicted_valbd = []
         var predicted_maxbd = []
         var predicted_minbd = []
-        var predicted_lengthbd = predicted_resultbd.data.length - 1
-        for (var x in predicted_resultbd.data) {
-            predicted_datebd.push((predicted_resultbd.data[predicted_lengthbd - x][0]).slice(0, 16))
-            predicted_valbd.push(predicted_resultbd.data[predicted_lengthbd - x][1])
-            predicted_maxbd.push(predicted_resultbd.data[predicted_lengthbd - x][2])
-            predicted_minbd.push(predicted_resultbd.data[predicted_lengthbd - x][3])
-        }
+        parsepredicted(predicted_datebd, predicted_valbd, predicted_maxbd, predicted_minbd, predicted_resultbd.data)
+
         // Formatting the building graph data to include the predicted vals w/ error bars 
         var bdgraph_timestamp = bd_date.slice(0)
         var bdgraph_pwr = bd_power.slice(0)
         var bdpredicted_pwr = []
         var bdpredicted_max = []
         var bdpredicted_min = []
-        for (var x in bd_date) {
-            bdpredicted_pwr.push(null)
-            bdpredicted_max.push(null)
-            bdpredicted_min.push(null)
-        }
-        for (var x in predicted_date) {
-            bdgraph_timestamp.push(predicted_datebd[x])
-            bdgraph_pwr.push(null)
-            bdpredicted_pwr.push(predicted_valbd[x])
-            bdpredicted_max.push(predicted_maxbd[x])
-            bdpredicted_min.push(predicted_minbd[x])
-        }
+        formatpredicted(bd_date, predicted_datebd, predicted_valbd, predicted_maxbd, predicted_minbd, bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min)
+
+        // Our vehicle data (static currently)
+        var charged_result = JSON.parse(data_chargedcar[0])
+        var charged_date = []
+        var charged_value = []
+        parsedata(charged_date, charged_value, charged_result.data)
+
+        // Our predicted results for chargedcars 
+        // NOTE: Currently using some random static data 
+        var predicted_resultcharged = JSON.parse(data_chargedprediction[0])
+        var predicted_datecharged = []
+        var predicted_valcharged = []
+        var predicted_maxcharged = []
+        var predicted_mincharged = []
+        parsepredicted(predicted_datecharged, predicted_valcharged, predicted_maxcharged, predicted_mincharged, predicted_resultcharged.data)
+
+        // Formatting the charged cars graph data to include the predicted vals w/ error bars 
+        var chargedgraph_timestamp = charged_date.slice(0)
+        var chargedgraph_val = charged_value.slice(0)
+        var chargedpredicted_val = []
+        var chargedpredicted_max = []
+        var chargedpredicted_min = []
+        formatpredicted(charged_date, predicted_datecharged, predicted_valcharged, predicted_maxcharged, predicted_mincharged, chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min)
+
+        // Our vehicle data (static currently)
+        var charging_result = JSON.parse(data_chargingcar[0])
+        var charging_date = []
+        var charging_value = []
+        parsedata(charging_date, charging_value, charging_result.data)
+
+        // Our predicted results for chargingcars 
+        // NOTE: Currently using some random static data 
+        var predicted_resultcharging = JSON.parse(data_chargingprediction[0])
+        var predicted_datecharging = []
+        var predicted_valcharging = []
+        var predicted_maxcharging = []
+        var predicted_mincharging = []
+        parsepredicted(predicted_datecharging, predicted_valcharging, predicted_maxcharging, predicted_mincharging, predicted_resultcharging.data)
+
+        // Formatting the charging cars graph data to include the predicted vals w/ error bars 
+        var charginggraph_timestamp = charging_date.slice(0)
+        var charginggraph_val = charging_value.slice(0)
+        var chargingpredicted_val = []
+        var chargingpredicted_max = []
+        var chargingpredicted_min = []
+        formatpredicted(charging_date, predicted_datecharging, predicted_valcharging, predicted_maxcharging, predicted_mincharging, charginggraph_timestamp, charginggraph_val, chargingpredicted_val, chargingpredicted_max, chargingpredicted_min)
 
         //call our chart function to create charts 
         //createChart creates our basic chart with predictions 
         var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
+        var chargedcarChart = createChart(chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min, "myChartCharged", 'Charged and Connected', 'Timestamp', 'Number of Vehicles')
         var bdChart = createChart(bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min, "myChartBuilding", 'Building Power Data', 'Timestamp', 'Power (kW)')
-        //createCarChart creates our vehicle chart 
-        var carChart = createCarChart(car_date, car_total, car_charged, "myChartCar", 'Vehicle Data', 'Timestamp', 'Number of Vehicles')
+        var chargingcarChart = createChart(charginggraph_timestamp, charginggraph_val, chargingpredicted_val, chargingpredicted_max, chargingpredicted_min, "myChartCharging", 'Charging and Connected', 'Timestamp', 'Number of Vehicles')
         //createBarChart creates our basic bar chart 
         var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Current Power Consumption", "Power (kW)", "Location")
         //createComboChart creates our ev + building chart (assumes we have the same datetime values)
@@ -310,8 +322,8 @@
                     updateComboData(combochart, ev_date, ev_power, bd_power)
                     //update our bar graph 
                     var bar_power = []
-                    bar_power.push(ev_power[ev_power.length-1])
-                    bar_power.push(bd_power[bd_power.length-1])
+                    bar_power.push(ev_power[ev_power.length - 1])
+                    bar_power.push(bd_power[bd_power.length - 1])
                     bar_power.push((bar_power[0] + bar_power[1]))
                     updateBarData(barchart, bar_power)
                 },
@@ -319,6 +331,40 @@
                 timeout: 2000
             })
         }, 0.5 * 60000); //sleep for 5 mins
+    }
+
+    function parsepredicted(date, val, max, min, data) {
+        var length = data.length - 1
+        for (var x in data) {
+            date.push((data[length - x][0]).slice(0, 16))
+            val.push(data[length - x][1])
+            max.push(data[length - x][2])
+            min.push(data[length - x][3])
+        }
+    }
+
+    function formatpredicted(curr_date, pred_date, pred_val, pred_max, pred_min, date, val, pred, max, min) {
+        for (var x in curr_date) {
+            pred.push(null)
+            max.push(null)
+            min.push(null)
+        }
+
+        for (var y in pred_date) {
+            date.push(pred_date[y])
+            val.push(null)
+            pred.push(pred_val[y])
+            max.push(pred_max[y])
+            min.push(pred_min[y])
+        }
+    }
+
+    function parsedata(date, val, data) {
+        var length = data.length - 1
+        for (var x in data) {
+            date.push((data[length - x][0]).slice(0, 16))
+            val.push(data[length - x][1])
+        }
     }
 
     {% endblock %}

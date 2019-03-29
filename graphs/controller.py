@@ -87,7 +87,8 @@ def replaceTable(pathtofile, tablename):
     print("Connected to mysql\n")
 
     df.to_sql(con=engine, name=tablename, if_exists='replace', index=False, index_label = 'timestamp')
-    
+
+
 def getBaseData(tablename):
     """
     Reads the raw data and returns it \n

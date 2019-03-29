@@ -1,0 +1,26 @@
+Alter table graphs_cardata MODIFY Column `timestamp` char(25);
+select * from graphs_cardata;
+alter table graphs_cardata change `timestamp` `timestamp` datetime;
+select @@global.time_zone, @@session.time_zone;
+select * from graphs_roseev LIMIT 1000, 1500;
+create table graphs_cardata (`timestamp` datetime, totalcars int, chargedcars int); 
+update buildingdata set `value`=100 where `timestamp`='2018-09-17 14:30';
+select * from graphs_westevfuture;
+insert into graphs_buildingfuture (`timestamp`, `value` ,maxerr, minerr)
+values('2019-04-02 7:00',42.91,31.5,49.2),('2019-04-02 7:15',65.91,55,69.2),
+('2019-04-02 7:30',50.25,47.43,62), ('2019-04-02 7:45',10.8,9,11.34),
+('2019-04-02 8:00',52.91,50,66.24),('2019-04-02 8:15',20.4,17.5,24.28),
+('2019-04-02 8:30',29,27.91,32.345), ('2019-04-02 8:45',31.8,25.9,40.7),
+('2019-04-02 9:00',35.91,30.5,41.6),('2019-04-02 9:15',29.91,25,36.2),
+('2019-04-02 9:30',32.25,29.43,35.2), ('2019-04-02 9:45',27.8,24.9,31.34),
+('2019-04-02 10:00',25.91,25,26.24),('2019-04-02 10:15',47.4,40.5,53.2),
+('2019-04-02 10:30',64.88,59.91,75.34), ('2019-04-02 10:45',74.8,72,77.7);
+update graphs_westevfuture set `timestamp`=DATE_ADD(`timestamp`, interval 7 DAY);
+insert into graphs_westevfuture (`timestamp`,`value`,maxerr, minerr)
+values('2019-04-10 5:00', 34, 41, 30.4);
+
+select * from graphs_chargedcarsdata;
+insert into graphs_buildingdata (`timestamp`, `value`) 
+select `timestamp`, `value` FROM buildingdata ORDER BY `timestamp` DESC
+limit 200;
+select * from graphs_buildingdata;
