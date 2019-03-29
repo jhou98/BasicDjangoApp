@@ -333,39 +333,5 @@
         }, 0.5 * 60000); //sleep for 5 mins
     }
 
-    function parsepredicted(date, val, max, min, data) {
-        var length = data.length - 1
-        for (var x in data) {
-            date.push((data[length - x][0]).slice(0, 16))
-            val.push(data[length - x][1])
-            max.push(data[length - x][2])
-            min.push(data[length - x][3])
-        }
-    }
-
-    function formatpredicted(curr_date, pred_date, pred_val, pred_max, pred_min, date, val, pred, max, min) {
-        for (var x in curr_date) {
-            pred.push(null)
-            max.push(null)
-            min.push(null)
-        }
-
-        for (var y in pred_date) {
-            date.push(pred_date[y])
-            val.push(null)
-            pred.push(pred_val[y])
-            max.push(pred_max[y])
-            min.push(pred_min[y])
-        }
-    }
-
-    function parsedata(date, val, data) {
-        var length = data.length - 1
-        for (var x in data) {
-            date.push((data[length - x][0]).slice(0, 16))
-            val.push(data[length - x][1])
-        }
-    }
-
     {% endblock %}
 </script>
