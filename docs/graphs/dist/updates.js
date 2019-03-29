@@ -131,8 +131,6 @@ function updateComboData(chart, timestamp, ev_pwr, bd_pwr) {
         total_pwr.push(ev_pwr[x] + bd_pwr[x])
     }
     console.log("updating combo data")
-    console.log(timestamp)
-    console.log(ev_pwr)
     chart.data.labels = timestamp
     chart.data.datasets[0].data = ev_pwr
     chart.data.datasets[1].data = bd_pwr

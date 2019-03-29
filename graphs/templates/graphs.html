@@ -106,14 +106,14 @@
 <!--Script for our Charts and Gauges-->
 <script>
     {% block jquery %}
-    var evpoint = '/api/west'
-    var buildingpoint = '/api/building'
-    var chargedcarpoint = '/api/chargedcars'
-    var chargingcarpoint = 'api/chargingcars'
-    var evpredictedpoint = 'api/prediction/west'
-    var bdpredictedpoint = 'api/prediction/building'
-    var chargedpredictedpoint = 'api/prediction/chargedcars'
-    var chargingpredictedpoint = 'api/prediction/chargingcars'
+    var evpoint = '{% url 'west' %}'
+    var buildingpoint = '{% url 'building' %}'
+    var chargedcarpoint =  '{% url 'carscharged' %}'
+    var chargingcarpoint =  '{% url 'carscharging' %}'
+    var evpredictedpoint =  '{% url 'west_future' %}'
+    var bdpredictedpoint =  '{% url 'building_future' %}'
+    var chargedpredictedpoint =  '{% url 'carscharged_future' %}'
+    var chargingpredictedpoint =  '{% url 'carscharging_future' %}'
 
     //Running the ajax methods in parallel
     $.when(
@@ -304,14 +304,7 @@
                     var result = JSON.parse(data)
                     var ev_date = []
                     var ev_power = []
-                    //length (as our objects are in Most recent->least recent)
-                    var length = result.data.length - 1
-                    for (var x in result.data) {
-                        //slice the ISO-Format String 
-                        //YYYY-mm-ddTHH:MM:SS.DDDZ -> YYYY-mm-ddTHH:MM:SS
-                        ev_date.push(result.data[length - x][0].slice(0, 16))
-                        ev_power.push(result.data[length - x][1])
-                    }
+                    parsedata(ev_date, ev_power, result.data)
                     //Update our EV gauge and Charts
                     ev_gauge1.setValue(result.data[0][1])
                     ev_gauge2.setValue(result.data[0][1])
@@ -319,10 +312,13 @@
 
                     //Update our BD Gauge and Charts 
                     var bd_power = updateBuildingData(bdchart, bd_gauge1, bd_gauge2, bd_url, bdpred_url)
+                    //update our Vehicle data 
                     updateData(chargedchart, charged_url, chargedpred_url)
                     updateData(chargingchart, charging_url, chargingpred_url)
+
                     //Update our Combo Chart
                     updateComboData(combochart, ev_date, ev_power, bd_power)
+
                     //update our bar graph 
                     var bar_power = []
                     bar_power.push(ev_power[ev_power.length - 1])
