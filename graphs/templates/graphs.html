@@ -278,7 +278,7 @@
         }
 
         //timeout function 
-        poll(evChart, bdChart, testChart, barChart, chargedcarChart, chargingcarChart, evdgauge, evmgauge, bddgauge, bdmgauge, evpoint, buildingpoint, chargedcarpoint, chargincargpoint, evpredictedpoint, bdpredictedpoint, chargedpredictedpoint, chargingpredictedpoint)
+        poll(evChart, bdChart, testChart, barChart, chargedcarChart, chargingcarChart, evdgauge, evmgauge, bddgauge, bdmgauge, evpoint, buildingpoint, chargedcarpoint, chargingcarpoint, evpredictedpoint, bdpredictedpoint, chargedpredictedpoint, chargingpredictedpoint)
 
     });
     {% endblock %}
@@ -330,7 +330,7 @@
                     bar_power.push((bar_power[0] + bar_power[1]))
                     updateBarData(barchart, bar_power)
                 },
-                complete: poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, evpred_url, bdpred_url),
+                complete: poll(evchart, bdchart, combochart, barchart, chargedchart, chargingchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, charged_url, charging_url, evpred_url, bdpred_url, chargedpred_url, chargingpred_url),
                 timeout: 2000
             })
         }, 0.5 * 60000); //sleep for 5 mins

@@ -15,7 +15,7 @@ function addDataChart(chart, curr_x, curr_y, pred_x, pred_y, pred_max, pred_min)
     //create the new arrays that will have null values so that total sizes are equal to the label size 
     var timestamp = curr_x.slice(0)
     var val = curr_y.slice(0)
-    var predictedpwr = []
+    var predictedval = []
     var predictedmax = []
     var predictedmin = []
     formatpredicted(curr_x, pred_x, pred_y, pred_max, pred_min, timestamp, val, predictedval, predictedmax, predictedmin)
@@ -108,8 +108,6 @@ function updateData(chart, _url, pred_url) {
             var val = []
             parsedata(date, val, result.data)
             //Update our EV gauge and Charts
-            daily_gauge.setValue(result.data[0][1])
-            monthly_gauge.setValue(result.data[0][1])
             updateChart(chart, date, val, pred_url)
         },
         error: function (err_data) {
