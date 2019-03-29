@@ -276,8 +276,9 @@
         evslider.oninput = function () {
             evctrlgauge.setValue(this.value)
         }
+
         //timeout function 
-        poll(evChart, bdChart, testChart, barChart, evdgauge, evmgauge, bddgauge, bdmgauge, evpoint, buildingpoint, evpredictedpoint, bdpredictedpoint)
+        poll(evChart, bdChart, testChart, barChart, chargedcarChart, chargingcarChart, evdgauge, evmgauge, bddgauge, bdmgauge, evpoint, buildingpoint, chargedcarpoint, chargincargpoint, evpredictedpoint, bdpredictedpoint, chargedpredictedpoint, chargingpredictedpoint)
 
     });
     {% endblock %}
@@ -285,7 +286,7 @@
 
 <script>
     {% block script %}
-    function poll(evchart, bdchart, combochart, barchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, evpred_url, bdpred_url) {
+    function poll(evchart, bdchart, combochart, barchart, chargedchart, chargingchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, charged_url, charging_url, evpred_url, bdpred_url, chargedpred_url, chargingpred_url) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
          * Used for EV power. 
@@ -318,6 +319,8 @@
 
                     //Update our BD Gauge and Charts 
                     var bd_power = updateBuildingData(bdchart, bd_gauge1, bd_gauge2, bd_url, bdpred_url)
+                    updateData(chargedchart, charged_url, chargedpred_url)
+                    updateData(chargingchart, charging_url, chargingpred_url)
                     //Update our Combo Chart
                     updateComboData(combochart, ev_date, ev_power, bd_power)
                     //update our bar graph 
