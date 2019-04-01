@@ -253,8 +253,8 @@
 
         //call our chart function to create charts 
         //createChart creates our basic chart with predictions 
-        var evChart = createChart1(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
-        var chargedcarChart = createChart1(chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min, "myChartCharged", 'Charged and Connected', 'Timestamp', 'Number of Vehicles')
+        var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
+        var chargedcarChart = createChart(chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min, "myChartCharged", 'Charged and Connected', 'Timestamp', 'Number of Vehicles')
         var bdChart = createChart(bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min, "myChartBuilding", 'Building Power Data', 'Timestamp', 'Power (kW)')
         var chargingcarChart = createChart(charginggraph_timestamp, charginggraph_val, chargingpredicted_val, chargingpredicted_max, chargingpredicted_min, "myChartCharging", 'Charging and Connected', 'Timestamp', 'Number of Vehicles')
         //createBarChart creates our basic bar chart 
@@ -331,6 +331,6 @@
             })
         }, 0.5 * 60000); //sleep for 5 mins
     }
-    
+
     {% endblock %}
 </script>

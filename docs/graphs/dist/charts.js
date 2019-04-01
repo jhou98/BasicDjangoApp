@@ -39,10 +39,11 @@ function createGauge(val_id, maxval_id, id) {
  * @param {string} lbl_title Title of the chart.
  * @param {string} x_axis Title for x-axis of the chart.
  * @param {string} y_axis Title for y-axis of the chart. 
+ * @param {string} _lbl Label for our main data series. 
  * 
  * @returns {Chart} Chart object. 
  */
-function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lbl_title, x_axis, y_axis) {
+function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, _title, x_axis, y_axis, _lbl) {
     var ctx = document.getElementById(id).getContext('2d');
 
 
@@ -51,14 +52,14 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lb
         data: {
             labels: dates,
             datasets: [{
-                label: 'EV Energy Consumption',
+                label: _lbl,
                 data: pwr_vals,
                 spanGaps: false,
                 backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#73C2E5',
                 fill: false,
             }, {
-                label: 'Predicted Energy Consumption',
+                label: 'Predicted Values',
                 data: future_pwr,
                 spanGaps: false,
                 backgroundColor: 'rgba(155, 194, 229, 0.4)', // rgba(215, 135, 48, 0.4)'
@@ -88,7 +89,7 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lb
         options: {
             title: {
                 display: true,
-                text: lbl_title,
+                text: _title,
                 fontColor: '#0C5784',
                 fontSize: 25,
             },
@@ -162,116 +163,23 @@ function createComboChart(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
         data: {
             labels: dates,
             datasets: [{
-                label: 'EV Power',
+                label: 'EV Energy Consumption',
                 data: ev_pwr,
                 backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#73C2E5',
                 fill: 'zero',
             }, {
-                label: 'Building Power',
+                label: 'Building Energy Consumption',
                 data: bd_pwr,
                 backgroundColor: 'rgba(215, 135, 48, 0.4)',
                 borderColor: '#D78730',
                 fill: '-1',
             }, {
-                label: 'Total Power',
+                label: 'Total Energy Consumption',
                 data: total_pwr,
                 backgroundColor: 'rgba(91, 122, 139, 0.4)',
                 borderColor: '#5B7A8B',
                 fill: '-1',
-            }]
-        },
-        options: {
-            title: {
-                display: true,
-                text: title,
-                fontColor: '#0C5784',
-                fontSize: 22,
-            },
-            scales: {
-                xAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: x_axis,
-                        fontColor: '#0C5784',
-                        fontSize: 20,
-                    },
-                    ticks: {
-                        fontColor: '#0C5784'
-                    },
-                    gridLines: {
-                        color: '#0C5784',
-                        display: true
-                    }
-                }],
-                yAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: y_axis,
-                        fontColor: '#0C5784',
-                        fontSize: 20,
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: '#0C5784'
-                    },
-                    gridLines: {
-                        color: '#0C5784',
-                        display: true
-                    }
-                }],
-            },
-            plugins: {
-                filler: {
-                    propagate: true
-                }
-            },
-            legend: {
-                labels: {
-                    fontColor: '#0C5784'
-                }
-            },
-        }
-    });
-    return myChart
-}
-
-/**
- * Creates a chart for number of cars.
- * 
- * @param {Array} dates Array of dates for our chart. 
- * @param {Array} totalcars Array of total cars within the EV parkade. 
- * @param {Array} chargedcars Array of cars that are done charginh in EV parkade. 
- * @param {string} id Element ID in HTML. 
- * @param {string} title Title of our chart. 
- * @param {string} x_axis Label for our x_axis. 
- * @param {string} y_axis Label for our y_axis
- * 
- * @returns {Chart} Returns chart object.
- */
-function createCarChart(dates, totalcars, chargedcars, id, title, x_axis, y_axis) {
-
-    var ctx = document.getElementById(id).getContext('2d');
-
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{
-                label: 'Total Connected Vehicles',
-                data: totalcars,
-                backgroundColor: 'rgba(215, 135, 48, 0.4)',
-                borderColor: '#D78730',
-                fill: '1',
-                stepped: true,
-            }, {
-                label: 'Charged Vehicles',
-                data: chargedcars,
-                backgroundColor: 'rgba(155, 194, 229, 0.4)',
-                borderColor: '#73C2E5',
-                stepped: true,
             }]
         },
         options: {
@@ -358,7 +266,7 @@ function createBarChart(locations, values, powercap, id, title, x_axis, y_axis) 
         data: {
             labels: locations,
             datasets: [{
-                label: 'EV Power Consumption',
+                label: 'Energy Consumption',
                 data: values,
                 backgroundColor: [
                     'rgba(155, 194, 229, 0.4)',
@@ -373,7 +281,7 @@ function createBarChart(locations, values, powercap, id, title, x_axis, y_axis) 
                 borderWidth: 3
             }, {
                 type: 'line',
-                label: 'Power Cap',
+                label: 'Energy Cap',
                 data: pwrcap,
                 backgroundColor: 'rgba(48, 48, 52, 0.4)',
                 borderColor: '#303034',

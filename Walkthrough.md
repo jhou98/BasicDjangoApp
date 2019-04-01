@@ -1,5 +1,6 @@
 # Walkthrough of Project 
 - A rough walkthrough of the project. Important parts are revised and shown in [README file](README.md)
+- This walkthrough DOES NOT cover all of the project and is a rough draft of the overall thought process. 
 
 ## Setup a Django Project with mySQL  
 - Make sure Python is installed, you can check through the `python -V` command
@@ -472,21 +473,30 @@
 - The _label_ refers to the label on the upper right hand corner 
 
 ## Connecting to an Azure SQL server 
+
 - To being migrating the project from a localhost to the cloud, we need to first set up and connect to a Cloud Database, which we chose to be __Azure SQL__
 - This section will walk through the following steps: 
     1. Creating a SQL Server
     2. Setting up Firewall 
     3. Testing Connection
+
 ### Creating a SQL Server 
+
 - Follow the instructions in the __Create a single database section__ found on [the following tutorial by Microsoft](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-single-database-get-started) as a guide for creating a single database 
 - Make sure to keep note of the server name, admin login and password
 - Use __Canada Central__ for location and __Basic__ for pricing tier
+
 ### Setting up a Firewall
+
 - Once your database is created, follow [these instructions](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-server-level-firewall-rule) to setup a firewall to enable connections 
+
 ### Testing Connection
+
 - To start off, we will use the Azure portal to create a table and input a datapoint 
-- In your Azure Portal, navigate to your Database's Query Editor and login according to your username and password set when you created the database 
+- In your Azure Portal, navigate to your Database's Query Editor and login according to your username and password set when you created the database
+
 ![Query Editor](/static/images/azurefig1.png)
+
 - In the Query, add the following code and run it, making sure you get a table returned successfully with the values inserted
 
 <table>
@@ -508,6 +518,7 @@
 
 - Now we will try creating a python file to try connecting. We will assume you have a method that returns to you a dataframe with the following 2 columns: timestamp and value
 - Make sure you have pandas and pyodbc installed. If not, use `pip install` to add them to your virtual environment
+
     ```python  
         import pandas as pd 
         import pyodbc 
@@ -525,9 +536,13 @@
         cursor.execute('select * from testtable;')
         print(cursor.fetchone())
     ```
+
 ![ODBC Driver](/static/images/azurefig2.png)
+
 - You should be able to get the same information as you had from your previous Query in the Azure portal 
+
 - To create a connection with pandas, create a file with the following code
+
     ```python
         from sqlalchemy import create_engine
 
@@ -554,7 +569,262 @@
         print(df)
         df.to_sql(name = __tbl, con=cxn, if_exists='append', index=False, index_label=__idx)
     ```
+
 - Once you run the file, you should be able to see the df rows appended to your table that you created already in your Azure portal
 
+## Creating a 2 Part Chart 
+- This section will walkthrough how to create a chart with both historic/realtime data as well as predicted future + max/min error 
+- We will be using Chart.js to implement our chart 
+- The main issue with creating these sets of data is the difference in the timestamps (x-axis) and the difference in the number of points. 
+    > In order to solve this, we need to create 4 seperate datasets 
+
+        1. Historic/Realtime Data
+        2. Predicted Data 
+        3. Max error for Predicted Data 
+        4. Min error for Predicted Data 
+
+    > Each of these datasets must be the same size and have the same timestamps (x-axis), so we must fill in any missing points with null values 
+- The functions below walk through how it was done for the first iteration of the project: 
+
+    ```javascript 
+        /**
+         * Function updates a Chart without gauges. 
+         * @note THIS IS FUNCTION THAT WE WOULD CALL TO RUN THE WHOLE THING
+         * @param {Chart} chart Chart object. 
+         * @param {string} _url string for URL to obtain historical data in JSON format. 
+         * @param {string} pred_url string for URL to obtain predicted data in JSON format. 
+         */
+        function updateData(chart, _url, pred_url) {
+            $.ajax({
+                url: _url,
+                type: "GET",
+                success: function (data) {
+                    console.log("polling next point")
+                    var result = JSON.parse(data)
+                    var date = []
+                    var val = []
+                    parsedata(date, val, result.data)
+                    //Update our EV gauge and Charts
+                    updateChart(chart, date, val, pred_url)
+                },
+                error: function (err_data) {
+                    console.log("error", err_data)
+                }
+            });
+        }
+        /*--------- The following are all helper functions for updateData() ----------*/
+        /**
+        * Function that helps us parse our current data. 
+        * @note Assumes that the data array is a 2d array where the second dimension corresponds
+        * as follows: 
+        *  - [0]: date
+        *  - [1]: value
+        * 
+        * @param {Array} date Array of dates
+        * @param {Array} val Array of values 
+        * @param {Array} data Array of data to be parsed 
+        */
+        function parsedata(date, val, data) {
+            var length = data.length - 1
+            for (var x in data) {
+                date.push((data[length - x][0]).slice(0, 16))
+                val.push(data[length - x][1])
+            }
+        }
+        /**
+         * Updates our Chart that has predicted and historic power values. 
+         * 
+         * @param {Chart} chart Chart object. 
+         * @param {Array} timestamps Array of date values.  
+         * @param {Array} pwr Array of float values corresponding to power.  
+         * @param {string} _url URL to obtain predicted JSON data from.  
+         */
+        function updateChart(chart, timestamps, pwr, _url) {
+            $.ajax({
+                url: _url,
+                type: "GET",
+                success: function (data) {
+                    var result = JSON.parse(data)
+                    var predicted_date = []
+                    var predicted_val = []
+                    var predicted_max = []
+                    var predicted_min = []
+                    parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, result.data)
+                    //Add most recent datapoint into our chart
+                    addDataChart(chart, timestamps, pwr, predicted_date, predicted_val, predicted_max, predicted_min)
+                },
+                error: function (err_data) {
+                    console.log("error", err_data)
+                }
+            });
+        }
+        /**
+        * Function that helps us parse our predicted data 
+        * @note Assumes that the data array is a 2d array where the second dimension corresponds
+        * as follows: 
+        *  - [0]: date
+        *  - [1]: value
+        *  - [2]: max 
+        *  - [3]: min 
+        * 
+        * @param {Array} date array of dates 
+        * @param {Array} val array of values 
+        * @param {Array} max array of max error 
+        * @param {Array} min array of min error 
+        * @param {Array} data Data array to parse 
+        */
+        function parsepredicted(date, val, max, min, data) {
+            var length = data.length - 1
+            for (var x in data) {
+                date.push((data[length - x][0]).slice(0, 16))
+                val.push(data[length - x][1])
+                max.push(data[length - x][2])
+                min.push(data[length - x][3])
+            }
+        }
+        /**
+        * Helper function to update our chart. 
+        * 
+        * @param {Chart} chart Chart object.
+        * @param {Array} curr_x Current/Historical timestamps. 
+        * @param {Array} curr_y Current/Historical power values.
+        * @param {Array} pred_x Predicted timestamps. 
+        * @param {Array} pred_y Predicted power values.
+        * @param {Array} pred_max Predicted maximum error value. 
+        * @param {Array} pred_min Predicted minimum error value. 
+        * 
+        */
+        function addDataChart(chart, curr_x, curr_y, pred_x, pred_y, pred_max, pred_min) {
+        
+            //create the new arrays that will have null values so that total sizes are equal to the label size 
+            var timestamp = curr_x.slice(0)
+            var val = curr_y.slice(0)
+            var predictedval = []
+            var predictedmax = []
+            var predictedmin = []
+            formatpredicted(curr_x, pred_x, pred_y, pred_max, pred_min, timestamp, val, predictedval, predictedmax, predictedmin)
+
+            chart.data.datasets[0].data = val
+            chart.data.datasets[1].data = predictedval
+            chart.data.datasets[2].data = predictedmax
+            chart.data.datasets[3].data = predictedmin
+            chart.data.labels = timestamp
+            chart.update();
+        }
+    ```
+
+- What is done in the code is essentially going through and creating datasets of the same size, and filling out the missing datapoints with the correct timestamp and a null value. The data is pulled from 2 different URL's which are sent the data in a JSON string format. 
+- The chart is created by just using 4 datasets when creating it, and setting different color, fill and styling values: 
+
+    ```javascript 
+        /**
+        * Creates a chart for either building or ev along with predicted values. 
+        * 
+        * @param {Array} dates Array of dates for our chart. 
+        * @param {Array} pwr_vals Array of power for our chart.
+        * @param {Array} future_pwr Array of future values for our chart. 
+        * @param {Array} maxerr_pwr Array of max error for future values.
+        * @param {Array} minerr_pwr Array of min error for future values.
+        * @param {string} id HTML element id. 
+        * @param {string} lbl_title Title of the chart.
+        * @param {string} x_axis Title for x-axis of the chart.
+        * @param {string} y_axis Title for y-axis of the chart. 
+        * @param {string} _lbl Label for our main data series. 
+        * 
+        * @returns {Chart} Chart object. 
+        */
+        function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, _title, x_axis, y_axis, _lbl) {
+            var ctx = document.getElementById(id).getContext('2d');
 
 
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: _lbl,
+                        data: pwr_vals,
+                        spanGaps: false,
+                        backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                        borderColor: '#73C2E5',
+                        fill: false,
+                    }, {
+                        label: 'Predicted Values',
+                        data: future_pwr,
+                        spanGaps: false,
+                        backgroundColor: 'rgba(155, 194, 229, 0.4)', // rgba(215, 135, 48, 0.4)'
+                        borderColor: '#73C2E5',
+                        fill: false,
+                        borderDash: [10, 10]
+                    }, {
+                        label: 'Max Error',
+                        data: maxerr_pwr,
+                        spanGaps: false,
+                        backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                        borderColor: '#D78730',
+                        borderWidth: 1,
+                        fill: '-1',
+                        pointRadius: 0,
+                    }, {
+                        label: 'Min Error',
+                        data: minerr_pwr,
+                        spanGaps: false,
+                        backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                        borderColor: '#D78730',
+                        borderWidth: 1,
+                        fill: '-2',
+                        pointRadius: 0,
+                    }]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: _title,
+                        fontColor: '#0C5784',
+                        fontSize: 25,
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: x_axis,
+                                fontColor: '#0C5784',
+                                fontSize: 20
+                            },
+                            ticks: {
+                                fontColor: '#0C5784'
+                            },
+                            gridLines: {
+                                color: '#0C5784',
+                                display: true
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: y_axis,
+                                fontColor: '#0C5784',
+                                fontSize: 20,
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: '#0C5784'
+                            },
+                            gridLines: {
+                                color: '#0C5784',
+                                display: true
+                            }
+                        }],
+                    },
+                    legend: {
+                        labels: {
+                            fontColor: '#0C5784'
+                        }
+                    },
+                }
+            });
+            return myChart
+        }
+    ```

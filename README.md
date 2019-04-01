@@ -14,7 +14,7 @@
 ------
 [Part 4 - Database](#Database) 
 ------
-[Part 5 - Graphs](#Graphs) 
+[Part 5 - Charts](#Charts) 
 ------
 [Part 6 - Gauges](#Gauges)
 ------
@@ -143,6 +143,7 @@
 ## Database 
 ### Creating a new table 
 - Walkthrough of setting up a MySQL database and adding data to the table 
+- A sample of how to setup and connect to a cloud database (Azure SQL Database) can be found in [Walkthrough.md](Walkthrough.md)
 - To start off, create a new MySQL server and save the settings into the DATABASES in __settings.py__ 
 - To create a table, we simply need to create a new model class and migrate the class to our database. Create the following model and follow the steps in Part 1 to link it to our database. 
     ```python
@@ -219,8 +220,8 @@
 - Afterwards, if you connected everything correctly, you should be able to see the new data in both your MySQL connector and your Django admin page on localhost:8000/admin
 <br>[Back to Top](#Basic-Django-App)
 
-## Graphs 
-- This section will go over how to create a graph using Chart.js 
+## Charts
+- This section will go over how to create a graph/chart using Chart.js 
 - This section assumes you have a base template called `base.html` which your other HTML templates extend using `{% extends 'base.html' %}` and `controller.py` file for working with the data 
 - For this section, we will be using the the __powerData__ model that we went over in part 3 under the __graphs app__
 ### Getting Data in JSON format 
@@ -414,8 +415,16 @@
 
 ## Gauges 
 - Gauges is another different way to efficiently display data 
-- The gauge layout that we will be using is svg-gauges, you will need to add the javascript source to your __base.html__ file 
+- The gauge layout that we will be using is svg-gauges, you will need to add the javascript source to your __base.html__ file. In addition, you will need to download and host the source code remotely. Fortunately Github allows you to do this pretty easily.
+
+    1. Navigate to your Github Project __Settings__ Page (or create a new github project if you have not done so already)
+    2. Scroll down the __Github Pages__ section where you have the option to host project pages on Github repository
+    3. Choose __master branch /docs folder__ as your source to build from and publish your page 
+    4. In your Github Project, create a new folder called docs and add the code from svg-gauges into that folder, and then push the changes to your Github Repository
+    5. If setup correctly, you should be able to navigate according to the URL to something similar to https://username.github.io/#PROJECTNAME/svg-gauge/dist/gauges.js 
+
 - In base.html, add to the styling the following gauge settings.
+
     ```css 
         /** 
         * Gauge Styling
@@ -482,8 +491,10 @@
         color: rgb(105, 140, 176); 
         }
     ```
+
 - You can modify the settings according to the layout you wish to use for your project. 
 - In __graphs.html__, add a function that will create a new gauge in your scripts 
+
     ```javascript
         function createGauge(val_id, maxval_id, id) {
             /**
@@ -517,7 +528,9 @@
             return gauge
         }
     ```
+
 - In your HTML section, to add a new gauge object, you can add the following code.
+
     ```html
         <div id="%GAUGEID%" class="gauge-container">
             <span class="value-text">%TEXT%</span>
@@ -526,9 +539,12 @@
             <input type="hidden" id="evdailymax" value={{max_evdaily}}>
         </div>
     ```
-> GAUGEID refers to the ID of the gauge object, while the hidden inputs refer to the current electrical vehicle power consumption and max daily power consumption that is passed via python 
+
+    > GAUGEID refers to the ID of the gauge object, while the hidden inputs refer to the current electrical vehicle power consumption and max daily power consumption that is passed via python 
 - In the `{% block jquery %}` add the following line of code to be able to create your gauge object. 
+
     ```javascript
         var evdgauge = createGauge("evdailyval", "evdailymax", "%GAUGEID%")
      ```
+
 <br> [Back to Top](#Basic-Django-App)
