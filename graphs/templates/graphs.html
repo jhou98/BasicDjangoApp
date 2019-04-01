@@ -37,8 +37,8 @@
         <div class='col-md-12 col-lg-4'>
             <canvas id='myChartCharged' width='400' height='400'></canvas>
             <br>
-            <div class = 'row'>
-                <div class = 'col-sm-12'>
+            <div class='row'>
+                <div class='col-sm-12'>
                     <canvas id='myChartCharging' width='400' height='400'></canvas>
                 </div>
             </div>
@@ -108,12 +108,12 @@
     {% block jquery %}
     var evpoint = '{% url 'west' %}'
     var buildingpoint = '{% url 'building' %}'
-    var chargedcarpoint =  '{% url 'carscharged' %}'
-    var chargingcarpoint =  '{% url 'carscharging' %}'
-    var evpredictedpoint =  '{% url 'west_future' %}'
-    var bdpredictedpoint =  '{% url 'building_future' %}'
-    var chargedpredictedpoint =  '{% url 'carscharged_future' %}'
-    var chargingpredictedpoint =  '{% url 'carscharging_future' %}'
+    var chargedcarpoint = '{% url 'carscharged' %}'
+    var chargingcarpoint = '{% url 'carscharging' %}'
+    var evpredictedpoint = '{% url 'west_future' %}'
+    var bdpredictedpoint = '{% url 'building_future' %}'
+    var chargedpredictedpoint = '{% url 'carscharged_future' %}'
+    var chargingpredictedpoint = '{% url 'carscharging_future' %}'
 
     //Running the ajax methods in parallel
     $.when(
@@ -253,14 +253,14 @@
 
         //call our chart function to create charts 
         //createChart creates our basic chart with predictions 
-        var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
-        var chargedcarChart = createChart(chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min, "myChartCharged", 'Charged and Connected', 'Timestamp', 'Number of Vehicles')
+        var evChart = createChart1(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)')
+        var chargedcarChart = createChart1(chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min, "myChartCharged", 'Charged and Connected', 'Timestamp', 'Number of Vehicles')
         var bdChart = createChart(bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min, "myChartBuilding", 'Building Power Data', 'Timestamp', 'Power (kW)')
         var chargingcarChart = createChart(charginggraph_timestamp, charginggraph_val, chargingpredicted_val, chargingpredicted_max, chargingpredicted_min, "myChartCharging", 'Charging and Connected', 'Timestamp', 'Number of Vehicles')
         //createBarChart creates our basic bar chart 
         var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Current Power Consumption", "Power (kW)", "Location")
         //createComboChart creates our ev + building chart (assumes we have the same datetime values)
-        var testChart = createComboChart1(ev_date, ev_power, bd_power, "myChartCombo", "Power Consumption", "Timestamp", "Power (kW)")
+        var testChart = createComboChart(ev_date, ev_power, bd_power, "myChartCombo", "Power Consumption", "Timestamp", "Power (kW)")
 
 
         //call our gauge function to create gauges
@@ -331,6 +331,6 @@
             })
         }, 0.5 * 60000); //sleep for 5 mins
     }
-
+    
     {% endblock %}
 </script>

@@ -51,33 +51,34 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lb
         data: {
             labels: dates,
             datasets: [{
-                label: 'EV Consumption',
+                label: 'EV Energy Consumption',
                 data: pwr_vals,
                 spanGaps: false,
                 backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#73C2E5',
+                fill: false,
             }, {
-                label: 'Predicted Consumption',
+                label: 'Predicted Energy Consumption',
                 data: future_pwr,
                 spanGaps: false,
-                backgroundColor: 'rgba(155, 194, 229, 0.4)',
+                backgroundColor: 'rgba(155, 194, 229, 0.4)', // rgba(215, 135, 48, 0.4)'
                 borderColor: '#73C2E5',
                 fill: false,
                 borderDash: [10, 10]
             }, {
-                label: 'Max',
+                label: 'Max Error',
                 data: maxerr_pwr,
                 spanGaps: false,
-                backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#D78730',
                 borderWidth: 1,
                 fill: '-1',
                 pointRadius: 0,
             }, {
-                label: 'Min',
+                label: 'Min Error',
                 data: minerr_pwr,
                 spanGaps: false,
-                backgroundColor: 'rgba(215, 135, 48, 0.4)',
+                backgroundColor: 'rgba(155, 194, 229, 0.4)',
                 borderColor: '#D78730',
                 borderWidth: 1,
                 fill: '-2',
@@ -148,7 +149,7 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, lb
  * @param {string} x_axis label of x-axis.  
  * @param {string} y_axis label of y-axis. 
  */
-function createComboChart1(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
+function createComboChart(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
 
     var ctx = document.getElementById(id).getContext('2d');
 
