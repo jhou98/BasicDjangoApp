@@ -195,12 +195,9 @@ def getMonthlyPeak(tablename):
     Returns a decimal power value 
     """
      # Only need the most recent point since we will sample the data we need with another query 
-    # df = getRecentData(tablename, 1, 'Timestamp')
     df = getRecentData(tablename, 1, 'timestamp')
 
     #Calculating the current month
-    # curr_year = df.iloc[0].Timestamp.year 
-    # curr_month = df.iloc[0].Timestamp.month 
     curr_year = df.iloc[0].timestamp.year 
     curr_month = df.iloc[0].timestamp.month 
 
@@ -256,8 +253,8 @@ def getRecentDataList(num_req):
     Reads and returns a Query list of data from powerdata \n 
     :param int num_req: Number of datapoints to retrieve
     """
-    from .models import powerData 
-    latest_data_list = powerData.objects.order_by('-Timestamp')[:num_req]
+    from .models import WestEV
+    latest_data_list = WestEV.objects.order_by('-timestamp')[:num_req]
     return latest_data_list
 
 def getMaxData(num_req):
@@ -265,7 +262,7 @@ def getMaxData(num_req):
     Gets a list of data points ordered by power consumption \n
     :param int num_req: Number of data points to be extracted \n
     """
-    from .models import powerData 
-    latest_data_list = powerData.objects.order_by('-Power')[:num_req]
+    from .models import WestEV 
+    latest_data_list = WestEV.objects.order_by('-value')[:num_req]
     return latest_data_list
 

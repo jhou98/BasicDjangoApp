@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 __timecol = 'timestamp'
 
-def graphs(request):
+def westgraph(request):
     """
     Sends the following data to our graphs page: 
     EV: current power, previous days peak power, previous months peak power\n
@@ -16,11 +16,11 @@ def graphs(request):
 
     #Get the values using our controller functions 
     ev_pwr = getCurrentPower('graphs_westev', __timecol, 'value')
-    bd_pwr = getCurrentPower('graphs_buildingdata', __timecol, 'value')
+    bd_pwr = getCurrentPower('graphs_building', __timecol, 'value')
     ev_daily = getDailyPeak('graphs_westev', __timecol)
-    bd_daily = getDailyPeak('graphs_buildingdata', __timecol)
+    bd_daily = getDailyPeak('graphs_building', __timecol)
     ev_monthly = getMonthlyPeak('graphs_westev')
-    bd_monthly = getMonthlyPeak('graphs_buildingdata')
+    bd_monthly = getMonthlyPeak('graphs_building')
 
     #Debugging Purposes
     print("current daily ev power is : ", ev_daily)
@@ -30,7 +30,7 @@ def graphs(request):
     print("current monthly ev peak is : ",ev_monthly)
     print("current monthly building peak is : ",bd_monthly)
 
-    return render(request, 'graphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
+    return render(request, 'westgraphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
 
 def recentData(request, num_req):
     """
@@ -56,18 +56,6 @@ def peakData(request, num_req):
     latest_data_list = getMaxData(num_req)
     return render(request, 'max_val.html', {'max_power':latest_data_list})
 
-def dateData(request, date_val):
-    """
-    Gets a list of data points corresponding to the specific date \n
-    :param Datetime date_val: Date in YYYY-MM-DD format
-    Returns an unorder list of datapoints, error if date does not exist
-    """
-    from .controller import getSingleDateData as getDateData
-    my_df = getDateData('graphs_powerdata','Timestamp',date_val)
-    if my_df.empty: 
-        raise Http404("Timestamp does not exist!")
-    return render(request, 'date.html', {'date': date_val, 'date_data':my_df})
-
 # Rest Framework - building data 
 class BuildingData(APIView):
     """
@@ -81,10 +69,25 @@ class BuildingData(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_buildingdata',96, 'Timestamp')
+        my_df = getRecentData('graphs_building',96, 'Timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
+# Rest Framework - Building data future
+class BuildingPredicted(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_buildingfuture',48, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+    
 # Rest Framework - West Parkade EV data 
 class WestEVData(APIView):
     """
@@ -153,18 +156,20 @@ class HealthEVData(APIView):
         data = pandasToJSON(my_df)
         return Response(data)
 
-# Rest Framework - Charged Cars 
-class chargedCars(APIView):
+# Rest Framework - North Parkade EV data 
+class NorthEVData(APIView):
     """
-    Method to send 96 most recent car data points as a JSON string \n 
-    """
+    This method is used to send 100 most recent ev data points from North Parkade as a JSON string\n
+    Has built in support for authentication and permissions \n 
+    See https://www.django-rest-framework.org/api-guide/views/ for more details 
+    """ 
     authentication_classes = []
     permission_classes = []
     def get(self, request, format=None):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_chargedcarsdata',96,'timestamp')
+        my_df = getRecentData('graphs_northev',96, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
@@ -183,8 +188,68 @@ class WestPredictedData(APIView):
         data = pandasToJSON(my_df)
         return Response(data)
 
-# Rest Framework - Charging Cars 
-class chargingCars(APIView):
+# Rest Framework - Rose Future EV Data 
+class RosePredictedData(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_roseevfuture',48, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Fraser Future EV Data 
+class FraserPredictedData(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_fraserevfuture',48, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Health Future EV Data 
+class HealthPredictedData(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_healthevfuture',48, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - North Future EV Data 
+class NorthPredictedData(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_northevfuture',48, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charged Cars 
+class chargedCarsWest(APIView):
     """
     Method to send 96 most recent car data points as a JSON string \n 
     """
@@ -194,12 +259,27 @@ class chargingCars(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_chargingcarsdata',96,'timestamp')
+        my_df = getRecentData('graphs_chargedcarswest',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charging Cars 
+class chargingCarsWest(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarswest',96,'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
 # Rest Framework - Future Charged Cars data
-class ChargedCarsPredicted(APIView):
+class ChargedCarsPredictedWest(APIView):
     """
     This method used to send predicted values
     """ 
@@ -209,12 +289,12 @@ class ChargedCarsPredicted(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_chargedcarsfuture',12, 'timestamp')
+        my_df = getRecentData('graphs_chargedcarswestfuture',12, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
 # Rest Framework - Future Charging Cars data  
-class ChargingCarsPredicted(APIView):
+class ChargingCarsPredictedWest(APIView):
     """
     This method used to send predicted values
     """ 
@@ -224,12 +304,42 @@ class ChargingCarsPredicted(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_chargingcarsfuture',12, 'timestamp')
+        my_df = getRecentData('graphs_chargingcarswestfuture',12, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)
 
-# Rest Framework - Building data future
-class BuildingPredicted(APIView):
+# Rest Framework - Charged Cars 
+class chargedCarsRose(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargedcarsrose',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charging Cars 
+class chargingCarsRose(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarsrose',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charged Cars data
+class ChargedCarsPredictedRose(APIView):
     """
     This method used to send predicted values
     """ 
@@ -239,6 +349,201 @@ class BuildingPredicted(APIView):
         from .controller import getRecentData
         from .controller import pandasToJSON 
         
-        my_df = getRecentData('graphs_buildingfuture',48, 'timestamp')
+        my_df = getRecentData('graphs_chargedcarsrosefuture',12, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charging Cars data  
+class ChargingCarsPredictedRose(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarsrosefuture',12, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charged Cars 
+class chargedCarsFraser(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargedcarsfraser',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charging Cars 
+class chargingCarsFraser(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarsfraser',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charged Cars data
+class ChargedCarsPredictedFraser(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargedcarsfraserfuture',12, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charging Cars data  
+class ChargingCarsPredictedFraser(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarsfraserfuture',12, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charged Cars 
+class chargedCarsHealth(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargedcarshealth',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charging Cars 
+class chargingCarsHealth(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarshealth',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charged Cars data
+class ChargedCarsPredictedHealth(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargedcarshealthfuture',12, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charging Cars data  
+class ChargingCarsPredictedHealth(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarshealthfuture',12, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charged Cars 
+class chargedCarsNorth(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargedcarsnorth',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Charging Cars 
+class chargingCarsNorth(APIView):
+    """
+    Method to send 96 most recent car data points as a JSON string \n 
+    """
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarsnorth',96,'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charged Cars data
+class ChargedCarsPredictedNorth(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargedcarsnorthfuture',12, 'timestamp')
+        data = pandasToJSON(my_df)
+        return Response(data)
+
+# Rest Framework - Future Charging Cars data  
+class ChargingCarsPredictedNorth(APIView):
+    """
+    This method used to send predicted values
+    """ 
+    authentication_classes = []
+    permission_classes = []
+    def get(self, request, format=None):
+        from .controller import getRecentData
+        from .controller import pandasToJSON 
+        
+        my_df = getRecentData('graphs_chargingcarsnorthfuture',12, 'timestamp')
         data = pandasToJSON(my_df)
         return Response(data)

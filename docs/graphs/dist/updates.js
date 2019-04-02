@@ -73,7 +73,7 @@ function updateBuildingData(chart, daily_gauge, monthly_gauge, _url, pred_url) {
         type: "GET",
         async: false,
         success: function (data) {
-            console.log("polling next building point")
+            console.log("polling next point with gauges")
             var result = JSON.parse(data)
             var date = []
             var power = []
@@ -102,7 +102,7 @@ function updateData(chart, _url, pred_url) {
         url: _url,
         type: "GET",
         success: function (data) {
-            console.log("polling next vehicle point")
+            console.log("polling next point")
             var result = JSON.parse(data)
             var date = []
             var val = []
