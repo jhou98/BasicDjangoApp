@@ -4,33 +4,52 @@ import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-__timecol = 'timestamp'
 
-def westgraph(request):
-    """
-    Sends the following data to our graphs page: 
-    EV: current power, previous days peak power, previous months peak power\n
-    Building: current power, previous days peak power, previous months peak power \n
-    """
-    from .controller import getCurrentPower, getDailyPeak, getMonthlyPeak
 
-    #Get the values using our controller functions 
-    ev_pwr = getCurrentPower('graphs_westev', __timecol, 'value')
-    bd_pwr = getCurrentPower('graphs_building', __timecol, 'value')
-    ev_daily = getDailyPeak('graphs_westev', __timecol)
-    bd_daily = getDailyPeak('graphs_building', __timecol)
-    ev_monthly = getMonthlyPeak('graphs_westev')
-    bd_monthly = getMonthlyPeak('graphs_building')
+class graph():
 
-    #Debugging Purposes
-    print("current daily ev power is : ", ev_daily)
-    print("current daily building power is : ",bd_daily)
-    print("current ev power is : ",ev_pwr)
-    print("current building power is : ",bd_pwr)
-    print("current monthly ev peak is : ",ev_monthly)
-    print("current monthly building peak is : ",bd_monthly)
+    def getevgraph(x):
+        return { 
+            'west': 'graphs_westev',
+            'rose': 'graphs_roseev',
+            'fraser': 'graphs_fraserev',
+            'health': 'graphs_healthev',
+            'north': 'graphs_northev',
+        } [x]
 
-    return render(request, 'westgraphs.html', {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
+    def getgraph(request, parkade, template ):
+        """
+        Sends the following data to our graphs page: 
+        EV: current power, previous days peak power, previous months peak power\n
+        Building: current power, previous days peak power, previous months peak power \n
+        """
+        from .controller import getCurrentPower, getDailyPeak, getMonthlyPeak
+        __timecol = 'timestamp'
+        graphval = graph.getevgraph(parkade)
+        #Get the values using our controller functions 
+        ev_pwr = getCurrentPower(graphval, __timecol, 'value')
+        bd_pwr = getCurrentPower('graphs_building', __timecol, 'value')
+        ev_daily = getDailyPeak(graphval, __timecol)
+        bd_daily = getDailyPeak('graphs_building', __timecol)
+        ev_monthly = getMonthlyPeak(graphval)
+        bd_monthly = getMonthlyPeak('graphs_building')
+
+        return render(request, template, {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
+
+    def westgraph(request):
+        return graph.getgraph(request, 'west', 'westgraphs.html')
+
+    def rosegraph(request):
+        return graph.getgraph(request, 'rose', 'rosegraphs.html')
+    
+    def frasergraph(request):
+        return graph.getgraph(request, 'fraser', 'frasergraphs.html')
+
+    def healthgraph(request):
+        return graph.getgraph(request, 'health', 'healthgraphs.html')
+
+    def northgraph(request):
+        return graph.getgraph(request, 'north', 'northgraphs.html')
 
 def recentData(request, num_req):
     """

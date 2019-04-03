@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% block navbar %}<a class="navbar-brand" href={% url 'westev' %}>West Parkade</a>{% endblock %}
-{% block title%}West EV Parkade and Building Data{% endblock %}
+{% block navbar %}<a class="navbar-brand" href={% url 'fraserev' %}>Fraser Parkade</a>{% endblock %}
+{% block title%}Fraser EV Parkade and Building Data{% endblock %}
 
-{% block header %} <h1><b>West Parkade and Building Data</b></h1> {% endblock %}
+{% block header %} <h1><b>Fraser Parkade and Building Data</b></h1> {% endblock %}
 
 {% block content %}
 <!--HTML Content Here-->
@@ -107,14 +107,14 @@
 <!--Script for our Charts and Gauges-->
 <script>
     {% block jquery %}
-    var evpoint = '{% url 'west' %}'
+    var evpoint = '{% url 'fraser' %}'
     var buildingpoint = '{% url 'building' %}'
-    var chargedcarpoint = '{% url 'carschargedwest' %}'
-    var chargingcarpoint = '{% url 'carschargingwest' %}'
-    var evpredictedpoint = '{% url 'west_future' %}'
+    var chargedcarpoint = '{% url 'carschargedfraser' %}'
+    var chargingcarpoint = '{% url 'carschargingfraser' %}'
+    var evpredictedpoint = '{% url 'fraser_future' %}'
     var bdpredictedpoint = '{% url 'building_future' %}'
-    var chargedpredictedpoint = '{% url 'carschargedwest_future' %}'
-    var chargingpredictedpoint = '{% url 'carschargingwest_future' %}'
+    var chargedpredictedpoint = '{% url 'carschargedfraser_future' %}'
+    var chargingpredictedpoint = '{% url 'carschargingfraser_future' %}'
 
     //Running the ajax methods in parallel
     $.when(
@@ -330,7 +330,7 @@
                 complete: poll(evchart, bdchart, combochart, barchart, chargedchart, chargingchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, charged_url, charging_url, evpred_url, bdpred_url, chargedpred_url, chargingpred_url),
                 timeout: 2000
             })
-        }, 10 * 60000); //sleep for 5 mins
+        }, 10 * 60000); //sleep for 10 mins
     }
 
     {% endblock %}

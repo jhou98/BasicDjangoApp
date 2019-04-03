@@ -5,8 +5,12 @@ urlpatterns = [
     path(r'recent/<int:num_req>/',views.recentData, name='recent'),
     path(r'max/<int:num_req>/',views.peakData, name='max'),
 
-    path(r'west', views.westgraph, name='westev'),
-    
+    path(r'west', views.graph.westgraph, name='westev'),
+    path(r'rose', views.graph.rosegraph, name='roseev'),
+    path(r'fraser', views.graph.frasergraph, name='fraserev'),
+    path(r'health', views.graph.healthgraph, name='healthev'),
+    # path(r'north', views.graph.northgraph, name='northev'), #No data currently 
+
     path(r'api/west', views.WestEVData.as_view(), name='west'),
     path(r'api/rose', views.RoseEVData.as_view(), name='rose'),
     path(r'api/fraser', views.FraserEVData.as_view(), name='fraser'),
@@ -46,6 +50,6 @@ urlpatterns = [
     path(r'api/chargingcars/north',views.chargingCarsNorth.as_view(), name='carschargingnorth'),
     path(r'api/prediction/chargedcars/north',views.ChargedCarsPredictedNorth.as_view(), name='carschargednorth_future'),
     path(r'api/prediction/chargingcars/north',views.ChargingCarsPredictedNorth.as_view(), name='carschargingnorth_future'),
-  
+
 ]
 
