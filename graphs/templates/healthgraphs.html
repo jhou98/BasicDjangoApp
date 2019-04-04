@@ -108,11 +108,11 @@
 <script>
     {% block jquery %}
     var evpoint = '{% url 'health' %}'
-    var buildingpoint = '{% url 'building' %}'
+    var buildingpoint = '{% url 'buildinghealth' %}'
     var chargedcarpoint = '{% url 'carschargedhealth' %}'
     var chargingcarpoint = '{% url 'carscharginghealth' %}'
     var evpredictedpoint = '{% url 'health_future' %}'
-    var bdpredictedpoint = '{% url 'building_future' %}'
+    var bdpredictedpoint = '{% url 'buildinghealth_future' %}'
     var chargedpredictedpoint = '{% url 'carschargedhealth_future' %}'
     var chargingpredictedpoint = '{% url 'carscharginghealth_future' %}'
 
@@ -153,17 +153,17 @@
     ).then(function (data_ev, data_building, data_chargedcar, data_chargingcar, data_evprediction, data_bdprediction, data_chargedprediction, data_chargingprediction) {
 
         //Parse our EV data and format it into arrays 
-        var ev_result = JSON.parse(data_ev[0])
+        var ev_result = data_ev[0]
         var ev_date = []
         var ev_power = []
         //length (as our objects are in Most recent->least recent)
-        parsedata(ev_date, ev_power, ev_result.data)
+        parsedata(ev_date, ev_power, ev_result)
 
         //Similarly for our building data (static currently)
-        var bd_result = JSON.parse(data_building[0])
+        var bd_result = data_building[0]
         var bd_date = []
         var bd_power = []
-        parsedata(bd_date, bd_power, bd_result.data)
+        parsedata(bd_date, bd_power, bd_result)
 
         //create an array for bar chart
         //The array will look like this -> [ev power, building power, combined power]
@@ -173,12 +173,12 @@
         bar_power.push(bar_power[0] + bar_power[1])
 
         //Our predicted data for ev
-        var predicted_result = JSON.parse(data_evprediction[0])
+        var predicted_result = data_evprediction[0]
         var predicted_date = []
         var predicted_val = []
         var predicted_max = []
         var predicted_min = []
-        parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, predicted_result.data)
+        parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, predicted_result)
 
         // Formatting the ev graph data to include the predicted vals w/ error bars 
         // NOTE: Currently just using static random data for predicted values, change API url once setup
@@ -191,12 +191,12 @@
 
         // Our predicted results for building 
         // NOTE: Currently just using the some random static data 
-        var predicted_resultbd = JSON.parse(data_bdprediction[0])
+        var predicted_resultbd = data_bdprediction[0]
         var predicted_datebd = []
         var predicted_valbd = []
         var predicted_maxbd = []
         var predicted_minbd = []
-        parsepredicted(predicted_datebd, predicted_valbd, predicted_maxbd, predicted_minbd, predicted_resultbd.data)
+        parsepredicted(predicted_datebd, predicted_valbd, predicted_maxbd, predicted_minbd, predicted_resultbd)
 
         // Formatting the building graph data to include the predicted vals w/ error bars 
         var bdgraph_timestamp = bd_date.slice(0)
@@ -207,19 +207,19 @@
         formatpredicted(bd_date, predicted_datebd, predicted_valbd, predicted_maxbd, predicted_minbd, bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min)
 
         // Our vehicle data (static currently)
-        var charged_result = JSON.parse(data_chargedcar[0])
+        var charged_result = data_chargedcar[0]
         var charged_date = []
         var charged_value = []
-        parsedata(charged_date, charged_value, charged_result.data)
+        parsedata(charged_date, charged_value, charged_result)
 
         // Our predicted results for chargedcars 
         // NOTE: Currently using some random static data 
-        var predicted_resultcharged = JSON.parse(data_chargedprediction[0])
+        var predicted_resultcharged = data_chargedprediction[0]
         var predicted_datecharged = []
         var predicted_valcharged = []
         var predicted_maxcharged = []
         var predicted_mincharged = []
-        parsepredicted(predicted_datecharged, predicted_valcharged, predicted_maxcharged, predicted_mincharged, predicted_resultcharged.data)
+        parsepredicted(predicted_datecharged, predicted_valcharged, predicted_maxcharged, predicted_mincharged, predicted_resultcharged)
 
         // Formatting the charged cars graph data to include the predicted vals w/ error bars 
         var chargedgraph_timestamp = charged_date.slice(0)
@@ -230,19 +230,19 @@
         formatpredicted(charged_date, predicted_datecharged, predicted_valcharged, predicted_maxcharged, predicted_mincharged, chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min)
 
         // Our vehicle data (static currently)
-        var charging_result = JSON.parse(data_chargingcar[0])
+        var charging_result = data_chargingcar[0]
         var charging_date = []
         var charging_value = []
-        parsedata(charging_date, charging_value, charging_result.data)
+        parsedata(charging_date, charging_value, charging_result)
 
         // Our predicted results for chargingcars 
         // NOTE: Currently using some random static data 
-        var predicted_resultcharging = JSON.parse(data_chargingprediction[0])
+        var predicted_resultcharging = data_chargingprediction[0]
         var predicted_datecharging = []
         var predicted_valcharging = []
         var predicted_maxcharging = []
         var predicted_mincharging = []
-        parsepredicted(predicted_datecharging, predicted_valcharging, predicted_maxcharging, predicted_mincharging, predicted_resultcharging.data)
+        parsepredicted(predicted_datecharging, predicted_valcharging, predicted_maxcharging, predicted_mincharging, predicted_resultcharging)
 
         // Formatting the charging cars graph data to include the predicted vals w/ error bars 
         var charginggraph_timestamp = charging_date.slice(0)
@@ -287,6 +287,7 @@
 
 <script>
     {% block script %}
+
     function poll(evchart, bdchart, combochart, barchart, chargedchart, chargingchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, charged_url, charging_url, evpred_url, bdpred_url, chargedpred_url, chargingpred_url) {
         /** 
          * Function that calls itself over a set interval using setTimeout and ajax.
@@ -302,13 +303,13 @@
                 type: "GET",
                 success: function (data) {
                     console.log("polling next point")
-                    var result = JSON.parse(data)
+                    var result = data
                     var ev_date = []
                     var ev_power = []
-                    parsedata(ev_date, ev_power, result.data)
+                    parsedata(ev_date, ev_power, result)
                     //Update our EV gauge and Charts
-                    ev_gauge1.setValue(result.data[0][1])
-                    ev_gauge2.setValue(result.data[0][1])
+                    ev_gauge1.setValue(result.value[0])
+                    ev_gauge2.setValue(result.value[0])
                     updateChart(evchart, ev_date, ev_power, evpred_url)
 
                     //Update our BD Gauge and Charts 
@@ -330,8 +331,10 @@
                 complete: poll(evchart, bdchart, combochart, barchart, chargedchart, chargingchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, charged_url, charging_url, evpred_url, bdpred_url, chargedpred_url, chargingpred_url),
                 timeout: 2000
             })
-        }, 10 * 60000); //sleep for 10 mins
+        }, 10 * 60000); //sleep for 5 mins
     }
+
+    {% endblock %}
 
     {% endblock %}
 </script>

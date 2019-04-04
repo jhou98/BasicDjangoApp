@@ -6,9 +6,9 @@ urlpatterns = [
     path(r'max/<int:num_req>/',views.peakData, name='max'),
 
     path(r'west', views.graph.westgraph, name='westev'),
-    # path(r'rose', views.graph.rosegraph, name='roseev'),
-    # path(r'fraser', views.graph.frasergraph, name='fraserev'),
-    # path(r'health', views.graph.healthgraph, name='healthev'),
+    path(r'rose', views.graph.rosegraph, name='roseev'),
+    path(r'fraser', views.graph.frasergraph, name='fraserev'),
+    path(r'health', views.graph.healthgraph, name='healthev'),
     # path(r'north', views.graph.northgraph, name='northev'), #No data currently 
 
     path(r'api/west', views.EVData.west, name='west'),

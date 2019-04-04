@@ -101,7 +101,7 @@ def getJSONPredictedData(request, location, format=None):
 
 class BuildingData():
     
-    def getbdgraph(x):
+    def getgraph(x):
         return { 
             'west': 'graphs_buildingwest',
             'rose': 'graphs_buildingrose',

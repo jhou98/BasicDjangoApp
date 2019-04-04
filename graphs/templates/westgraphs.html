@@ -108,11 +108,11 @@
 <script>
     {% block jquery %}
     var evpoint = '{% url 'west' %}'
-    var buildingpoint = '{% url 'building_west' %}'
+    var buildingpoint = '{% url 'buildingwest' %}'
     var chargedcarpoint = '{% url 'carschargedwest' %}'
     var chargingcarpoint = '{% url 'carschargingwest' %}'
     var evpredictedpoint = '{% url 'west_future' %}'
-    var bdpredictedpoint = '{% url 'building_future' %}'
+    var bdpredictedpoint = '{% url 'buildingwest_future' %}'
     var chargedpredictedpoint = '{% url 'carschargedwest_future' %}'
     var chargingpredictedpoint = '{% url 'carschargingwest_future' %}'
 
@@ -153,6 +153,7 @@
     ).then(function (data_ev, data_building, data_chargedcar, data_chargingcar, data_evprediction, data_bdprediction, data_chargedprediction, data_chargingprediction) {
 
         //Parse our EV data and format it into arrays 
+        console.log(data_ev)
         var ev_result = data_ev[0]
         var ev_date = []
         var ev_power = []
@@ -161,7 +162,6 @@
 
         //Similarly for our building data (static currently)
         var bd_result = data_building[0]
-        console.log(bd_result)
         var bd_date = []
         var bd_power = []
         parsedata(bd_date, bd_power, bd_result)
@@ -304,10 +304,11 @@
                 type: "GET",
                 success: function (data) {
                     console.log("polling next point")
-                    var result = data[0]
+                    var result = data
                     var ev_date = []
                     var ev_power = []
-                    parsedata(ev_date, ev_power, result.data)
+                    console.log(ev_url)
+                    parsedata(ev_date, ev_power, result)
                     //Update our EV gauge and Charts
                     ev_gauge1.setValue(result.value[0])
                     ev_gauge2.setValue(result.value[0])
@@ -332,7 +333,7 @@
                 complete: poll(evchart, bdchart, combochart, barchart, chargedchart, chargingchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, charged_url, charging_url, evpred_url, bdpred_url, chargedpred_url, chargingpred_url),
                 timeout: 2000
             })
-        }, 10 * 60000); //sleep for 5 mins
+        }, 0.2 * 60000); //sleep for 5 mins
     }
 
     {% endblock %}
