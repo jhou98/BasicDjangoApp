@@ -40,12 +40,12 @@ function updateChart(chart, timestamps, pwr, _url) {
         url: _url,
         type: "GET",
         success: function (data) {
-            var result = JSON.parse(data)
+            var result = data[0]
             var predicted_date = []
             var predicted_val = []
             var predicted_max = []
             var predicted_min = []
-            parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, result.data)
+            parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, result)
             //Add most recent datapoint into our chart
             addDataChart(chart, timestamps, pwr, predicted_date, predicted_val, predicted_max, predicted_min)
         },
@@ -74,13 +74,13 @@ function updateBuildingData(chart, daily_gauge, monthly_gauge, _url, pred_url) {
         async: false,
         success: function (data) {
             console.log("polling next point with gauges")
-            var result = JSON.parse(data)
+            var result = data[0]
             var date = []
             var power = []
-            parsedata(date, power, result.data)
+            parsedata(date, power, result)
             //Update our EV gauge and Charts
-            daily_gauge.setValue(result.data[0][1])
-            monthly_gauge.setValue(result.data[0][1])
+            daily_gauge.setValue(result.value[0])
+            monthly_gauge.setValue(result.value[0])
             updateChart(chart, date, power, pred_url)
             retval = power.slice(0)
         },
@@ -103,10 +103,10 @@ function updateData(chart, _url, pred_url) {
         type: "GET",
         success: function (data) {
             console.log("polling next point")
-            var result = JSON.parse(data)
+            var result = data[0]
             var date = []
             var val = []
-            parsedata(date, val, result.data)
+            parsedata(date, val, result)
             //Update our EV gauge and Charts
             updateChart(chart, date, val, pred_url)
         },
@@ -166,12 +166,12 @@ function updateBarData(chart, power){
  * @param {Array} data Data array to parse 
  */
 function parsepredicted(date, val, max, min, data) {
-    var length = data.length - 1
-    for (var x in data) {
-        date.push((data[length - x][0]).slice(0, 16))
-        val.push(data[length - x][1])
-        max.push(data[length - x][2])
-        min.push(data[length - x][3])
+    var length = data.timestamp.length - 1
+    for (var x in data.timestamp) {
+        date.push((data.timestamp[length - x]).slice(0, 16))
+        val.push(data.value[length - x])
+        max.push(data.maxerr[length - x])
+        min.push(data.minerr[length - x])
     }
 }
 
@@ -217,9 +217,9 @@ function formatpredicted(curr_date, pred_date, pred_val, pred_max, pred_min, dat
  * @param {Array} data Array of data to be parsed 
  */
 function parsedata(date, val, data) {
-    var length = data.length - 1
-    for (var x in data) {
-        date.push((data[length - x][0]).slice(0, 16))
-        val.push(data[length - x][1])
+    var length = data.timestamp.length - 1
+    for (var x in data.timestamp) {
+        date.push((data.timestamp[length - x]).slice(0, 16))
+        val.push(data.value[length - x])
     }
 }

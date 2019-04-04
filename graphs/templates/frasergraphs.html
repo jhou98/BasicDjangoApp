@@ -149,9 +149,8 @@
         $.ajax({
             method: "GET",
             url: chargingpredictedpoint
-        })
+        }),
     ).then(function (data_ev, data_building, data_chargedcar, data_chargingcar, data_evprediction, data_bdprediction, data_chargedprediction, data_chargingprediction) {
-
         //Parse our EV data and format it into arrays 
         var ev_result = JSON.parse(data_ev[0])
         var ev_date = []

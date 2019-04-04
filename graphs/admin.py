@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import WestEV, NorthEV, FraserEV, RoseEV, HealthEV
 from .models import WestEVFuture, NorthEVFuture, FraserEVFuture, RoseEVFuture,HealthEVFuture
-from .models import building, buildingFuture
+from .models import buildingWest, buildingRose, buildingHealth, buildingFraser, buildingNorth 
+from .models import buildingWestFuture, buildingRoseFuture, buildingHealthFuture, buildingFraserFuture, buildingNorthFuture
 from .models import chargedCarsWest, chargingCarsWest, chargedCarsWestFuture, chargingCarsWestFuture
 from .models import chargedCarsRose, chargingCarsRose, chargedCarsRoseFuture, chargingCarsRoseFuture
 from .models import chargedCarsFraser, chargingCarsFraser, chargedCarsFraserFuture, chargingCarsFraserFuture
@@ -24,8 +25,16 @@ admin.site.register(RoseEVFuture)
 admin.site.register(HealthEVFuture)
 
 # Building and Building prediction 
-admin.site.register(building)
-admin.site.register(buildingFuture)
+admin.site.register(buildingWest)
+admin.site.register(buildingWestFuture)
+admin.site.register(buildingRose)
+admin.site.register(buildingRoseFuture)
+admin.site.register(buildingHealth)
+admin.site.register(buildingHealthFuture)
+admin.site.register(buildingFraser)
+admin.site.register(buildingFraserFuture)
+admin.site.register(buildingNorth)
+admin.site.register(buildingNorthFuture)
 
 # 4 for vehicles for each Parkade
 admin.site.register(chargedCarsWest)

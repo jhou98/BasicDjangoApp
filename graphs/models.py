@@ -147,7 +147,7 @@ class FraserEVFuture(models.Model):
             " with max/min error of " + str(self.maxerr) + "/" + str(self.minerr)
 
 # class for building (can make more per building)
-class building(models.Model):
+class buildingWest(models.Model):
     """
      Class the represents building data energy 
         1. timestamp: Datetime field
@@ -160,7 +160,127 @@ class building(models.Model):
     def __str__(self):
         return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
 
-class buildingFuture(models.Model):
+class buildingWestFuture(models.Model):
+    """
+    Class that holds the predicted values for the building power. 
+        1. timestamp: Datetime field
+        2. value: Predicted value 
+        3. maxerr: Maximum error value  
+        4. minerr: Minimum error value 
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+    maxerr = models.FloatField()
+    minerr = models.FloatField()
+
+    def __str__(self):
+        return "For future timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " the predicted Energy is " + str(self.value) + \
+            " with max/min error of " + str(self.maxerr) + "/" + str(self.minerr)
+
+class buildingRose(models.Model):
+    """
+     Class the represents building data energy 
+        1. timestamp: Datetime field
+        2. value: Energy consumption 
+    Currently not used (waiting for API connection)
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class buildingRoseFuture(models.Model):
+    """
+    Class that holds the predicted values for the building power. 
+        1. timestamp: Datetime field
+        2. value: Predicted value 
+        3. maxerr: Maximum error value  
+        4. minerr: Minimum error value 
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+    maxerr = models.FloatField()
+    minerr = models.FloatField()
+
+    def __str__(self):
+        return "For future timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " the predicted Energy is " + str(self.value) + \
+            " with max/min error of " + str(self.maxerr) + "/" + str(self.minerr)
+
+class buildingHealth(models.Model):
+    """
+     Class the represents building data energy 
+        1. timestamp: Datetime field
+        2. value: Energy consumption 
+    Currently not used (waiting for API connection)
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class buildingHealthFuture(models.Model):
+    """
+    Class that holds the predicted values for the building power. 
+        1. timestamp: Datetime field
+        2. value: Predicted value 
+        3. maxerr: Maximum error value  
+        4. minerr: Minimum error value 
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+    maxerr = models.FloatField()
+    minerr = models.FloatField()
+
+    def __str__(self):
+        return "For future timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " the predicted Energy is " + str(self.value) + \
+            " with max/min error of " + str(self.maxerr) + "/" + str(self.minerr)
+
+class buildingFraser(models.Model):
+    """
+     Class the represents building data energy 
+        1. timestamp: Datetime field
+        2. value: Energy consumption 
+    Currently not used (waiting for API connection)
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class buildingFraserFuture(models.Model):
+    """
+    Class that holds the predicted values for the building power. 
+        1. timestamp: Datetime field
+        2. value: Predicted value 
+        3. maxerr: Maximum error value  
+        4. minerr: Minimum error value 
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+    maxerr = models.FloatField()
+    minerr = models.FloatField()
+
+    def __str__(self):
+        return "For future timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " the predicted Energy is " + str(self.value) + \
+            " with max/min error of " + str(self.maxerr) + "/" + str(self.minerr)
+
+class buildingNorth(models.Model):
+    """
+     Class the represents building data energy 
+        1. timestamp: Datetime field
+        2. value: Energy consumption 
+    Currently not used (waiting for API connection)
+    """
+    timestamp = models.DateTimeField(primary_key=True)
+    value = models.FloatField()
+
+    def __str__(self):
+        return "Timestamp: " + self.timestamp.strftime("%m/%d/%y %H:%M:%S") + " Energy: " + str(self.value)
+
+class buildingNorthFuture(models.Model):
     """
     Class that holds the predicted values for the building power. 
         1. timestamp: Datetime field
