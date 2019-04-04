@@ -145,6 +145,8 @@ def getCurrentPower(tablename, timecol, powercol):
     Returns a decimal power value 
     """
     df = getRecentData(tablename, 1, timecol)
+    if df.empty:
+        return 0
     return df.at[0, 'value']
 
 def getDailyPeak(tablename, timecol):
@@ -156,6 +158,10 @@ def getDailyPeak(tablename, timecol):
     """
     # Only need the most recent point since we will sample the data we need with another query 
     df = getRecentData(tablename, 1, timecol)
+
+    if df.empty: 
+        return 0
+
     #Calculating the current day 
     curr_year = df.iloc[0].timestamp.year 
     curr_month = df.iloc[0].timestamp.month 
@@ -197,6 +203,9 @@ def getMonthlyPeak(tablename):
      # Only need the most recent point since we will sample the data we need with another query 
     df = getRecentData(tablename, 1, 'timestamp')
 
+    if df.empty: 
+        return 0 
+        
     #Calculating the current month
     curr_year = df.iloc[0].timestamp.year 
     curr_month = df.iloc[0].timestamp.month 

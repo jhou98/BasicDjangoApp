@@ -19,7 +19,16 @@ class graph():
             'north': 'graphs_northev',
         } [x]
 
-    def getgraph(request, parkade, template ):
+    def getbdgraph(y):
+        return {
+            'west': 'graphs_buildingwest',
+            'rose': 'graphs_buildingrose',
+            'fraser': 'graphs_buildingfraser',
+            'health': 'graphs_buildinghealth',
+            'north': 'graphs_buildingnorth',
+        } [y]
+
+    def getgraph(request, parkade, template):
         """
         Sends the following data to our graphs page: 
         EV: current power, previous days peak power, previous months peak power\n
@@ -27,14 +36,16 @@ class graph():
         """
         from .controller import getCurrentPower, getDailyPeak, getMonthlyPeak
         __timecol = 'timestamp'
-        graphval = graph.getevgraph(parkade)
+        __val = 'value'
+        evgraphs = graph.getevgraph(parkade)
+        bdgraphs = graph.getbdgraph(parkade)
         #Get the values using our controller functions 
-        ev_pwr = getCurrentPower(graphval, __timecol, 'value')
-        bd_pwr = getCurrentPower('graphs_buildingwest', __timecol, 'value')
-        ev_daily = getDailyPeak(graphval, __timecol)
-        bd_daily = getDailyPeak('graphs_buildingwest', __timecol)
-        ev_monthly = getMonthlyPeak(graphval)
-        bd_monthly = getMonthlyPeak('graphs_buildingwest')
+        ev_pwr = getCurrentPower(evgraphs, __timecol, __val)
+        bd_pwr = getCurrentPower(bdgraphs, __timecol, __val)
+        ev_daily = getDailyPeak(evgraphs, __timecol)
+        bd_daily = getDailyPeak(bdgraphs, __timecol)
+        ev_monthly = getMonthlyPeak(evgraphs)
+        bd_monthly = getMonthlyPeak(bdgraphs)
 
         return render(request, template, {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
 
@@ -84,7 +95,6 @@ def getJSONData(request, location, format=None):
     A view that returns the count of active users in JSON.
     """
     from .controller import getRecentData
-    from .controller import pandasToJSON 
     my_df = getRecentData(location, 96, 'timestamp')
     return Response(my_df)
 
@@ -95,7 +105,6 @@ def getJSONPredictedData(request, location, format=None):
     A view that returns the count of active users in JSON.
     """
     from .controller import getRecentData
-    from .controller import pandasToJSON 
     my_df = getRecentData(location, 48, 'timestamp')
     return Response(my_df)
 

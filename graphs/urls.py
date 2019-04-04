@@ -9,7 +9,7 @@ urlpatterns = [
     path(r'rose', views.graph.rosegraph, name='roseev'),
     path(r'fraser', views.graph.frasergraph, name='fraserev'),
     path(r'health', views.graph.healthgraph, name='healthev'),
-    # path(r'north', views.graph.northgraph, name='northev'), #No data currently 
+    path(r'north', views.graph.northgraph, name='northev'), #No data currently 
 
     path(r'api/west', views.EVData.west, name='west'),
     path(r'api/rose', views.EVData.rose, name='rose'),

@@ -40,11 +40,12 @@ function updateChart(chart, timestamps, pwr, _url) {
         url: _url,
         type: "GET",
         success: function (data) {
+            var result = data
             var predicted_date = []
             var predicted_val = []
             var predicted_max = []
             var predicted_min = []
-            parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, data)
+            parsepredicted(predicted_date, predicted_val, predicted_max, predicted_min, result)
             //Add most recent datapoint into our chart
             addDataChart(chart, timestamps, pwr, predicted_date, predicted_val, predicted_max, predicted_min)
         },
@@ -73,12 +74,13 @@ function updateBuildingData(chart, daily_gauge, monthly_gauge, _url, pred_url) {
         async: false,
         success: function (data) {
             console.log("polling next point with gauges")
+            var result = data
             var date = []
             var power = []
-            parsedata(date, power, data)
+            parsedata(date, power, result)
             //Update our EV gauge and Charts
-            daily_gauge.setValue(data.value[0])
-            monthly_gauge.setValue(data.value[0])
+            daily_gauge.setValue(result.value[0])
+            monthly_gauge.setValue(result.value[0])
             updateChart(chart, date, power, pred_url)
             retval = power.slice(0)
         },
@@ -101,9 +103,10 @@ function updateData(chart, _url, pred_url) {
         type: "GET",
         success: function (data) {
             console.log("polling next point")
+            var result = data 
             var date = []
             var val = []
-            parsedata(date, val, data)
+            parsedata(date, val, result)
             //Update our EV gauge and Charts
             updateChart(chart, date, val, pred_url)
         },

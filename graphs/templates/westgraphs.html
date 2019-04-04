@@ -307,7 +307,6 @@
                     var result = data
                     var ev_date = []
                     var ev_power = []
-                    console.log(ev_url)
                     parsedata(ev_date, ev_power, result)
                     //Update our EV gauge and Charts
                     ev_gauge1.setValue(result.value[0])
@@ -333,7 +332,7 @@
                 complete: poll(evchart, bdchart, combochart, barchart, chargedchart, chargingchart, ev_gauge1, ev_gauge2, bd_gauge1, bd_gauge2, ev_url, bd_url, charged_url, charging_url, evpred_url, bdpred_url, chargedpred_url, chargingpred_url),
                 timeout: 2000
             })
-        }, 0.2 * 60000); //sleep for 5 mins
+        }, 10 * 60000); //sleep for 5 mins
     }
 
     {% endblock %}
