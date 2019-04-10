@@ -205,7 +205,7 @@ def getMonthlyPeak(tablename):
 
     if df.empty: 
         return 0 
-        
+
     #Calculating the current month
     curr_year = df.iloc[0].timestamp.year 
     curr_month = df.iloc[0].timestamp.month 
@@ -250,28 +250,4 @@ def getRecentData(tablename, num_req, col):
                 " LIMIT " + str(num_req)
     df = pd.read_sql_query(sql = my_query, con=engine)
     return df
-
-def pandasToJSON(df):
-    """
-    Converts a dataframe into a JSON string 
-    """
-    return df.to_json(date_format='iso', orient='split')
-
-def getRecentDataList(num_req):
-    """
-    Reads and returns a Query list of data from powerdata \n 
-    :param int num_req: Number of datapoints to retrieve
-    """
-    from .models import WestEV
-    latest_data_list = WestEV.objects.order_by('-timestamp')[:num_req]
-    return latest_data_list
-
-def getMaxData(num_req):
-    """
-    Gets a list of data points ordered by power consumption \n
-    :param int num_req: Number of data points to be extracted \n
-    """
-    from .models import WestEV 
-    latest_data_list = WestEV.objects.order_by('-value')[:num_req]
-    return latest_data_list
 

@@ -16,3 +16,12 @@ cursor = cnxn.cursor()
 
 cursor.execute('select * from testtable;')
 print(cursor.fetchone())
+
+# 'default': {
+#   'ENGINE': 'sql_server.pyodbc',
+#   'NAME': 'myTestDatabase',
+#   'USER': 'azureuser@myserver',
+#   'PASSWORD': 'Cerc2019', 
+#   'HOST': 'powertest.database.windows.net,
+#   'PORT': '',
+# }

@@ -572,6 +572,19 @@
 
 - Once you run the file, you should be able to see the df rows appended to your table that you created already in your Azure portal
 
+- To add the cloud server onto your Django Web Platform, you will need to modify the default Database settings in the __settings.py__ file
+
+    ```python 
+         'default': {
+           'ENGINE': 'sql_server.pyodbc',
+           'NAME': '<databasename>',
+           'USER': '<username>@myserver', 
+           'PASSWORD': '<password>', 
+           'HOST': '<servername>', #ie. powertest.database.windows.net
+           'PORT': '',
+        }
+    ```
+
 ## Creating a 2 Part Chart 
 - This section will walkthrough how to create a chart with both historic/realtime data as well as predicted future + max/min error 
 - We will be using Chart.js to implement our chart 

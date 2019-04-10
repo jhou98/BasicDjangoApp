@@ -6,6 +6,13 @@
     > __View__: View component is used for UI logic and whatever the user interacts with <br>
     > __Controller__: The Controller component acts as an interface between the Model and View to process all logic and requests, manipulate the data from the Model and interact with our View to render the final results. <br>
 
+### Installation 
+
+To add this app and have it running on your machine, you will need to clone the repository using the `git clone` command. 
+Afterwards, you will need to create a new __virtual environment__ using the `virtualenv` command (check walkthrough for more details on how to create and activate the virtual environment). 
+Once the virtual environment is activated, navigate to project base directory where `requirements.txt` is located, and run the command `pip install -r requirements.txt` in your shell. 
+Once all the libraries are installed, you should be able to activate the app using the command `python manage.py runserver` and view it on the localhost:8000. 
+
 [Part 1 - Models](#Models) 
 ------
 [Part 2 - Views](#Views) 
@@ -18,6 +25,8 @@
 ------
 [Part 6 - Gauges](#Gauges)
 ------
+[Part 7 - Working Implementation](#How-to-operate-Version-1-of-the-App)
+------ 
 
 ## Models 
 - Assume you have your main project called __basic__ and you want to add a model to your app called __graphs__
@@ -546,5 +555,31 @@
     ```javascript
         var evdgauge = createGauge("evdailyval", "evdailymax", "%GAUGEID%")
      ```
+
+<br> [Back to Top](#Basic-Django-App)
+
+## How to operate Version 1 of the App
+
+- Version 1 of the Django Application is the first full working implementation of our Application with the following parts:
+    1. 5 main pages displaying data for each of the corresponding parkades: West, Rose, Fraser, Health, North
+    2. Each of the parkade data pages has the following components
+        - Chart of parkade data for last 24 hours with prediction for next 12 hours =with max and min error
+        - Chart of building data for last 24 hours with prediction for next 12 hours with max and min error
+        - Chart of vehicle data: finished charging and connected, for last 24 hours and prediction for next 12 hours with max and min error
+        - Chart of vehicle data: still charging, for last 24 hours and prediction for next 12 hours with max and min error
+        - Chart of combined parkade and building data for last 24 hours
+        - Chart of most recent parkade and building data
+        - Gauge comparing current parkade data to peak parkade data from yesterday
+        - Gauge comparing current parkade data to peak parkade data from last month
+        - Gauge comparing current building data to peak building data from yesterday
+        - Gauge comparing current building data to peak building data from last month
+        - Gauge with slider that could potentially allow control for Energy output of EV chargers
+    3. All charts are and gauges are updated in real time every 10 mins by long polling a URL where our database data is sent via JSON (so there will be at most a delay of 5 minutes after the database is updated)
+
+- Inside each of the graph HTML templates, there are 8 variables at the start of the `{% block jquery %}`. These variables are the only ones that need to be modified if you wish to change the source of data. These variables are linked to the _name variable_ defined in our `urlpatterns[]` in our __urls.py__ file, so if the variable changes, we will need to change it in our templates as well. This will likely be the thing that changes most frequently.
+
+- Our `urlpatterns[]` in __urls.py__ are linked to methods within the classes found in our __views.py__ file. The majority of these classes are very similar API classes that use the django-rest-framework library to send a JSON object containing data from a specific graph in our database as a response. Each of these API classes have their own individual dictionary which helps us map our parkade to the corresponding database table.
+
+- Our classes in the __views.py__ file use helper functions in __connector.py__ to communicate with our database, such as `getRecentData()`, `getCurrentPower()`, `getDailyPeak()`, and `getMonthlyPeak()`.
 
 <br> [Back to Top](#Basic-Django-App)

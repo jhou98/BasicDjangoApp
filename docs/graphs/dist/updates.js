@@ -73,7 +73,6 @@ function updateBuildingData(chart, daily_gauge, monthly_gauge, _url, pred_url) {
         type: "GET",
         async: false,
         success: function (data) {
-            console.log("polling next point with gauges")
             var result = data
             var date = []
             var power = []
@@ -102,7 +101,6 @@ function updateData(chart, _url, pred_url) {
         url: _url,
         type: "GET",
         success: function (data) {
-            console.log("polling next point")
             var result = data 
             var date = []
             var val = []
@@ -130,7 +128,6 @@ function updateComboData(chart, timestamp, ev_pwr, bd_pwr) {
     for (var x in timestamp) {
         total_pwr.push(ev_pwr[x] + bd_pwr[x])
     }
-    console.log("updating combo data")
     chart.data.labels = timestamp
     chart.data.datasets[0].data = ev_pwr
     chart.data.datasets[1].data = bd_pwr
@@ -147,7 +144,6 @@ function updateComboData(chart, timestamp, ev_pwr, bd_pwr) {
 function updateBarData(chart, power){
     chart.data.datasets[0].data = power
     chart.update(); 
-    console.log("updating bar data")
 }
 
 /**
@@ -168,7 +164,7 @@ function updateBarData(chart, power){
 function parsepredicted(date, val, max, min, data) {
     var length = data.timestamp.length - 1
     for (var x in data.timestamp) {
-        date.push((data.timestamp[length - x]).slice(0, 16))
+        date.push((data.timestamp[length - x]).slice(5, 16))
         val.push(data.value[length - x])
         max.push(data.maxerr[length - x])
         min.push(data.minerr[length - x])
@@ -219,7 +215,7 @@ function formatpredicted(curr_date, pred_date, pred_val, pred_max, pred_min, dat
 function parsedata(date, val, data) {
     var length = data.timestamp.length - 1
     for (var x in data.timestamp) {
-        date.push((data.timestamp[length - x]).slice(0, 16))
+        date.push((data.timestamp[length - x]).slice(5, 16))
         val.push(data.value[length - x])
     }
 }

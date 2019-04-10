@@ -11,6 +11,11 @@ from rest_framework.decorators import renderer_classes
 class graph():
 
     def getevgraph(x):
+        """
+        Dictionary of Key-Value pairs for parkades. 
+
+        @returns string for our table name in the database 
+        """
         return { 
             'west': 'graphs_westev',
             'rose': 'graphs_roseev',
@@ -19,20 +24,27 @@ class graph():
             'north': 'graphs_northev',
         } [x]
 
-    def getbdgraph(y):
+    def getbdgraph(x):
+        """
+        Dictionary of Key-Value pairs for buildings. 
+
+        @returns string for our table name in the database 
+        """
         return {
             'west': 'graphs_buildingwest',
             'rose': 'graphs_buildingrose',
             'fraser': 'graphs_buildingfraser',
             'health': 'graphs_buildinghealth',
             'north': 'graphs_buildingnorth',
-        } [y]
+        } [x]
 
     def getgraph(request, parkade, template):
         """
         Sends the following data to our graphs page: 
-        EV: current power, previous days peak power, previous months peak power\n
-        Building: current power, previous days peak power, previous months peak power \n
+
+        EV: current power, previous days peak power, previous months peak power
+
+        Building: current power, previous days peak power, previous months peak power 
         """
         from .controller import getCurrentPower, getDailyPeak, getMonthlyPeak
         __timecol = 'timestamp'
@@ -49,50 +61,33 @@ class graph():
 
         return render(request, template, {'curr_ev': ev_pwr, 'curr_bd': bd_pwr,'max_evdaily': ev_daily, 'max_evmonthly': ev_monthly, 'max_bddaily': bd_daily, 'max_bdmonthly': bd_monthly})
 
-    def westgraph(request):
+    """
+    The following functions are specific to each parkade, and uses the other functions in the graph class to get the values that we need for our main chart pages. 
+
+    @returns a render which graphs our request to a URL and HTML template.
+    """
+    def west(request):
         return graph.getgraph(request, 'west', 'westgraphs.html')
 
-    def rosegraph(request):
+    def rose(request):
         return graph.getgraph(request, 'rose', 'rosegraphs.html')
     
-    def frasergraph(request):
+    def fraser(request):
         return graph.getgraph(request, 'fraser', 'frasergraphs.html')
 
-    def healthgraph(request):
+    def health(request):
         return graph.getgraph(request, 'health', 'healthgraphs.html')
 
-    def northgraph(request):
+    def north(request):
         return graph.getgraph(request, 'north', 'northgraphs.html')
-
-def recentData(request, num_req):
-    """
-    Gets a list of the most recent data points in our powerData table model \n
-    :param int num_req: Number of data points to extracted \n
-    Returns an unordered list of datapoints (max of 1000)
-    """
-    from .controller import getRecentDataList as getRecent
-    if num_req > 1000:
-        raise Http404("Too many points requested. MAX=1000")
-    latest_data_list = getRecent(num_req)
-    return render(request, 'data.html', {'recent_data':latest_data_list})
-
-def peakData(request, num_req):
-    """
-    Gets a list of data points ordered by power consumption \n
-    :param int num_req: Number of data points to be extracted \n
-    Returns an unordered list of datapoints (max of 1000)
-    """
-    from .controller import getMaxData 
-    if num_req > 1000:
-        raise Http404("Too many points requested. MAX=1000")
-    latest_data_list = getMaxData(num_req)
-    return render(request, 'max_val.html', {'max_power':latest_data_list})
 
 @api_view(['GET'])    
 @renderer_classes((JSONRenderer,))
 def getJSONData(request, location, format=None):
     """
-    A view that returns the count of active users in JSON.
+    Returns a response in JSON. 
+    
+    To control the amount of datapoints (rows), modify the function getRecentData(*graphname, *num of points, *name of column to order by)
     """
     from .controller import getRecentData
     my_df = getRecentData(location, 96, 'timestamp')
@@ -102,12 +97,27 @@ def getJSONData(request, location, format=None):
 @renderer_classes((JSONRenderer,))
 def getJSONPredictedData(request, location, format=None):
     """
-    A view that returns the count of active users in JSON.
+    Returns a response in JSON, this is a seperate function as predicted is 12 hours instead of 24. 
+    
+    To control the amount of datapoints (rows), modify the function getRecentData(*graphname, *num of points, *name of column to order by)
     """
     from .controller import getRecentData
     my_df = getRecentData(location, 48, 'timestamp')
     return Response(my_df)
 
+
+"""
+The classes below are all similar, with the following functions. 
+getgraph(x): Dictionary that maps parkade to the name of the table in my sql. 
+west(request)
+rose(request)
+fraser(request)
+health(request)
+north(request): returns a JSON response of data to the url request. 
+
+self / parent classes are not used because of how these functions are called in urls.py
+if self is used, an error occurs in urls.py as it then needs a request argument explicitly stated 
+"""
 class BuildingData():
     
     def getgraph(x):
@@ -173,14 +183,9 @@ class BuildingPredictedData:
 
 # Rest Framework - Ev data
 class EVData():
-    """
-        Class for EV data 
-    """
-    
+
     def getgraph(x):
-        """
-            Gets the graph 
-        """
+
         return { 
             'west': 'graphs_westev',
             'rose': 'graphs_roseev',
@@ -209,16 +214,11 @@ class EVData():
         mygraph = EVData.getgraph('north')
         return getJSONData(request, mygraph)
 
-# Rest Framework - Ev data
+# Rest Framework - Ev data future
 class EVPredictedData():
-    """
-        Class for EV data predicted
-    """
     
     def getgraph(x):
-        """
-            Gets the graph 
-        """
+
         return { 
             'west': 'graphs_westevfuture',
             'rose': 'graphs_roseevfuture',
@@ -249,14 +249,8 @@ class EVPredictedData():
 
 # Rest Framework - Charged Cars 
 class chargedCarsData():
-    """
-        Class for charged cars
-    """
     
     def getgraph(x):
-        """
-            Gets the graph 
-        """
         return { 
             'west': 'graphs_chargedcarswest',
             'rose': 'graphs_chargedcarsrose',
@@ -287,14 +281,8 @@ class chargedCarsData():
 
 # Rest Framework - Charged cars predicted 
 class chargedCarsPredictedData():
-    """
-        Class for charged cars predicted
-    """
     
     def getgraph(x):
-        """
-            Gets the graph 
-        """
         return { 
             'west': 'graphs_chargedcarswestfuture',
             'rose': 'graphs_chargedcarsrosefuture',
@@ -325,14 +313,8 @@ class chargedCarsPredictedData():
 
 # Rest Framework - Charging Cars
 class chargingCarsData():
-    """
-        Class for charging cars
-    """
     
     def getgraph(x):
-        """
-            Gets the graph 
-        """
         return { 
             'west': 'graphs_chargingcarswest',
             'rose': 'graphs_chargingcarsrose',
@@ -363,14 +345,8 @@ class chargingCarsData():
 
 # Rest Framework - Charging Cars predicted 
 class chargingCarsPredictedData():
-    """
-        Class for charging cars predicted
-    """
     
     def getgraph(x):
-        """
-            Gets the graph 
-        """
         return { 
             'west': 'graphs_chargingcarswestfuture',
             'rose': 'graphs_chargingcarsrosefuture',
