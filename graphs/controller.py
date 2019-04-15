@@ -10,7 +10,7 @@ class toMySQL():
     # Base directory of our project, used to get files 
     __base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    # Database variables
+    # Database variables (dependent on database)
     __user = 'root'
     __pwd = 'Cerc2019'
     __schema= 'basic'
@@ -32,9 +32,12 @@ class toMySQL():
 
     def createNewTable(self, pathtofile, tablename): 
         """
-        Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
-        :param str pathtofile: Path to file from our projects base directory \n
-        :param str tablename: Name of the table we wish to input data into. \n
+        Uses Pandas to read a csv file to a dataframe object and stores it into our database.
+
+        :param str pathtofile: Path to file from our projects base directory.
+
+        :param str tablename: Name of the table we wish to input data into.
+        
         IF tablename exists, it will fail
         """
         df = pd.read_csv(self.__base+pathtofile,parse_dates=['timestamp']) 
@@ -46,10 +49,14 @@ class toMySQL():
     
     def createSubTable(self, pathtofile, tablename, cols):
         """
-        Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
-        :param str pathtofile: Path to file from our projects base directory \n
-        :param str tablename: Name of the table we wish to input data into. \n
-        :param list cols: List of columns to specifically use ie. ['Timestamp', 'Power'] \n
+        Uses Pandas to read a csv file to a dataframe object and stores it into our database.
+        
+        :param str pathtofile: Path to file from our projects base directory 
+        
+        :param str tablename: Name of the table we wish to input data into. 
+        
+        :param list cols: List of columns to specifically use ie. ['Timestamp', 'Power'] 
+        
         IF tablename exists, it will fail
         """
         df = pd.read_csv(self.__base+pathtofile, usecols=cols, parse_dates=['timestamp']) 
@@ -62,10 +69,13 @@ class toMySQL():
 
     def updateTable(self, pathtofile, tablename):
         """
-        Updates a table in our database by appending the new data into the table \n
-        :param str pathtofile: Path to file from our projects base directory \n
-        :param str tablename: name of table to input data. \n
-        IF tablename exists, we will append the data to the bottom \
+        Updates a table in our database by appending the new data into the table
+        
+        :param str pathtofile: Path to file from our projects base directory 
+        
+        :param str tablename: name of table to input data. 
+        
+        IF tablename exists, we will append the data to the bottom.
         OTHERWISE it will create a new table 
         """
         df = pd.read_csv(self.__base+pathtofile, parse_dates=['timestamp'])
@@ -76,9 +86,12 @@ class toMySQL():
 
     def replaceTable(self, pathtofile, tablename): 
         """
-        Uses Pandas to read a csv file to a dataframe object and stores it into our database \n
-        :param str pathtofile: Path to file from our projects base directory \n
-        :param str tablename: Name of the table we wish to input data into. \n
+        Uses Pandas to read a csv file to a dataframe object and stores it into our database 
+        
+        :param str pathtofile: Path to file from our projects base directory 
+        
+        :param str tablename: Name of the table we wish to input data into. 
+        
         IF tablename exists, it will be replaced with the new data
         """
         df = pd.read_csv(self.__base+pathtofile, parse_dates=['timestamp'])
@@ -170,8 +183,10 @@ class toCloudSQL():
 
 def getBaseData(tablename):
     """
-    Reads the raw data and returns it \n
-    :param str tablename: Name of table to be opened in our basic db \n
+    Reads the raw data and returns it 
+
+    :param str tablename: Name of table to be opened in our basic db 
+    
     Returns the dataframe created by pandas of our table    
     """
     engine = create_engine(toCloudSQL.createConnection, echo=False)
@@ -181,17 +196,24 @@ def getBaseData(tablename):
 
 def getDateData(tablename, timecol, startdate, enddate):
     """
-    Reads raw data according to the date and returns it \n
-    :param str tablename: Name of table to be opened \n
-    :param str timecol: Name of the Date column \n
-    :param DateTime startdate: Start date we want to select data from \n
-    :param DateTime enddate: End date we want to select data from \n
+    Reads raw data according to the date and returns it 
+
+    :param str tablename: Name of table to be opened 
+    
+    :param str timecol: Name of the Date column 
+    
+    :param DateTime startdate: Start date we want to select data from 
+    
+    :param DateTime enddate: End date we want to select data from 
+    
     Returns a dataframe of our table 
     """
     newConn = toCloudSQL()
+    # newConn = toMySQL() 
     engine = create_engine(newConn.createConnection(), echo=False)
 
-    #sql query to select specific dates 
+    # sql query to select specific dates 
+    # This query works for both SQL and mySQL 
     my_query = "SELECT * FROM " + \
                 tablename + \
                 " WHERE " + timecol + " >= " + "'" + startdate + "'" + \
@@ -203,9 +225,13 @@ def getDateData(tablename, timecol, startdate, enddate):
 def getSingleDateData(tablename, timecol, dateval):
     """
     Reads and returns all the data for a single date 
-    :param str tablename: Name of table to be opened \n
-    :param str timecol: Name of Date column \n
-    :param Datetime dateval: Date to extract data from \n
+
+    :param str tablename: Name of table to be opened 
+
+    :param str timecol: Name of Date column 
+    
+    :param Datetime dateval: Date to extract data from
+    
     Returns a dataframe of our data 
     """
     
@@ -219,9 +245,13 @@ def getSingleDateData(tablename, timecol, dateval):
 def getCurrentPower(tablename, timecol, powercol):
     """
     Reads and returns the most recent power reading
-    :param str tablename: Name of table to be opened \n
-    :param str timecol: Name of time column \n
-    :param str powercol: Name of the power column \n
+
+    :param str tablename: Name of table to be opened 
+    
+    :param str timecol: Name of time column 
+    
+    :param str powercol: Name of the power column 
+    
     Returns a decimal power value 
     """
     df = getRecentData(tablename, 1, timecol)
@@ -232,8 +262,11 @@ def getCurrentPower(tablename, timecol, powercol):
 def getDailyPeak(tablename, timecol):
     """
     Reads and returns the peak power for yesterday
-    :param str tablename: Name of table to be opened \n
-    :param str timecol: Name of time column \n
+
+    :param str tablename: Name of table to be opened 
+    
+    :param str timecol: Name of time column 
+    
     Returns a decimal power value 
     """
     # Only need the most recent point since we will sample the data we need with another query 
@@ -276,8 +309,11 @@ def getDailyPeak(tablename, timecol):
 def getMonthlyPeak(tablename):
     """
     Reads and returns the peak power for the previous month
-    :param str tablename: Name of table to be opened \n
-    Assumes Timestamp is the name of our date column \n
+
+    :param str tablename: Name of table to be opened 
+    
+    Assumes Timestamp is the name of our date column 
+    
     Returns a decimal power value 
     """
      # Only need the most recent point since we will sample the data we need with another query 
@@ -315,19 +351,31 @@ def getMonthlyPeak(tablename):
 
 def getRecentData(tablename, num_req, col):
     """
-    Reads and returns the recent data \n
-    :param str tablename: Name of table to be opened \n
-    :param int num_req: Number of datapoints to be limited to \n
-    :param str col: Name of column in database to be ordered by \n
+    Reads and returns the recent data 
+    
+    :param str tablename: Name of table to be opened 
+    
+    :param int num_req: Number of datapoints to be limited to 
+    
+    :param str col: Name of column in database to be ordered by 
+    
     Returns a dataframe of our data
     """ 
     newConn = toCloudSQL()
     engine = create_engine(newConn.createConnection(), echo=False)
 
-    #sql query to select specific dates 
+    # sql query to select specific dates 
     my_query = "SELECT TOP " + str(num_req) + " * FROM " + \
                 tablename + \
                 " ORDER BY " + col + " DESC" 
+
+    ## mysql query to select specific dates (if we decide to use mysql)
+    # newConn = toMySQL()
+    # engine = create_engine(newConn.createConnection(), echo=False)
+    # my_query = "SELECT * FROM " + \
+    #             tablename + \
+    #             " ORDER BY " + col + " DESC" + \
+    #             " LIMIT " + str(num_req)
     
     df = pd.read_sql_query(sql = my_query, con=engine)
     return df

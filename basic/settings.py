@@ -94,6 +94,7 @@ DATABASES = {
         'HOST': 'cypowerserv.database.windows.net',
         'PORT': '',
 
+        # Change according to driver on your computer! 
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
         },

@@ -119,7 +119,7 @@ self / parent classes are not used because of how these functions are called in 
 if self is used, an error occurs in urls.py as it then needs a request argument explicitly stated 
 """
 class BuildingData():
-    
+     
     def getgraph(x):
         return { 
             'west': 'graphs_buildingwest',

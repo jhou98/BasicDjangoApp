@@ -1,6 +1,14 @@
 from django.urls import path
 from . import views
 
+"""
+URL patterns
+
+Modify these to link the requests via URL's to specific views in our backend (which would return a response of some kind)
+
+The name variable is used mostly in our html templates in order to provide links to the other pages.
+If you modify them, make sure to check and fix them in any other file where they are present (HTML files found in templates folder). 
+"""
 urlpatterns = [  
     path(r'west', views.graph.west, name='westev'),
     path(r'rose', views.graph.rose, name='roseev'),

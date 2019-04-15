@@ -257,14 +257,28 @@
 
         //call our chart function to create charts 
         //createChart creates our basic chart with predictions 
-        var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger Power Data', 'Timestamp', 'Power (kW)', 'EV')
+        /**
+         * @function createChart creates a chart for either building or ev along with predicted values. 
+         * 
+         * @param {Array} dates Array of dates for our chart. 
+         * @param {Array} pwr_vals Array of power for our chart.
+         * @param {Array} future_pwr Array of future values for our chart. 
+         * @param {Array} maxerr_pwr Array of max error for future values.
+         * @param {Array} minerr_pwr Array of min error for future values.
+         * @param {string} id HTML element id. 
+         * @param {string} lbl_title Title of the chart.
+         * @param {string} x_axis Title for x-axis of the chart.
+         * @param {string} y_axis Title for y-axis of the chart. 
+         * @param {string} _lbl Label for our main data series. 
+         **/
+        var evChart = createChart(evgraph_timestamp, evgraph_pwr, evpredicted_pwr, evpredicted_max, evpredicted_min, "myChartEV", 'EV Charger', 'Timestamp', 'Power (kW)', 'EV')
         var chargedcarChart = createChart(chargedgraph_timestamp, chargedgraph_val, chargedpredicted_val, chargedpredicted_max, chargedpredicted_min, "myChartCharged", 'Charged and Connected', 'Timestamp', 'Number of Vehicles', 'Vehicles')
-        var bdChart = createChart(bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min, "myChartBuilding", 'Building Power Data', 'Timestamp', 'Power (kW)', 'Building')
+        var bdChart = createChart(bdgraph_timestamp, bdgraph_pwr, bdpredicted_pwr, bdpredicted_max, bdpredicted_min, "myChartBuilding", 'Building', 'Timestamp', 'Power (kW)', 'Building')
         var chargingcarChart = createChart(charginggraph_timestamp, charginggraph_val, chargingpredicted_val, chargingpredicted_max, chargingpredicted_min, "myChartCharging", 'Charging and Connected', 'Timestamp', 'Number of Vehicles', 'Vehicles')
         //createBarChart creates our basic bar chart 
-        var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Current Energy Consumption", "Energy (kW)", "Location")
+        var barChart = createBarChart(["EV", "Building", "Total"], bar_power, 100, "myBarChart", "Current Power Consumption", "Power (kW)", "Location")
         //createComboChart creates our ev + building chart (assumes we have the same datetime values)
-        var testChart = createComboChart(ev_date, ev_power, bd_power, "myChartCombo", "Energy Consumption", "Timestamp", "Energy(kW)")
+        var testChart = createComboChart(ev_date, ev_power, bd_power, "myChartCombo", "Power Consumption", "Timestamp", "Power(kW)")
 
 
         //call our gauge function to create gauges
