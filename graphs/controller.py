@@ -37,7 +37,7 @@ class toMySQL():
         :param str pathtofile: Path to file from our projects base directory.
 
         :param str tablename: Name of the table we wish to input data into.
-        
+
         IF tablename exists, it will fail
         """
         df = pd.read_csv(self.__base+pathtofile,parse_dates=['timestamp']) 
@@ -180,19 +180,6 @@ class toCloudSQL():
 # The following functions can connect to either our Cloud or MySQL database, you will just need to adjust the settings in the create_engine whenever it appears. 
 #
 ## 
-
-def getBaseData(tablename):
-    """
-    Reads the raw data and returns it 
-
-    :param str tablename: Name of table to be opened in our basic db 
-    
-    Returns the dataframe created by pandas of our table    
-    """
-    engine = create_engine(toCloudSQL.createConnection, echo=False)
-
-    df = pd.read_sql_table(con=engine, table_name=tablename)
-    return df
 
 def getDateData(tablename, timecol, startdate, enddate):
     """
