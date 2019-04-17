@@ -149,6 +149,8 @@ function createChart(dates, pwr_vals, future_pwr, maxerr_pwr, minerr_pwr, id, _t
  * @param {string} title title of the chart.  
  * @param {string} x_axis label of x-axis.  
  * @param {string} y_axis label of y-axis. 
+ * 
+ * @returns {Chart} returns a chart object. 
  */
 function createComboChart(dates, ev_pwr, bd_pwr, id, title, x_axis, y_axis) {
 
